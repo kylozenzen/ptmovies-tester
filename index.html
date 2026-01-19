@@ -1649,7 +1649,7 @@ class PlotTwisted {
     
     loadSettings() {
         const saved = localStorage.getItem('plotTwistedSettings');
-        this.settings = saved ? JSON.parse(saved) : { sound: false, roastMode: 'clean' };
+        this.settings = this.safeJsonParse(saved, { sound: false, roastMode: 'clean' }, 'settings');
         if (!Object.prototype.hasOwnProperty.call(this.settings, 'sound')) {
             this.settings.sound = false;
         }
@@ -1665,6 +1665,17 @@ class PlotTwisted {
 
     saveSettings() {
         localStorage.setItem('plotTwistedSettings', JSON.stringify(this.settings));
+    }
+
+    safeJsonParse(raw, fallback, label) {
+        if (!raw) return fallback;
+        try {
+            const parsed = JSON.parse(raw);
+            return parsed ?? fallback;
+        } catch (err) {
+            console.warn(`⚠️ Invalid ${label} data in localStorage. Resetting to defaults.`, err);
+            return fallback;
+        }
     }
 
     cacheDOM() {
@@ -1716,13 +1727,20 @@ class PlotTwisted {
     }
 
     bindEvents() {
-        document.getElementById('playBtn').onclick = () => this.showCategoryScreen();
-        document.getElementById('howToPlayBtn').onclick = () => this.showScreen('howToPlay');
-        document.getElementById('howToBackBtn').onclick = () => this.showScreen('start');
-        document.getElementById('settingsBtn').onclick = () => this.showScreen('settings');
-        document.getElementById('settingsBackBtn').onclick = () => this.showScreen('start');
+        const onClick = (id, handler) => {
+            const el = document.getElementById(id);
+            if (el) el.onclick = handler;
+        };
+
+        onClick('playBtn', () => this.showCategoryScreen());
+        onClick('howToPlayBtn', () => this.showScreen('howToPlay'));
+        onClick('howToBackBtn', () => this.showScreen('start'));
+        onClick('settingsBtn', () => this.showScreen('settings'));
+        onClick('settingsBackBtn', () => this.showScreen('start'));
         
-        this.dom.soundToggle.onclick = () => this.toggleSound();
+        if (this.dom.soundToggle) {
+            this.dom.soundToggle.onclick = () => this.toggleSound();
+        }
         if (this.dom.roastModeSelect) {
             this.dom.roastModeSelect.addEventListener('change', (event) => {
                 this.handleRoastModeChange(event.target.value);
@@ -1732,19 +1750,27 @@ class PlotTwisted {
             this.dom.resetBtn.onclick = () => this.resetProgress();
         }
         
-        document.getElementById('categoryBackBtn').onclick = () => this.showScreen('start');
-        this.dom.startGameBtn.onclick = () => this.startGame();
+        onClick('categoryBackBtn', () => this.showScreen('start'));
+        if (this.dom.startGameBtn) {
+            this.dom.startGameBtn.onclick = () => this.startGame();
+        }
         
-        this.dom.revealBtn.onclick = () => this.revealLetter();
-        this.dom.giveUpBtn.onclick = () => this.giveUp();
-        this.dom.solveBtn.onclick = () => this.openSolveModal();
+        if (this.dom.revealBtn) {
+            this.dom.revealBtn.onclick = () => this.revealLetter();
+        }
+        if (this.dom.giveUpBtn) {
+            this.dom.giveUpBtn.onclick = () => this.giveUp();
+        }
+        if (this.dom.solveBtn) {
+            this.dom.solveBtn.onclick = () => this.openSolveModal();
+        }
         
-        document.getElementById('quitBtn').onclick = () => this.dom.quitModal.classList.add('active');
-        document.getElementById('cancelQuitBtn').onclick = () => this.dom.quitModal.classList.remove('active');
-        document.getElementById('confirmQuitBtn').onclick = () => this.confirmQuit();
+        onClick('quitBtn', () => this.dom.quitModal?.classList.add('active'));
+        onClick('cancelQuitBtn', () => this.dom.quitModal?.classList.remove('active'));
+        onClick('confirmQuitBtn', () => this.confirmQuit());
         
-        document.getElementById('cancelSolveBtn').onclick = () => this.closeSolveModal();
-        document.getElementById('submitSolveBtn').onclick = () => this.submitSolve();
+        onClick('cancelSolveBtn', () => this.closeSolveModal());
+        onClick('submitSolveBtn', () => this.submitSolve());
         if (this.dom.solveInput) {
             this.dom.solveInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -1754,9 +1780,9 @@ class PlotTwisted {
             });
         }
         
-        document.getElementById('playAgainBtn').onclick = () => this.playAgain();
-        document.getElementById('shareBtn').onclick = () => this.shareScore();
-        document.getElementById('menuBtn').onclick = () => this.showScreen('start');
+        onClick('playAgainBtn', () => this.playAgain());
+        onClick('shareBtn', () => this.shareScore());
+        onClick('menuBtn', () => this.showScreen('start'));
     }
     
     toggleSound() {
@@ -1852,7 +1878,13 @@ class PlotTwisted {
 
     startGame() {
         const category = this.state.selectedCategory;
-        const allClues = this.clueBank[category];
+        const allClues = this.clueBank?.[category];
+
+        if (!category || !allClues || allClues.length === 0) {
+            console.error('No clues available for selected category:', category);
+            alert('No clues available for that category yet. Please choose another.');
+            return;
+        }
         
         const seenTitles = this.state.seenClues[category] || [];
         
@@ -2075,7 +2107,9 @@ class PlotTwisted {
     openSolveModal() {
         this.dom.solveModal.classList.add('active');
         this.dom.solveInput.value = '';
-        setTimeout(() => this.dom.solveInput.focus(), 100);
+        requestAnimationFrame(() => {
+            this.dom.solveInput?.focus({ preventScroll: true });
+        });
     }
 
     closeSolveModal() {
@@ -2408,13 +2442,13 @@ Can you beat my score?`;
 
     loadStats() {
         const saved = localStorage.getItem('plotTwistedStats');
-        return saved ? JSON.parse(saved) : {
+        return this.safeJsonParse(saved, {
             totalSolved: 0,
             totalPlayed: 0,
             bestStreak: 0,
             currentStreak: 0,
             highScore: 0
-        };
+        }, 'stats');
     }
 
     saveStats() {
@@ -2423,7 +2457,7 @@ Can you beat my score?`;
 
     loadSeenClues() {
         const saved = localStorage.getItem('plotTwistedSeen');
-        this.state.seenClues = saved ? JSON.parse(saved) : {};
+        this.state.seenClues = this.safeJsonParse(saved, {}, 'seen clues');
     }
 
     saveSeenClues() {
