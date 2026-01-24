@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Plot Twisted</title>
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Plot Twisted">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <!-- Google Analytics - Replace G-XXXXXXXXXX with your Measurement ID -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
@@ -1532,6 +1548,104 @@ html, body {
 }
 
 .shake { animation: shake 0.4s ease; }
+
+/* ============================================
+   PWA INSTALL PROMPT
+   ============================================ */
+
+.install-prompt {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--gold-dark);
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    z-index: 200;
+    touch-action: pan-y;
+}
+
+.install-prompt.visible {
+    transform: translateY(0);
+}
+
+.install-prompt.dragging {
+    transition: none;
+}
+
+.install-prompt-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--text-muted);
+    border-radius: 2px;
+    margin: 0 auto 15px;
+}
+
+.install-prompt-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-elevated);
+    border: none;
+    border-radius: 50%;
+    color: var(--cream-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.install-prompt-content {
+    text-align: center;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.install-prompt-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.install-prompt-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--cream);
+    margin-bottom: 8px;
+}
+
+.install-prompt-text {
+    font-size: 0.9rem;
+    color: var(--cream-muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.install-prompt-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.install-prompt-actions .btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.btn-install-dismiss {
+    background: var(--bg-elevated);
+    color: var(--cream-muted);
+}
+
+.btn-install-action {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    color: var(--bg-deep);
+}
     </style>
 </head>
 <body>
@@ -1791,7 +1905,136 @@ html, body {
         </div>
     </div>
 
+    <!-- PWA INSTALL PROMPT -->
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-prompt-handle"></div>
+        <button class="install-prompt-close" id="installPromptClose">×</button>
+        <div class="install-prompt-content">
+            <div class="install-prompt-icon">🎬</div>
+            <div class="install-prompt-title">Add to Home Screen</div>
+            <div class="install-prompt-text" id="installPromptText">
+                Install Plot Twisted for quick access and offline play!
+            </div>
+            <div class="install-prompt-actions">
+                <button class="btn btn-install-dismiss" id="installDismissBtn">Not Now</button>
+                <button class="btn btn-install-action" id="installActionBtn">Install</button>
+            </div>
+        </div>
+    </div>
+
 <script>
+// ============================================
+// PWA INSTALL PROMPT MANAGER
+// ============================================
+
+class InstallPromptManager {
+    constructor() {
+        this.deferredPrompt = null;
+        this.installPrompt = document.getElementById('installPrompt');
+        this.installPromptText = document.getElementById('installPromptText');
+        this.installActionBtn = document.getElementById('installActionBtn');
+        this.installDismissBtn = document.getElementById('installDismissBtn');
+        this.installPromptClose = document.getElementById('installPromptClose');
+        
+        this.startY = 0;
+        this.currentY = 0;
+        this.isDragging = false;
+        
+        this.init();
+    }
+    
+    init() {
+        if (this.isStandalone() || this.wasDismissedRecently()) return;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            this.deferredPrompt = e;
+            this.showPrompt('android');
+        });
+        
+        if (this.isIOS() && !this.isStandalone()) {
+            setTimeout(() => this.showPrompt('ios'), 3000);
+        }
+        
+        this.installDismissBtn?.addEventListener('click', () => this.dismiss());
+        this.installPromptClose?.addEventListener('click', () => this.dismiss());
+        this.installActionBtn?.addEventListener('click', () => this.install());
+        
+        this.installPrompt?.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: true });
+        this.installPrompt?.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: true });
+        this.installPrompt?.addEventListener('touchend', () => this.onTouchEnd());
+    }
+    
+    isIOS() {
+        return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    }
+    
+    isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+    
+    wasDismissedRecently() {
+        const dismissed = localStorage.getItem('installPromptDismissed');
+        if (!dismissed) return false;
+        const hoursSince = (Date.now() - parseInt(dismissed, 10)) / (1000 * 60 * 60);
+        return hoursSince < 24;
+    }
+    
+    showPrompt(platform) {
+        if (platform === 'ios') {
+            this.installPromptText.innerHTML = 'Tap <strong>Share</strong> then <strong>"Add to Home Screen"</strong> for quick access!';
+            this.installActionBtn.textContent = 'Got It';
+            this.installActionBtn.onclick = () => this.dismiss();
+        } else {
+            this.installPromptText.textContent = 'Install Plot Twisted for quick access and offline play!';
+            this.installActionBtn.textContent = 'Install';
+        }
+        
+        setTimeout(() => this.installPrompt?.classList.add('visible'), 2000);
+    }
+    
+    async install() {
+        if (this.deferredPrompt) {
+            this.deferredPrompt.prompt();
+            await this.deferredPrompt.userChoice;
+            this.deferredPrompt = null;
+        }
+        this.dismiss();
+    }
+    
+    dismiss() {
+        this.installPrompt?.classList.remove('visible');
+        localStorage.setItem('installPromptDismissed', Date.now().toString());
+    }
+    
+    onTouchStart(e) {
+        this.startY = e.touches[0].clientY;
+        this.isDragging = true;
+        this.installPrompt?.classList.add('dragging');
+    }
+    
+    onTouchMove(e) {
+        if (!this.isDragging) return;
+        this.currentY = e.touches[0].clientY;
+        const deltaY = this.currentY - this.startY;
+        if (deltaY > 0) this.installPrompt.style.transform = `translateY(${deltaY}px)`;
+    }
+    
+    onTouchEnd() {
+        this.isDragging = false;
+        this.installPrompt?.classList.remove('dragging');
+        if (this.currentY - this.startY > 80) this.dismiss();
+        else this.installPrompt.style.transform = '';
+    }
+}
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+}
+
 // ============================================
 // SVG ICONS FOR CATEGORIES
 // ============================================
@@ -1947,6 +2190,9 @@ class PlotTwisted {
         this.loadSeenClues();
         
         await this.loadClueDatabase();
+
+        // Initialize PWA install prompt
+        new InstallPromptManager();
         
         this.loadDailyQuote();
         this.checkDailyStatus();
