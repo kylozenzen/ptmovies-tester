@@ -6,11 +6,11 @@
     <title>Plot Twisted</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
 /* ============================================
-   PLOT TWISTED V2 - RETRO CINEMA AESTHETIC
+   PLOT TWISTED - RETRO CINEMA AESTHETIC
    ============================================ */
 
 :root {
@@ -27,6 +27,9 @@
     --red-primary: #c41e3a;
     --red-light: #e63950;
     --red-glow: rgba(196, 30, 58, 0.5);
+    
+    --green-correct: #4a9d5b;
+    --green-glow: rgba(74, 157, 91, 0.5);
     
     --cream: #f5f0e6;
     --cream-muted: #c9c4b8;
@@ -82,49 +85,63 @@ html, body {
    ============================================ */
 
 #startScreen {
-    background: 
-        radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(196, 30, 58, 0.1) 0%, transparent 40%),
-        var(--bg-deep);
+    background: var(--bg-deep);
     justify-content: center;
     align-items: center;
     padding: 20px;
+    position: relative;
+    overflow: hidden;
 }
 
-.marquee-frame {
+/* Spotlight Effect */
+.spotlight {
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140%;
+    height: 70%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.15) 0%, rgba(212, 168, 83, 0.05) 30%, transparent 60%);
+    pointer-events: none;
+}
+
+.spotlight-secondary {
+    position: absolute;
+    bottom: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 50%;
+    background: radial-gradient(ellipse at 50% 100%, rgba(196, 30, 58, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Title Spotlight - soft glow behind PLOT */
+.title-spotlight {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -40%);
+    width: 280px;
+    height: 160px;
+    background: radial-gradient(ellipse at 50% 50%, rgba(212, 168, 83, 0.3) 0%, rgba(212, 168, 83, 0.1) 40%, transparent 70%);
+    pointer-events: none;
+    filter: blur(25px);
+    z-index: -1;
+}
+
+.home-content {
     position: relative;
-    padding: 40px 30px;
+    z-index: 1;
     max-width: 400px;
     width: 100%;
-}
-
-.marquee-frame::before,
-.marquee-frame::after {
-    content: '';
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    border: 3px solid var(--gold-primary);
-    opacity: 0.6;
-}
-
-.marquee-frame::before {
-    top: 0;
-    left: 0;
-    border-right: none;
-    border-bottom: none;
-}
-
-.marquee-frame::after {
-    bottom: 0;
-    right: 0;
-    border-left: none;
-    border-top: none;
+    padding: 20px;
 }
 
 .main-title {
     text-align: center;
     margin-bottom: 15px;
+    position: relative;
 }
 
 .title-plot {
@@ -137,7 +154,7 @@ html, body {
     text-shadow: 
         0 2px 0 var(--gold-dark),
         0 4px 0 rgba(0,0,0,0.3),
-        0 0 40px var(--gold-glow);
+        0 0 60px var(--gold-glow);
 }
 
 .title-twisted {
@@ -188,6 +205,7 @@ html, body {
     transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn:disabled {
@@ -195,7 +213,7 @@ html, body {
     cursor: not-allowed;
 }
 
-.btn-play {
+.btn-primary {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -207,17 +225,33 @@ html, body {
     color: var(--bg-deep);
     border-radius: 4px;
     box-shadow: 0 4px 15px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.2);
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
-.btn-play:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.2);
+@media (hover: hover) {
+    .btn-primary:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
 }
 
-.btn-play:active { transform: translateY(0); }
+.btn-primary:active { transform: translateY(0); }
 
-.btn-play svg { width: 22px; height: 22px; }
+.btn-primary svg { width: 22px; height: 22px; }
+
+.btn-daily {
+    background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated));
+    border: 2px solid var(--gold-dark);
+    color: var(--gold-light);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+@media (hover: hover) {
+    .btn-daily:hover:not(:disabled) {
+        border-color: var(--gold-primary);
+        box-shadow: 0 6px 20px var(--gold-glow);
+    }
+}
 
 .btn-secondary {
     width: 100%;
@@ -229,14 +263,17 @@ html, body {
     border-radius: 4px;
 }
 
-.btn-secondary:hover {
-    border-color: var(--cream-muted);
-    color: var(--cream);
+@media (hover: hover) {
+    .btn-secondary:hover {
+        border-color: var(--cream-muted);
+        color: var(--cream);
+    }
 }
 
 .menu-row {
     display: flex;
     gap: 12px;
+    margin-top: 12px;
 }
 
 .btn-half {
@@ -261,44 +298,32 @@ html, body {
     color: var(--cream);
 }
 
-/* Stats Bar */
-.stats-bar {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
+/* Daily Quote - Premium Styling */
+.daily-quote-container {
     margin-top: 50px;
     padding-top: 30px;
     border-top: 1px solid rgba(212, 168, 83, 0.2);
-}
-
-.stat-item { text-align: center; }
-
-.stat-value {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    color: var(--gold-light);
-}
-
-.stat-label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
-.home-quote-rotator {
-    width: 100%;
-}
-
-#homeQuoteText,
-#homeQuoteSource {
     text-align: center;
 }
 
-#homeQuoteSource {
-    opacity: 0.8;
-    font-size: 0.9em;
-    margin-top: 4px;
+.daily-quote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.15rem;
+    color: rgba(212, 168, 83, 0.9);
+    line-height: 1.7;
+    letter-spacing: 0.03em;
+    margin-bottom: 12px;
+}
+
+.daily-quote-source {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--cream-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
 }
 
 /* ============================================
@@ -345,11 +370,18 @@ html, body {
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.category-card:hover {
-    border-color: var(--gold-dark);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .category-card:hover {
+        border-color: var(--gold-dark);
+        transform: translateY(-2px);
+    }
+}
+
+.category-card:active {
+    transform: scale(0.98);
 }
 
 .category-card.selected {
@@ -357,9 +389,17 @@ html, body {
     box-shadow: 0 0 20px var(--gold-glow);
 }
 
-.category-emoji {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+.category-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    color: var(--gold-primary);
+}
+
+.category-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
 }
 
 .category-name {
@@ -373,6 +413,7 @@ html, body {
 .category-count {
     font-size: 0.75rem;
     color: var(--text-muted);
+    display: none;
 }
 
 .category-actions {
@@ -481,9 +522,8 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 25px 20px;
-    gap: 20px;
+    padding: 20px 15px;
+    gap: 15px;
     overflow-y: auto;
 }
 
@@ -516,7 +556,7 @@ html, body {
     background: var(--bg-card);
     border: 1px solid rgba(212, 168, 83, 0.3);
     border-radius: 8px;
-    padding: 30px 25px;
+    padding: 25px 20px;
     position: relative;
     box-shadow: var(--shadow-deep);
 }
@@ -537,8 +577,8 @@ html, body {
 
 .clue-text {
     font-family: var(--font-typewriter);
-    font-size: 1.3rem;
-    line-height: 1.7;
+    font-size: 1.15rem;
+    line-height: 1.6;
     text-align: center;
     color: var(--cream);
 }
@@ -548,8 +588,8 @@ html, body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 20px;
-    padding-top: 15px;
+    margin-top: 15px;
+    padding-top: 12px;
     border-top: 1px solid rgba(212, 168, 83, 0.15);
     font-size: 0.8rem;
     color: var(--text-muted);
@@ -563,7 +603,7 @@ html, body {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 12px 25px;
+    padding: 10px 20px;
     background: var(--bg-card);
     border: 1px solid rgba(212, 168, 83, 0.3);
     border-radius: 50px;
@@ -578,11 +618,17 @@ html, body {
 
 .pot-value {
     font-family: var(--font-display);
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     color: var(--gold-light);
     text-shadow: 0 0 15px var(--gold-glow);
-    min-width: 60px;
+    min-width: 50px;
     text-align: center;
+}
+
+.pot-multiplier {
+    font-size: 0.75rem;
+    color: var(--green-correct);
+    font-weight: 600;
 }
 
 .pot-value.dropping {
@@ -598,14 +644,15 @@ html, body {
 .title-reveal {
     width: 100%;
     max-width: 500px;
-    min-height: 70px;
+    min-height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 15px;
     background: var(--bg-dark);
-    border: 2px solid var(--bg-elevated);
+    border: 1px solid var(--gold-dark);
     border-radius: 8px;
+    box-shadow: 0 0 20px rgba(212, 168, 83, 0.1);
 }
 
 .title-letters {
@@ -614,7 +661,7 @@ html, body {
     justify-content: center;
     gap: 4px;
     font-family: var(--font-title);
-    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-size: clamp(1.3rem, 5vw, 1.8rem);
     letter-spacing: 0.05em;
 }
 
@@ -640,40 +687,111 @@ html, body {
     100% { transform: scale(1) rotateX(0); opacity: 1; }
 }
 
+/* On-Screen Keyboard */
+.keyboard {
+    width: 100%;
+    max-width: 540px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--gold-dark);
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(212, 168, 83, 0.1);
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.key {
+    flex: 1;
+    max-width: 42px;
+    min-width: 32px;
+    height: 46px;
+    padding: 0;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    background: var(--bg-dark);
+    color: var(--gold-light);
+    border: 1px solid var(--gold-dark);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Only apply hover on devices that support it */
+@media (hover: hover) {
+    .key:hover:not(:disabled) {
+        border-color: var(--gold-primary);
+        background: var(--bg-elevated);
+        transform: translateY(-2px);
+    }
+}
+
+.key:active:not(:disabled) {
+    transform: translateY(0);
+    background: var(--bg-elevated);
+}
+
+.key:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.key.correct {
+    background: var(--gold-primary);
+    border-color: var(--gold-primary);
+    color: var(--bg-deep);
+    box-shadow: 0 0 10px var(--gold-glow);
+}
+
+.key.incorrect {
+    background: var(--bg-elevated);
+    border-color: var(--text-muted);
+    opacity: 0.4;
+    color: var(--cream-muted);
+}
+
 /* Action Buttons */
 .action-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     width: 100%;
     max-width: 500px;
 }
 
-.btn-reveal, .btn-giveup {
+.btn-giveup {
     flex: 1;
-    padding: 16px 20px;
-    font-size: 0.9rem;
+    padding: 14px 16px;
+    font-size: 0.85rem;
     background: var(--bg-elevated);
     color: var(--cream);
     border-radius: 6px;
     border: 1px solid var(--text-muted);
 }
 
-.btn-reveal:hover:not(:disabled),
 .btn-giveup:hover:not(:disabled) {
     background: var(--bg-card);
     border-color: var(--cream-muted);
 }
 
-.btn-reveal:disabled,
 .btn-giveup:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
 .btn-solve {
-    flex: 1.5;
-    padding: 16px 24px;
-    font-size: 0.95rem;
+    flex: 2;
+    padding: 14px 20px;
+    font-size: 0.9rem;
     background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
     color: var(--bg-deep);
     border-radius: 6px;
@@ -691,6 +809,224 @@ html, body {
     opacity: 0.4;
     cursor: not-allowed;
     transform: none;
+}
+
+/* ============================================
+   DAILY CHALLENGE SCREEN
+   ============================================ */
+
+#dailyScreen {
+    background: var(--bg-deep);
+}
+
+.daily-header {
+    text-align: center;
+    padding: 20px;
+    background: var(--bg-dark);
+    border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+}
+
+.daily-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--gold-light);
+    margin-bottom: 5px;
+}
+
+.daily-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.daily-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 20px;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.daily-clue-card {
+    width: 100%;
+    max-width: 500px;
+    background: var(--bg-card);
+    border: 1px solid rgba(212, 168, 83, 0.3);
+    border-radius: 8px;
+    padding: 30px 25px;
+    position: relative;
+    box-shadow: var(--shadow-deep);
+}
+
+.daily-clue-card::before {
+    content: attr(data-question);
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-title);
+    font-size: 0.75rem;
+    color: var(--gold-primary);
+    background: var(--bg-deep);
+    padding: 4px 16px;
+    letter-spacing: 0.2em;
+}
+
+.daily-input-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.daily-input {
+    width: 100%;
+    padding: 16px;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--gold-dark);
+    border-radius: 8px;
+    color: var(--gold-light);
+    text-align: center;
+    box-shadow: 0 0 15px rgba(212, 168, 83, 0.1);
+}
+
+.daily-input:focus {
+    outline: none;
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 20px rgba(212, 168, 83, 0.2);
+}
+
+.daily-input::placeholder { color: var(--text-muted); }
+
+.daily-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.daily-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.daily-actions .btn {
+    flex: 1;
+    padding: 16px 24px;
+    border-radius: 6px;
+}
+
+.btn-skip {
+    background: var(--bg-elevated);
+    color: var(--cream-muted);
+}
+
+.btn-submit-daily {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    color: var(--bg-deep);
+}
+
+/* Daily Results */
+#dailyResultsScreen {
+    background: 
+        radial-gradient(ellipse at 50% 30%, rgba(212, 168, 83, 0.1) 0%, transparent 50%),
+        var(--bg-deep);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.daily-results-card {
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.daily-results-title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+}
+
+.daily-results-date {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.daily-score-display {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.daily-star {
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.daily-star.earned {
+    color: var(--gold-light);
+    text-shadow: 0 0 15px var(--gold-glow);
+}
+
+.daily-star.empty {
+    color: var(--text-muted);
+    opacity: 0.3;
+}
+
+.daily-score-text {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    color: var(--cream);
+    letter-spacing: 0.1em;
+    margin-bottom: 30px;
+}
+
+.daily-breakdown {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(212, 168, 83, 0.2);
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.daily-breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
+    border-bottom: 1px solid var(--bg-elevated);
+    font-size: 0.85rem;
+}
+
+.daily-breakdown-row:last-child { border-bottom: none; }
+
+.daily-breakdown-result {
+    font-size: 1.2rem;
+}
+
+.daily-results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.daily-results-actions .btn {
+    width: 100%;
+    padding: 16px 24px;
+    border-radius: 6px;
+}
+
+.daily-next-puzzle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 20px;
 }
 
 /* ============================================
@@ -712,12 +1048,13 @@ html, body {
 
 .solve-modal {
     background: var(--bg-card);
-    border: 1px solid rgba(212, 168, 83, 0.3);
+    border: 1px solid var(--gold-dark);
     border-radius: 12px;
     padding: 30px;
     width: 100%;
     max-width: 400px;
     text-align: center;
+    box-shadow: 0 0 30px rgba(212, 168, 83, 0.15);
 }
 
 .solve-modal h3 {
@@ -733,16 +1070,23 @@ html, body {
     font-family: var(--font-body);
     font-size: 1.1rem;
     background: var(--bg-dark);
-    border: 2px solid var(--bg-elevated);
+    border: 1px solid var(--gold-dark);
     border-radius: 8px;
-    color: var(--cream);
+    color: var(--gold-light);
     text-align: center;
     margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(212, 168, 83, 0.1);
 }
 
 .solve-input:focus {
     outline: none;
     border-color: var(--gold-primary);
+    box-shadow: 0 0 20px rgba(212, 168, 83, 0.2);
+}
+
+.solve-input::placeholder {
+    color: var(--text-muted);
+}
 }
 
 .solve-input::placeholder { color: var(--text-muted); }
@@ -802,7 +1146,7 @@ html, body {
 
 .result-title {
     font-family: var(--font-display);
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-bottom: 10px;
 }
 
@@ -815,14 +1159,14 @@ html, body {
 
 .result-movie {
     font-family: var(--font-title);
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: var(--cream);
     letter-spacing: 0.1em;
     margin-bottom: 10px;
 }
 
 .result-points {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: var(--gold-primary);
     margin-bottom: 30px;
 }
@@ -1101,6 +1445,17 @@ html, body {
     transform: translateX(22px);
 }
 
+#roastModeSelect {
+    padding: 8px 12px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    background: var(--bg-elevated);
+    color: var(--cream);
+    border: 1px solid var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
 .btn-reset {
     padding: 10px 20px;
     font-size: 0.85rem;
@@ -1178,22 +1533,6 @@ html, body {
 
 .shake { animation: shake 0.4s ease; }
     </style>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
-  window.dataLayer=window.dataLayer||[];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config','G-XXXXXXXXXX');
-</script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
-}
-</script>
-
 </head>
 <body>
     <div class="film-grain"></div>
@@ -1206,8 +1545,11 @@ if('serviceWorker' in navigator){
 
     <!-- START SCREEN -->
     <div id="startScreen" class="screen active">
-        <div class="marquee-frame">
+        <div class="spotlight"></div>
+        <div class="spotlight-secondary"></div>
+        <div class="home-content">
             <div class="main-title">
+                <div class="title-spotlight"></div>
                 <div class="title-plot">PLOT</div>
                 <div class="title-twisted">TWISTED</div>
             </div>
@@ -1217,31 +1559,21 @@ if('serviceWorker' in navigator){
                 <span class="divider-star">★</span>
                 <span class="divider-line"></span>
             </div>
-            <button class="btn btn-play" id="playBtn" disabled>
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                Start Playing
+            <button class="btn btn-primary" id="quickPlayBtn" disabled>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M8 5v14l11-7z"/></svg>
+                Quick Play
+            </button>
+            <button class="btn btn-primary btn-daily" id="dailyBtn" disabled>
+                <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                Daily Challenge
             </button>
             <div class="menu-row">
                 <button class="btn btn-secondary btn-half" id="howToPlayBtn">How to Play</button>
                 <button class="btn btn-secondary btn-half" id="settingsBtn">Settings</button>
             </div>
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-value" id="statSolved">0</div>
-                    <div class="stat-label">Solved</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="statAccuracy">0%</div>
-                    <div class="stat-label">Accuracy</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="statStreak">0</div>
-                    <div class="stat-label">Best Streak</div>
-                </div>
-                <div id="homeQuoteRotator" class="home-quote-rotator">
-                    <div id="homeQuoteText"></div>
-                    <div id="homeQuoteSource"></div>
-                </div>
+            <div class="daily-quote-container">
+                <div class="daily-quote" id="dailyQuote"></div>
+                <div class="daily-quote-source" id="dailyQuoteSource"></div>
             </div>
         </div>
     </div>
@@ -1268,19 +1600,19 @@ if('serviceWorker' in navigator){
         <div class="how-to-content">
             <div class="how-to-section">
                 <h3>🎬 The Goal</h3>
-                <p>Read the twisted (but technically accurate) plot summary and guess the movie title. The faster you solve it, the more points you earn!</p>
+                <p>Read the twisted (but technically accurate) plot summary and guess the movie title. Use the keyboard to guess letters, or go for the full solve!</p>
             </div>
             <div class="how-to-section">
                 <h3>💰 Scoring</h3>
-                <p>Each movie starts at 500 points. Every letter you reveal costs 50 points. Solve early for maximum score, or reveal letters if you're stuck.</p>
+                <p>Each movie starts at 500 points. Wrong consonant guesses cost 30 points (vowels are free!). Solve early with more letters hidden for bonus multipliers (1.5x or 1.25x)!</p>
             </div>
             <div class="how-to-section">
                 <h3>❌ Strikes</h3>
-                <p>You have 3 strikes for the entire game. Wrong guesses cost a strike. Run out and it's game over!</p>
+                <p>You have 3 strikes for the entire game. Wrong full solve attempts cost a strike. Run out and it's game over!</p>
             </div>
             <div class="how-to-section">
-                <h3>🏳️ Give Up</h3>
-                <p>Completely stumped? Hit "Give Up" to see the answer and move on with zero points for that round.</p>
+                <h3>📅 Daily Challenge</h3>
+                <p>Same 5 movies for everyone, one guess per movie, no hints. Compare your score with friends!</p>
             </div>
         </div>
     </div>
@@ -1330,7 +1662,7 @@ if('serviceWorker' in navigator){
         </div>
     </div>
 
-    <!-- GAME SCREEN -->
+    <!-- GAME SCREEN (Quick Play) -->
     <div id="gameScreen" class="screen">
         <div class="game-header">
             <div class="game-logo">Plot Twisted</div>
@@ -1359,15 +1691,53 @@ if('serviceWorker' in navigator){
             <div class="points-pot">
                 <span class="pot-label">Worth</span>
                 <span class="pot-value" id="potValue">500</span>
+                <span class="pot-multiplier" id="potMultiplier"></span>
             </div>
             <div class="title-reveal" id="titleReveal">
                 <div class="title-letters" id="titleLetters"></div>
             </div>
+            <div class="keyboard" id="keyboard"></div>
             <div class="action-buttons">
-                <button class="btn btn-reveal" id="revealBtn">Reveal Letter</button>
                 <button class="btn btn-giveup" id="giveUpBtn">Give Up</button>
                 <button class="btn btn-solve" id="solveBtn">I Know It!</button>
             </div>
+        </div>
+    </div>
+
+    <!-- DAILY CHALLENGE SCREEN -->
+    <div id="dailyScreen" class="screen">
+        <div class="daily-header">
+            <h2>Daily Challenge</h2>
+            <div class="daily-date" id="dailyDateDisplay"></div>
+        </div>
+        <div class="daily-content">
+            <div class="progress-track" id="dailyProgressTrack"></div>
+            <div class="daily-clue-card" id="dailyClueCard" data-question="MOVIE 1 OF 5">
+                <div class="clue-text" id="dailyClueText"></div>
+            </div>
+            <div class="daily-input-container">
+                <input type="text" class="daily-input" id="dailyInput" placeholder="Type your guess..." autocomplete="off" autocapitalize="off">
+            </div>
+            <div class="daily-actions">
+                <button class="btn btn-skip" id="dailySkipBtn">Skip</button>
+                <button class="btn btn-submit-daily" id="dailySubmitBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DAILY RESULTS SCREEN -->
+    <div id="dailyResultsScreen" class="screen">
+        <div class="daily-results-card">
+            <div class="daily-results-title">Daily Challenge Complete!</div>
+            <div class="daily-results-date" id="dailyResultsDate"></div>
+            <div class="daily-score-display" id="dailyScoreDisplay"></div>
+            <div class="daily-score-text" id="dailyScoreText">3/5 Correct • 300 pts</div>
+            <div class="daily-breakdown" id="dailyBreakdown"></div>
+            <div class="daily-results-actions">
+                <button class="btn btn-share" id="dailyShareBtn">Share Results</button>
+                <button class="btn btn-menu" id="dailyMenuBtn">Main Menu</button>
+            </div>
+            <div class="daily-next-puzzle" id="dailyNextPuzzle">Next puzzle in 12:34:56</div>
         </div>
     </div>
 
@@ -1423,44 +1793,31 @@ if('serviceWorker' in navigator){
 
 <script>
 // ============================================
-// CATEGORY METADATA (emojis only - clues load from JSON)
+// SVG ICONS FOR CATEGORIES
 // ============================================
 
-const CATEGORY_META = {
-    "Family": { emoji: "🎈" },
-    "Sci-Fi": { emoji: "🧠" },
-    "Fantasy": { emoji: "💫" },
-    "Superhero": { emoji: "🦸" },
-    "Emotional Damage": { emoji: "💔" },
-    "Streaming Hits": { emoji: "📺" }
+const CATEGORY_ICONS = {
+    "Family": `<svg viewBox="0 0 48 48" fill="currentColor"><path d="M24 4C12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20S35.05 4 24 4zm-2 30l-8-8 2.83-2.83L22 28.34l13.17-13.17L38 18 22 34z" opacity="0"/><path d="M35 16c0-2.76-2.24-5-5-5s-5 2.24-5 5c0 1.86 1.03 3.47 2.54 4.33L24 28l-3.54-7.67C21.97 19.47 23 17.86 23 16c0-2.76-2.24-5-5-5s-5 2.24-5 5c0 1.86 1.03 3.47 2.54 4.33L8 38h32L32.46 20.33C33.97 19.47 35 17.86 35 16zM18 14c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm6 20l3-8 3 8H24zm6-18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>`,
+    "Sci-Fi": `<svg viewBox="0 0 48 48" fill="currentColor"><path d="M24 2L4 14v20l20 12 20-12V14L24 2zm0 4.5l14 8.4v15.2l-14 8.4-14-8.4V14.9l14-8.4zM24 16c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>`,
+    "Fantasy": `<svg viewBox="0 0 48 48" fill="currentColor"><path d="M24 4l-6 18h-14l11.5 8.5-4.5 13.5 13-9.5 13 9.5-4.5-13.5L44 22H30L24 4z"/></svg>`,
+    "Superhero": `<svg viewBox="0 0 48 48" fill="currentColor"><path d="M24 4C12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20S35.05 4 24 4zm0 6c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 28c-5.52 0-10.29-3.23-12.54-7.9.06-4.15 8.36-6.43 12.54-6.43s12.48 2.28 12.54 6.43C33.29 34.77 29.52 38 24 38z"/><path d="M15 20l-3 4 6 2-3-6zm18 0l-3 6 6-2-3-4z"/></svg>`,
+    "Emotional Damage": `<svg viewBox="0 0 48 48" fill="currentColor"><path d="M24 44l-2.5-2.27C10.3 31.52 4 25.79 4 18.5 4 12.42 8.42 8 14.5 8c3.43 0 6.73 1.6 8.86 4.11L24 12.8l.64-.69C26.77 9.6 30.07 8 33.5 8 39.58 8 44 12.42 44 18.5c0 7.29-6.3 13.02-17.5 23.23L24 44z"/><path d="M19 22l5 5 5-5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+    "Streaming Hits": `<svg viewBox="0 0 48 48" fill="currentColor"><rect x="6" y="10" width="36" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><path d="M20 18v8l7-4-7-4z"/><line x1="16" y1="38" x2="32" y2="38" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`
 };
 
-const HOME_QUOTES = [
-    { quote: "May the Force be with you.", source: "Star Wars" },
-    { quote: "I’m gonna make him an offer he can’t refuse.", source: "The Godfather" },
-    { quote: "Here’s looking at you, kid.", source: "Casablanca" },
-    { quote: "Why so serious?", source: "The Dark Knight" },
-    { quote: "You can’t handle the truth!", source: "A Few Good Men" },
-    { quote: "I’ll be back.", source: "The Terminator" },
-    { quote: "To infinity and beyond!", source: "Toy Story" },
-    { quote: "My precious.", source: "The Lord of the Rings" },
-    { quote: "Life finds a way.", source: "Jurassic Park" },
-    { quote: "I see dead people.", source: "The Sixth Sense" },
-    { quote: "Just keep swimming.", source: "Finding Nemo" },
-    { quote: "You’re gonna need a bigger boat.", source: "Jaws" },
-    { quote: "Roads? Where we’re going we don’t need roads.", source: "Back to the Future" },
-    { quote: "I am your father.", source: "Star Wars: The Empire Strikes Back" },
-    { quote: "I volunteer as tribute!", source: "The Hunger Games" },
-    { quote: "Wakanda forever!", source: "Black Panther" },
-    { quote: "With great power comes great responsibility.", source: "Spider-Man" },
-    { quote: "Hakuna Matata.", source: "The Lion King" },
-    { quote: "I’m the king of the world!", source: "Titanic" },
-    { quote: "Keep your friends close, but your enemies closer.", source: "The Godfather Part II" },
-    { quote: "Houston, we have a problem.", source: "Apollo 13" },
-    { quote: "You had me at hello.", source: "Jerry Maguire" },
-    { quote: "There’s no place like home.", source: "The Wizard of Oz" },
-    { quote: "I drink your milkshake!", source: "There Will Be Blood" },
-    { quote: "Show me the money!", source: "Jerry Maguire" }
+const DAILY_QUOTES = [
+    { quote: "Every great film should seem new every time you see it.", source: "Roger Ebert" },
+    { quote: "Cinema is a matter of what's in the frame and what's out.", source: "Martin Scorsese" },
+    { quote: "A film is never really good unless the camera is an eye in the head of a poet.", source: "Orson Welles" },
+    { quote: "Movies are like an expensive form of therapy for me.", source: "Tim Burton" },
+    { quote: "The cinema is truth twenty-four times per second.", source: "Jean-Luc Godard" },
+    { quote: "Film lovers are sick people.", source: "François Truffaut" },
+    { quote: "I don't dream at night, I dream all day; I dream for a living.", source: "Steven Spielberg" },
+    { quote: "Cinema is the most beautiful fraud in the world.", source: "Jean-Luc Godard" },
+    { quote: "A story should have a beginning, a middle and an end, but not necessarily in that order.", source: "Jean-Luc Godard" },
+    { quote: "Every single movie is a miracle.", source: "Guillermo del Toro" },
+    { quote: "The length of a film should be directly related to the endurance of the human bladder.", source: "Alfred Hitchcock" },
+    { quote: "If it can be written, or thought, it can be filmed.", source: "Stanley Kubrick" }
 ];
 
 // ============================================
@@ -1469,60 +1826,45 @@ const HOME_QUOTES = [
 
 const PRAISE_MESSAGES = {
     clean: [
-        "You guessed that like you’ve seen it 47 times.",
+        "You guessed that like you've seen it 47 times.",
         "Cinema brain activated. Nice pull.",
-        "You didn’t just get it right, you got it efficiently right.",
-        "Textbook. If there were a textbook for this, you’d be in it.",
-        "Critics could never compete with that level of recall.",
-        "You and this movie clearly have unfinished business.",
-        "That was so fast I’m checking for spoilers on your forehead.",
-        "Streaming services fear how quickly you recognized that.",
-        "Someone’s been paying attention instead of scrolling their phone.",
-        "You didn’t guess. You *remembered*.",
-        "That answer landed smoother than a perfect opening weekend.",
-        "IMDb just got nervous about their job security.",
-        "Award-winning stuff right there. At least in this game.",
-        "Your movie memory is doing heavy lifting today.",
-        "You saw one vague clue and said, ‘I know that trauma.’",
-        "That was main-character-energy accurate.",
-        "You solved that like it was the trailer and you’d already bought tickets.",
-        "If this were trivia night, your team would be buying you snacks.",
-        "Perfect answer. Somewhere a director just felt validated.",
-        "You didn’t even hesitate. Iconic behavior."
+        "Textbook. If there were a textbook for this.",
+        "Critics could never compete with that recall.",
+        "That was so fast I'm checking for spoilers.",
+        "Someone's been paying attention.",
+        "You didn't guess. You remembered.",
+        "Award-winning stuff right there.",
+        "Your movie memory is doing heavy lifting.",
+        "That answer landed smooth.",
+        "Perfect answer. Somewhere a director feels validated.",
+        "You didn't even hesitate. Iconic.",
+        "If this were trivia night, you'd be buying snacks.",
+        "Main-character-energy accurate.",
+        "You saw the clue and said 'I know that trauma.'"
     ],
     spicy: [
         "Okay, film buff. Touch grass later, maybe?",
-        "Be honest, how many times have you rewatched this instead of sleeping?",
-        "You nailed it so fast I’m a little concerned for your social life.",
+        "How many times have you rewatched this?",
         "Your brain is 70% water, 30% movie quotes.",
-        "Therapist: ‘How often do you think about this movie?’ You:",
-        "That was suspiciously fast. Are you secretly the director?",
-        "You got that right like you’ve been emotionally damaged by it for years.",
-        "Your recall is terrifying in a ‘please join my trivia team’ way.",
-        "You really said, ‘Oh, that’s my Roman Empire.’",
+        "That was suspiciously fast. Are you the director?",
+        "You got that right like it emotionally damaged you.",
+        "Your recall is terrifying. Join my trivia team.",
+        "You really said 'Oh, that's my Roman Empire.'",
         "The way you snapped that answer out… stay dangerous.",
-        "You’re not just online. You *live* in the fandom.",
-        "That was a speedrun. Any percent. No glitches.",
-        "Some people have hobbies; you have hyper-specific movie knowledge.",
-        "You got it right, and honestly? I expected nothing less from you.",
-        "Your brain: a carefully curated library of oddly specific plots."
+        "Some people have hobbies; you have this.",
+        "If wrong answers were streaming, you'd be trending."
     ],
     nsfw: [
-        "Well damn, you didn’t even let the clue breathe.",
-        "Jesus, you smoked that answer like it owed you money.",
-        "Okay, calm down, Rotten Tomatoes, we get it—you know your shit.",
-        "That was so fast it felt a little illegal.",
-        "You didn’t guess. You **absolutely knew**. And frankly? Terrifying.",
-        "You answered that like this movie personally ruined your mental health.",
-        "Alright, trivia gremlin, go touch some daylight after this.",
-        "You cooked that answer. No notes. Just unhinged talent.",
-        "That was disrespectfully accurate. The movie didn’t stand a chance.",
-        "You hit that one like a spoiler in group chat on release day.",
-        "Your brain is just a cursed archive of movie trauma and I respect it.",
-        "You didn’t even blink. Are you okay? Blink twice if not.",
-        "You grabbed that answer by the throat and made it your own.",
-        "If knowledge is power, you’re one bad day away from villain origin.",
-        "That was feral-level correct. Proud of you, slightly afraid of you."
+        "Well damn, you didn't even let the clue breathe.",
+        "You smoked that answer like it owed you money.",
+        "Okay Rotten Tomatoes, we get it.",
+        "That was so fast it felt illegal.",
+        "You didn't guess. You absolutely knew. Terrifying.",
+        "That answer was feral-level correct.",
+        "You cooked that. No notes. Unhinged talent.",
+        "If knowledge is power, you're one bad day from villain.",
+        "You grabbed that answer by the throat.",
+        "That was disrespectfully accurate."
     ]
 };
 
@@ -1530,58 +1872,34 @@ const INSULT_MESSAGES = {
     clean: [
         "Strong start, wrong universe.",
         "Close, but the multiverse says no.",
-        "Somewhere, a film professor just sighed softly.",
-        "Not quite. Spirit of the answer? Maybe. Points? Absolutely not.",
-        "That guess is going straight to the cutting room floor.",
+        "That guess is going to the cutting room floor.",
         "Good energy, incorrect timeline.",
-        "Nice confidence. Shame about the accuracy.",
         "Bold of you to answer so wrong so fast.",
-        "You aimed for Oscar season and landed in straight-to-DVD.",
-        "Plot twist: that… was not it.",
-        "You and the right answer are on different streaming platforms.",
+        "You aimed for Oscar season, landed in straight-to-DVD.",
+        "Plot twist: that was not it.",
         "The vibes were there. The title was not.",
-        "If points were given for enthusiasm, you’d be thriving.",
         "That answer needs a reboot.",
-        "You missed, but in a very watchable way.",
-        "Honestly? I’ve seen worse guesses. Not many. But some.",
-        "Wrong, but at least you committed.",
-        "That guess was like a bad sequel—technically connects, but still no.",
-        "We’ll file that under ‘creative interpretations.’",
-        "It’s okay. Every flop era builds character."
+        "Wrong, but at least you committed."
     ],
     spicy: [
-        "You didn’t miss by a mile, you missed by a franchise.",
-        "That answer belongs in the bargain bin at a gas station.",
-        "You shot your shot and hit the neighbor’s Wi-Fi instead.",
+        "You didn't miss by a mile, you missed by a franchise.",
+        "That answer belongs in a gas station bargain bin.",
         "Peak confidence, zero correctness.",
-        "You really said, ‘I haven’t healed, but I will guess anyway.’",
         "I see the vision, but the vision is blindfolded.",
-        "If wrong answers were streaming, you’d be trending.",
-        "That guess was fanfic at best.",
-        "You’re not even in the same cinematic universe, my friend.",
-        "That was a popcorn kernel of a guess. All crunch, no substance.",
-        "The way you swerved around the correct answer should be illegal.",
-        "You typed that like it was right. It was not.",
-        "Your answer has strong ‘first draft’ energy.",
-        "If this were a director’s cut, your guess would be the deleted scene.",
-        "You didn’t just miss; you created a whole new genre of wrong."
+        "If wrong answers were streaming, you'd be trending.",
+        "You're not even in the same cinematic universe.",
+        "Your answer has strong 'first draft' energy.",
+        "You didn't just miss; you created a new genre of wrong."
     ],
     nsfw: [
-        "You didn’t just miss—that answer got dragged into the alley and jumped.",
-        "That was so wrong I had to check if we’re even playing the same game.",
-        "Your guess just got ratio’d by the correct answer.",
-        "That answer was a full-on disaster. Like, director-apologizes-on-Twitter bad.",
-        "You missed so hard the plot filed a restraining order.",
-        "That guess was straight-up fanfiction with none of the tags right.",
-        "If wrong answers were crimes, you’d be wanted in three countries.",
-        "You cooked that guess, but the stove wasn’t even on.",
-        "I’ve seen spoilers less offensive than that answer.",
-        "Your accuracy just rage-quit the session.",
-        "That guess was so off I’m checking your controller for drift.",
-        "You didn’t fumble the bag; you launched it into orbit.",
-        "That was not it, chief. Or deputy. Or background extra.",
-        "If there were achievements for being wrong, you’d just unlocked a legendary.",
-        "You and the right answer are not just distant—you’re in different tax brackets."
+        "That answer got dragged into the alley.",
+        "That was so wrong I checked if we're playing the same game.",
+        "Your guess just got ratio'd by the correct answer.",
+        "That was straight-up disaster. Director-apologizes bad.",
+        "The plot filed a restraining order.",
+        "If wrong answers were crimes, you'd be wanted.",
+        "You cooked that guess but the stove wasn't on.",
+        "You fumbled so hard the bag went to orbit."
     ]
 };
 
@@ -1600,34 +1918,38 @@ class PlotTwisted {
             strikes: 3,
             currentPot: 500,
             revealedIndices: [],
+            guessedLetters: [],
             results: [],
-            seenClues: {}
+            seenClues: {},
+            // Daily
+            dailyQuestions: [],
+            dailyIndex: 0,
+            dailyResults: [],
+            dailyCompleted: false
         };
         
         this.config = {
             maxPot: 500,
-            revealCost: 50,
+            wrongLetterCost: 30,
             minPot: 50,
             questionsPerRound: 5,
             fuzzyThreshold: 0.18
         };
         
         this.clueBank = null;
-        this.stats = this.loadStats();
-        this.quoteInterval = null;
-        this.quoteIndex = 0;
+        this.settings = { sound: false, roastMode: 'clean' };
     }
 
     async init() {
         this.cacheDOM();
         this.bindEvents();
-        this.hideTrackingUI();
-        this.loadSeenClues();
         this.loadSettings();
-        this.updateStatsDisplay();
+        this.loadSeenClues();
         
         await this.loadClueDatabase();
         
+        this.loadDailyQuote();
+        this.checkDailyStatus();
         this.showScreen('start');
     }
     
@@ -1637,44 +1959,14 @@ class PlotTwisted {
             if (!response.ok) throw new Error('Failed to load clues');
             this.clueBank = await response.json();
             
-            document.getElementById('playBtn').disabled = false;
+            document.getElementById('quickPlayBtn').disabled = false;
+            document.getElementById('dailyBtn').disabled = false;
             document.getElementById('loadingOverlay').classList.add('hidden');
             
             console.log('✅ Clue database loaded:', Object.keys(this.clueBank));
         } catch (err) {
             console.error("❌ Clues failed to load:", err);
             document.querySelector('.loading-text').textContent = 'Failed to load. Please refresh.';
-        }
-    }
-    
-    loadSettings() {
-        const saved = localStorage.getItem('plotTwistedSettings');
-        this.settings = this.safeJsonParse(saved, { sound: false, roastMode: 'clean' }, 'settings');
-        if (!Object.prototype.hasOwnProperty.call(this.settings, 'sound')) {
-            this.settings.sound = false;
-        }
-        if (!Object.prototype.hasOwnProperty.call(this.settings, 'roastMode')) {
-            this.settings.roastMode = 'clean';
-        }
-        this.dom.soundToggle.classList.toggle('active', this.settings.sound);
-        if (this.dom.roastModeSelect) {
-            this.dom.roastModeSelect.value = this.settings.roastMode;
-        }
-        this.saveSettings();
-    }
-
-    saveSettings() {
-        localStorage.setItem('plotTwistedSettings', JSON.stringify(this.settings));
-    }
-
-    safeJsonParse(raw, fallback, label) {
-        if (!raw) return fallback;
-        try {
-            const parsed = JSON.parse(raw);
-            return parsed ?? fallback;
-        } catch (err) {
-            console.warn(`⚠️ Invalid ${label} data in localStorage. Resetting to defaults.`, err);
-            return fallback;
         }
     }
 
@@ -1685,13 +1977,12 @@ class PlotTwisted {
             howToPlay: document.getElementById('howToPlayScreen'),
             settings: document.getElementById('settingsScreen'),
             game: document.getElementById('gameScreen'),
+            daily: document.getElementById('dailyScreen'),
+            dailyResults: document.getElementById('dailyResultsScreen'),
             gameOver: document.getElementById('gameOverScreen')
         };
         
         this.dom = {
-            statSolved: document.getElementById('statSolved'),
-            statAccuracy: document.getElementById('statAccuracy'),
-            statStreak: document.getElementById('statStreak'),
             categoryGrid: document.getElementById('categoryGrid'),
             startGameBtn: document.getElementById('startGameBtn'),
             clueText: document.getElementById('clueText'),
@@ -1699,10 +1990,11 @@ class PlotTwisted {
             clueCard: document.getElementById('clueCard'),
             titleLetters: document.getElementById('titleLetters'),
             potValue: document.getElementById('potValue'),
+            potMultiplier: document.getElementById('potMultiplier'),
             totalScore: document.getElementById('totalScore'),
             strikesDisplay: document.getElementById('strikesDisplay'),
             progressTrack: document.getElementById('progressTrack'),
-            revealBtn: document.getElementById('revealBtn'),
+            keyboard: document.getElementById('keyboard'),
             giveUpBtn: document.getElementById('giveUpBtn'),
             solveBtn: document.getElementById('solveBtn'),
             solveModal: document.getElementById('solveModal'),
@@ -1719,123 +2011,158 @@ class PlotTwisted {
             finalScore: document.getElementById('finalScore'),
             finalSubtitle: document.getElementById('finalSubtitle'),
             finalBreakdown: document.getElementById('finalBreakdown'),
-            homeQuoteRotator: document.getElementById('homeQuoteRotator'),
-            homeQuoteText: document.getElementById('homeQuoteText'),
-            homeQuoteSource: document.getElementById('homeQuoteSource'),
-            resetBtn: document.getElementById('resetBtn')
+            dailyQuote: document.getElementById('dailyQuote'),
+            dailyQuoteSource: document.getElementById('dailyQuoteSource'),
+            resetBtn: document.getElementById('resetBtn'),
+            // Daily
+            dailyDateDisplay: document.getElementById('dailyDateDisplay'),
+            dailyProgressTrack: document.getElementById('dailyProgressTrack'),
+            dailyClueCard: document.getElementById('dailyClueCard'),
+            dailyClueText: document.getElementById('dailyClueText'),
+            dailyInput: document.getElementById('dailyInput'),
+            dailySkipBtn: document.getElementById('dailySkipBtn'),
+            dailySubmitBtn: document.getElementById('dailySubmitBtn'),
+            dailyScoreDisplay: document.getElementById('dailyScoreDisplay'),
+            dailyScoreText: document.getElementById('dailyScoreText'),
+            dailyBreakdown: document.getElementById('dailyBreakdown'),
+            dailyResultsDate: document.getElementById('dailyResultsDate'),
+            dailyNextPuzzle: document.getElementById('dailyNextPuzzle')
         };
     }
 
     bindEvents() {
-        const onClick = (id, handler) => {
-            const el = document.getElementById(id);
-            if (el) el.onclick = handler;
-        };
-
-        onClick('playBtn', () => this.showCategoryScreen());
-        onClick('howToPlayBtn', () => this.showScreen('howToPlay'));
-        onClick('howToBackBtn', () => this.showScreen('start'));
-        onClick('settingsBtn', () => this.showScreen('settings'));
-        onClick('settingsBackBtn', () => this.showScreen('start'));
+        // Start screen
+        document.getElementById('quickPlayBtn').onclick = () => this.showCategoryScreen();
+        document.getElementById('dailyBtn').onclick = () => this.startDaily();
+        document.getElementById('howToPlayBtn').onclick = () => this.showScreen('howToPlay');
+        document.getElementById('howToBackBtn').onclick = () => this.showScreen('start');
+        document.getElementById('settingsBtn').onclick = () => this.showScreen('settings');
+        document.getElementById('settingsBackBtn').onclick = () => this.showScreen('start');
         
-        if (this.dom.soundToggle) {
-            this.dom.soundToggle.onclick = () => this.toggleSound();
-        }
-        if (this.dom.roastModeSelect) {
-            this.dom.roastModeSelect.addEventListener('change', (event) => {
-                this.handleRoastModeChange(event.target.value);
-            });
-        }
-        if (this.dom.resetBtn) {
-            this.dom.resetBtn.onclick = () => this.resetProgress();
-        }
+        // Settings
+        this.dom.soundToggle.onclick = () => this.toggleSound();
+        this.dom.roastModeSelect?.addEventListener('change', (e) => this.handleRoastModeChange(e.target.value));
+        this.dom.resetBtn?.addEventListener('click', () => this.resetProgress());
         
-        onClick('categoryBackBtn', () => this.showScreen('start'));
-        if (this.dom.startGameBtn) {
-            this.dom.startGameBtn.onclick = () => this.startGame();
-        }
+        // Category
+        document.getElementById('categoryBackBtn').onclick = () => this.showScreen('start');
+        this.dom.startGameBtn.onclick = () => this.startGame();
         
-        if (this.dom.revealBtn) {
-            this.dom.revealBtn.onclick = () => this.revealLetter();
-        }
-        if (this.dom.giveUpBtn) {
-            this.dom.giveUpBtn.onclick = () => this.giveUp();
-        }
-        if (this.dom.solveBtn) {
-            this.dom.solveBtn.onclick = () => this.openSolveModal();
-        }
+        // Game
+        this.dom.giveUpBtn.onclick = () => this.giveUp();
+        this.dom.solveBtn.onclick = () => this.openSolveModal();
         
-        onClick('quitBtn', () => this.dom.quitModal?.classList.add('active'));
-        onClick('cancelQuitBtn', () => this.dom.quitModal?.classList.remove('active'));
-        onClick('confirmQuitBtn', () => this.confirmQuit());
+        // Quit
+        document.getElementById('quitBtn').onclick = () => this.dom.quitModal.classList.add('active');
+        document.getElementById('cancelQuitBtn').onclick = () => this.dom.quitModal.classList.remove('active');
+        document.getElementById('confirmQuitBtn').onclick = () => this.confirmQuit();
         
-        onClick('cancelSolveBtn', () => this.closeSolveModal());
-        onClick('submitSolveBtn', () => this.submitSolve());
-        if (this.dom.solveInput) {
-            this.dom.solveInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    this.submitSolve();
-                }
-            });
-        }
+        // Solve modal
+        document.getElementById('cancelSolveBtn').onclick = () => this.closeSolveModal();
+        document.getElementById('submitSolveBtn').onclick = () => this.submitSolve();
+        this.dom.solveInput?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.submitSolve();
+            }
+        });
         
-        onClick('playAgainBtn', () => this.playAgain());
-        onClick('shareBtn', () => this.shareScore());
-        onClick('menuBtn', () => this.showScreen('start'));
+        // Game over
+        document.getElementById('playAgainBtn').onclick = () => this.playAgain();
+        document.getElementById('shareBtn').onclick = () => this.shareScore();
+        document.getElementById('menuBtn').onclick = () => this.showScreen('start');
+        
+        // Daily
+        this.dom.dailySubmitBtn.onclick = () => this.submitDailyGuess();
+        this.dom.dailySkipBtn.onclick = () => this.skipDailyQuestion();
+        this.dom.dailyInput?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.submitDailyGuess();
+            }
+        });
+        document.getElementById('dailyShareBtn').onclick = () => this.shareDailyScore();
+        document.getElementById('dailyMenuBtn').onclick = () => this.showScreen('start');
     }
+
+    // ============================================
+    // SETTINGS
+    // ============================================
     
+    loadSettings() {
+        const saved = localStorage.getItem('plotTwistedSettings');
+        this.settings = saved ? JSON.parse(saved) : { sound: false, roastMode: 'clean' };
+        this.dom.soundToggle?.classList.toggle('active', this.settings.sound);
+        if (this.dom.roastModeSelect) this.dom.roastModeSelect.value = this.settings.roastMode;
+    }
+
+    saveSettings() {
+        localStorage.setItem('plotTwistedSettings', JSON.stringify(this.settings));
+    }
+
     toggleSound() {
-        this.settings = this.settings || { sound: false };
         this.settings.sound = !this.settings.sound;
-        this.dom.soundToggle.classList.toggle('active', this.settings.sound);
+        this.dom.soundToggle?.classList.toggle('active', this.settings.sound);
         this.saveSettings();
     }
 
     handleRoastModeChange(mode) {
         if (mode === 'nsfw') {
-            const ok = window.confirm(
-                'NSFW mode includes explicit language and stronger roasts. Are you sure you want to enable it?'
-            );
-            if (!ok) {
-                if (this.dom.roastModeSelect) {
-                    this.dom.roastModeSelect.value = this.settings.roastMode || 'clean';
-                }
+            if (!confirm('NSFW mode includes explicit language. Continue?')) {
+                this.dom.roastModeSelect.value = this.settings.roastMode;
                 return;
             }
         }
-
         this.settings.roastMode = mode;
         this.saveSettings();
     }
     
     resetProgress() {
-        if (confirm('Are you sure? This will clear all your stats and seen clues.')) {
-            localStorage.removeItem('plotTwistedStats');
+        if (confirm('Clear all stats and seen clues?')) {
             localStorage.removeItem('plotTwistedSeen');
-            this.stats = this.loadStats();
             this.state.seenClues = {};
-            this.updateStatsDisplay();
             this.showScreen('start');
         }
     }
-    
-    confirmQuit() {
-        this.dom.quitModal.classList.remove('active');
-        this.showScreen('start');
-    }
+
+    // ============================================
+    // SCREENS
+    // ============================================
 
     showScreen(name) {
         Object.values(this.screens).forEach(s => s.classList.remove('active'));
         this.screens[name]?.classList.add('active');
         this.state.currentScreen = name;
-
-        if (name === 'start') {
-            this.startHomeQuoteRotator();
-        } else {
-            this.stopHomeQuoteRotator();
-        }
     }
+
+    confirmQuit() {
+        this.dom.quitModal.classList.remove('active');
+        this.showScreen('start');
+    }
+
+    // ============================================
+    // DAILY QUOTE
+    // ============================================
+
+    loadDailyQuote() {
+        const today = new Date().toDateString();
+        const stored = localStorage.getItem('ptQuoteDate');
+        let index = parseInt(localStorage.getItem('ptQuoteIndex'), 10);
+        
+        if (stored !== today || isNaN(index)) {
+            index = Math.floor(Math.random() * DAILY_QUOTES.length);
+            localStorage.setItem('ptQuoteDate', today);
+            localStorage.setItem('ptQuoteIndex', String(index));
+        }
+        
+        const quote = DAILY_QUOTES[index] || DAILY_QUOTES[0];
+        this.dom.dailyQuote.textContent = `"${quote.quote}"`;
+        this.dom.dailyQuoteSource.textContent = `— ${quote.source}`;
+    }
+
+    // ============================================
+    // CATEGORY SCREEN
+    // ============================================
 
     showCategoryScreen() {
         this.renderCategories();
@@ -1854,14 +2181,11 @@ class PlotTwisted {
             card.className = 'category-card';
             card.dataset.category = name;
             
-            const clues = this.clueBank[name];
-            const unseenCount = this.getUnseenCount(name);
-            const emoji = CATEGORY_META[name]?.emoji || '🎬';
+            const icon = CATEGORY_ICONS[name] || CATEGORY_ICONS["Family"];
             
             card.innerHTML = `
-                <div class="category-emoji">${emoji}</div>
+                <div class="category-icon">${icon}</div>
                 <div class="category-name">${name}</div>
-                <div class="category-count" style="display: none;">${unseenCount} unseen / ${clues.length} total</div>
             `;
             
             card.onclick = () => this.selectCategory(name);
@@ -1876,18 +2200,15 @@ class PlotTwisted {
         this.dom.startGameBtn.disabled = false;
     }
 
+    // ============================================
+    // QUICK PLAY GAME
+    // ============================================
+
     startGame() {
         const category = this.state.selectedCategory;
-        const allClues = this.clueBank?.[category];
-
-        if (!category || !allClues || allClues.length === 0) {
-            console.error('No clues available for selected category:', category);
-            alert('No clues available for that category yet. Please choose another.');
-            return;
-        }
+        const allClues = this.clueBank[category];
         
         const seenTitles = this.state.seenClues[category] || [];
-        
         const unseenClues = allClues.filter(c => !seenTitles.includes(c.title));
         const seenClues = allClues.filter(c => seenTitles.includes(c.title));
         
@@ -1898,9 +2219,7 @@ class PlotTwisted {
         
         this.state.questions = pool.slice(0, this.config.questionsPerRound);
         
-        if (!this.state.seenClues[category]) {
-            this.state.seenClues[category] = [];
-        }
+        if (!this.state.seenClues[category]) this.state.seenClues[category] = [];
         this.state.questions.forEach(q => {
             if (!this.state.seenClues[category].includes(q.title)) {
                 this.state.seenClues[category].push(q.title);
@@ -1910,10 +2229,12 @@ class PlotTwisted {
         
         this.state.currentIndex = 0;
         this.state.totalScore = 0;
+        this.state.strikes = 3;
         this.state.results = [];
         
         this.renderProgress();
         this.updateTotalScore();
+        this.updateStrikes();
         
         this.showScreen('game');
         this.loadQuestion();
@@ -1922,16 +2243,24 @@ class PlotTwisted {
     loadQuestion() {
         const q = this.state.questions[this.state.currentIndex];
         
-        this.state.strikes = 3;
         this.state.currentPot = this.config.maxPot;
         this.state.revealedIndices = [];
+        this.state.guessedLetters = [];
+        
+        // Auto-reveal numbers since keyboard has no number keys
+        const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
+        displayTitle.split('').forEach((char, i) => {
+            if (/[0-9]/.test(char)) {
+                this.state.revealedIndices.push(i);
+            }
+        });
         
         this.dom.clueText.textContent = q.clue;
         this.dom.clueCategory.textContent = this.state.selectedCategory;
         this.updatePot();
-        this.updateStrikes();
         this.updateProgress();
         this.renderTitle();
+        this.renderKeyboard();
     }
 
     renderTitle() {
@@ -1946,7 +2275,6 @@ class PlotTwisted {
             
             if (char === ' ') {
                 slot.classList.add('space');
-                slot.textContent = '';
             } else if (/[A-Z0-9]/.test(char)) {
                 if (this.state.revealedIndices.includes(i)) {
                     slot.textContent = char;
@@ -1963,124 +2291,120 @@ class PlotTwisted {
         });
     }
 
-    levenshtein(a, b) {
-        const matrix = [];
-        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-
-        for (let i = 1; i <= b.length; i++) {
-            for (let j = 1; j <= a.length; j++) {
-                if (b.charAt(i - 1) === a.charAt(j - 1)) {
-                    matrix[i][j] = matrix[i - 1][j - 1];
-                } else {
-                    matrix[i][j] = Math.min(
-                        matrix[i - 1][j - 1] + 1,
-                        matrix[i][j - 1] + 1,
-                        matrix[i - 1][j] + 1
-                    );
-                }
-            }
-        }
-        return matrix[b.length][a.length];
-    }
-
-    normalizeTitle(str) {
-        return str
-            .toLowerCase()
-            .replace(/\([^)]*\)/g, '')
-            .replace(/^the\s+/g, '')
-            .replace(/[^a-z0-9]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-    }
-
-    getDisplayTitle(title) {
-        return title.replace(/\([^)]*\)/g, '').trim();
-    }
-
-    isFuzzyMatch(guess, actual) {
-        const g = this.normalizeTitle(guess);
-        const a = this.normalizeTitle(actual);
-
-        if (!g) return false;
-        if (g === a) return true;
-
-        const distance = this.levenshtein(g, a);
-        const maxErrors = Math.floor(a.length * this.config.fuzzyThreshold);
+    renderKeyboard() {
+        const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
         
-        return distance <= Math.max(1, maxErrors);
+        this.dom.keyboard.innerHTML = '';
+        
+        rows.forEach(row => {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'keyboard-row';
+            
+            row.split('').forEach(letter => {
+                const key = document.createElement('button');
+                key.className = 'key';
+                key.textContent = letter;
+                key.dataset.letter = letter;
+                
+                if (this.state.guessedLetters.includes(letter)) {
+                    key.disabled = true;
+                    key.classList.add(this.isLetterInTitle(letter) ? 'correct' : 'incorrect');
+                }
+                
+                key.onclick = () => this.guessLetter(letter);
+                rowEl.appendChild(key);
+            });
+            
+            this.dom.keyboard.appendChild(rowEl);
+        });
     }
-    
-    revealLetter() {
+
+    isLetterInTitle(letter) {
         const q = this.state.questions[this.state.currentIndex];
         const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
+        return displayTitle.includes(letter);
+    }
 
-        // Collect all revealable letter indices (A–Z, 0–9)
-        const allLetterIndices = [];
+    guessLetter(letter) {
+        if (this.state.guessedLetters.includes(letter)) return;
+        
+        this.state.guessedLetters.push(letter);
+        
+        const q = this.state.questions[this.state.currentIndex];
+        const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
+        
+        let found = false;
         displayTitle.split('').forEach((char, i) => {
-            if (/[A-Z0-9]/.test(char)) {
-                allLetterIndices.push(i);
+            if (char === letter) {
+                this.state.revealedIndices.push(i);
+                found = true;
             }
         });
-
-        const totalLetters = allLetterIndices.length;
-
-        // Build list of currently hidden indices
-        const hiddenIndices = allLetterIndices.filter(
-            i => !this.state.revealedIndices.includes(i)
-        );
-
-        // If nothing left to reveal, bail
-        if (hiddenIndices.length === 0) return;
-
-        // SPECIAL CASE: very short titles (3 letters or fewer)
-        // For these, allow full reveal like before.
-        if (totalLetters <= 3) {
-            const randomIndex = hiddenIndices[Math.floor(Math.random() * hiddenIndices.length)];
-            this.state.revealedIndices.push(randomIndex);
-
-            this.state.currentPot = Math.max(this.config.minPot, this.state.currentPot - this.config.revealCost);
+        
+        // Vowels are free - no penalty for wrong vowel guesses
+        const vowels = ['A', 'E', 'I', 'O', 'U'];
+        const isVowel = vowels.includes(letter);
+        
+        if (!found && !isVowel) {
+            this.state.currentPot = Math.max(this.config.minPot, this.state.currentPot - this.config.wrongLetterCost);
             this.updatePot(true);
-            this.renderTitle();
-
-            // If that was the last hidden letter, you can still auto-solve if desired
-            if (hiddenIndices.length <= 1) {
-                this.autoSolve();
-            }
-
-            return;
         }
-
-        // NORMAL CASE: longer titles
-        // Always leave at least 2 letters unrevealed.
-        // If revealing another letter would drop hidden letters below 2, stop.
-        if (hiddenIndices.length <= 2) {
-            // Already at 2 or fewer hidden letters; do not reveal more via hints.
-            return;
-        }
-
-        // Safe to reveal one random hidden letter
-        const randomIndex = hiddenIndices[Math.floor(Math.random() * hiddenIndices.length)];
-        this.state.revealedIndices.push(randomIndex);
-
-        this.state.currentPot = Math.max(this.config.minPot, this.state.currentPot - this.config.revealCost);
-        this.updatePot(true);
+        
         this.renderTitle();
+        this.renderKeyboard();
+        this.updateMultiplier();
+        
+        // Check if all letters revealed
+        const allLetterIndices = [];
+        displayTitle.split('').forEach((char, i) => {
+            if (/[A-Z0-9]/.test(char)) allLetterIndices.push(i);
+        });
+        
+        if (allLetterIndices.every(i => this.state.revealedIndices.includes(i))) {
+            this.autoSolve();
+        }
+    }
 
-        // Do NOT call autoSolve here in the normal case.
+    updateMultiplier() {
+        const q = this.state.questions[this.state.currentIndex];
+        const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
+        
+        let totalLetters = 0;
+        displayTitle.split('').forEach(char => {
+            if (/[A-Z0-9]/.test(char)) totalLetters++;
+        });
+        
+        const hiddenCount = totalLetters - this.state.revealedIndices.length;
+        const hiddenPercent = hiddenCount / totalLetters;
+        
+        let multiplier = '';
+        if (hiddenPercent >= 0.8) multiplier = '1.5×';
+        else if (hiddenPercent >= 0.5) multiplier = '1.25×';
+        
+        this.dom.potMultiplier.textContent = multiplier;
+    }
+
+    getMultiplier() {
+        const q = this.state.questions[this.state.currentIndex];
+        const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
+        
+        let totalLetters = 0;
+        displayTitle.split('').forEach(char => {
+            if (/[A-Z0-9]/.test(char)) totalLetters++;
+        });
+        
+        const hiddenCount = totalLetters - this.state.revealedIndices.length;
+        const hiddenPercent = hiddenCount / totalLetters;
+        
+        if (hiddenPercent >= 0.8) return 1.5;
+        if (hiddenPercent >= 0.5) return 1.25;
+        return 1;
     }
 
     autoSolve() {
         const q = this.state.questions[this.state.currentIndex];
-        const points = this.state.currentPot;
-        
-        const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
-        displayTitle.split('').forEach((char, i) => {
-            if (/[A-Z0-9]/.test(char) && !this.state.revealedIndices.includes(i)) {
-                this.state.revealedIndices.push(i);
-            }
-        });
-        this.renderTitle();
+        const multiplier = this.getMultiplier();
+        const points = Math.round(this.state.currentPot * multiplier);
         
         this.state.results.push({ title: q.title, points, correct: true });
         this.state.totalScore += points;
@@ -2095,9 +2419,7 @@ class PlotTwisted {
         
         const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
         displayTitle.split('').forEach((char, i) => {
-            if (/[A-Z0-9]/.test(char)) {
-                this.state.revealedIndices.push(i);
-            }
+            if (/[A-Z0-9]/.test(char)) this.state.revealedIndices.push(i);
         });
         this.renderTitle();
         
@@ -2107,9 +2429,7 @@ class PlotTwisted {
     openSolveModal() {
         this.dom.solveModal.classList.add('active');
         this.dom.solveInput.value = '';
-        requestAnimationFrame(() => {
-            this.dom.solveInput?.focus({ preventScroll: true });
-        });
+        setTimeout(() => this.dom.solveInput.focus(), 100);
     }
 
     closeSolveModal() {
@@ -2117,20 +2437,13 @@ class PlotTwisted {
     }
 
     submitSolve() {
-        if (!this.dom.solveInput) return;
-
         const guess = this.dom.solveInput.value.trim();
-        if (!guess) {
-            // Ignore empty submissions; keep the modal open and do nothing.
-            return;
-        }
+        if (!guess) return;
 
         const q = this.state.questions[this.state.currentIndex];
-        const answer = q.title;
-        
         this.closeSolveModal();
         
-        if (this.isFuzzyMatch(guess, answer)) {
+        if (this.isFuzzyMatch(guess, q.title)) {
             this.handleCorrect();
         } else {
             this.handleIncorrect();
@@ -2139,7 +2452,8 @@ class PlotTwisted {
 
     handleCorrect() {
         const q = this.state.questions[this.state.currentIndex];
-        const points = this.state.currentPot;
+        const multiplier = this.getMultiplier();
+        const points = Math.round(this.state.currentPot * multiplier);
         
         this.state.results.push({ title: q.title, points, correct: true });
         this.state.totalScore += points;
@@ -2147,9 +2461,7 @@ class PlotTwisted {
         
         const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
         displayTitle.split('').forEach((char, i) => {
-            if (/[A-Z0-9]/.test(char)) {
-                this.state.revealedIndices.push(i);
-            }
+            if (/[A-Z0-9]/.test(char)) this.state.revealedIndices.push(i);
         });
         this.renderTitle();
         
@@ -2239,20 +2551,8 @@ class PlotTwisted {
 
     getRoastMessage(isCorrect) {
         const mode = this.settings?.roastMode || 'clean';
-        const praiseList = PRAISE_MESSAGES[mode] && PRAISE_MESSAGES[mode].length
-            ? PRAISE_MESSAGES[mode]
-            : PRAISE_MESSAGES.clean;
-        const insultList = INSULT_MESSAGES[mode] && INSULT_MESSAGES[mode].length
-            ? INSULT_MESSAGES[mode]
-            : INSULT_MESSAGES.clean;
-        const list = isCorrect ? praiseList : insultList;
-
-        if (!list.length) {
-            return isCorrect ? 'Nice work!' : 'Good try!';
-        }
-
-        const index = Math.floor(Math.random() * list.length);
-        return list[index];
+        const list = isCorrect ? (PRAISE_MESSAGES[mode] || PRAISE_MESSAGES.clean) : (INSULT_MESSAGES[mode] || INSULT_MESSAGES.clean);
+        return list[Math.floor(Math.random() * list.length)] || (isCorrect ? 'Nice!' : 'Nope!');
     }
 
     nextQuestion() {
@@ -2268,16 +2568,6 @@ class PlotTwisted {
     endGame() {
         const solved = this.state.results.filter(r => r.correct).length;
         const total = this.state.results.length;
-        
-        this.stats.totalSolved += solved;
-        this.stats.totalPlayed += total;
-        this.stats.currentStreak = solved === total ? this.stats.currentStreak + solved : 0;
-        this.stats.bestStreak = Math.max(this.stats.bestStreak, this.stats.currentStreak);
-        if (this.state.totalScore > this.stats.highScore) {
-            this.stats.highScore = this.state.totalScore;
-        }
-        this.saveStats();
-        this.updateStatsDisplay();
         
         this.dom.finalScore.textContent = this.state.totalScore;
         this.dom.finalSubtitle.textContent = `${solved} of ${total} movies solved`;
@@ -2303,18 +2593,14 @@ class PlotTwisted {
         const total = this.state.results.length;
         const category = this.state.selectedCategory;
         
-        const emoji = this.state.results.map(r => {
-            if (r.correct) return '🟩';
-            if (r.gaveUp) return '🟨';
-            return '🟥';
-        }).join('');
+        const emoji = this.state.results.map(r => r.correct ? '🟩' : (r.gaveUp ? '🟨' : '🟥')).join('');
         
         const text = `🎬 Plot Twisted - ${category}
 🏆 Score: ${this.state.totalScore}
 ${emoji}
 ${solved}/${total} correct
 
-Can you beat my score?`;
+Can you beat me?`;
         
         if (navigator.share) {
             navigator.share({ text }).catch(() => this.copyToClipboard(text));
@@ -2325,10 +2611,8 @@ Can you beat my score?`;
     
     copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('Score copied to clipboard! 📋');
-        }).catch(() => {
-            alert('Could not copy to clipboard');
-        });
+            alert('Score copied to clipboard!');
+        }).catch(() => {});
     }
 
     playAgain() {
@@ -2339,12 +2623,232 @@ Can you beat my score?`;
         }
     }
 
+    // ============================================
+    // DAILY CHALLENGE
+    // ============================================
+
+    getTodayKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    checkDailyStatus() {
+        const key = `plotTwistedDaily_${this.getTodayKey()}`;
+        const saved = localStorage.getItem(key);
+        
+        if (saved) {
+            this.state.dailyCompleted = true;
+            this.state.dailyResults = JSON.parse(saved);
+        } else {
+            this.state.dailyCompleted = false;
+            this.state.dailyResults = [];
+        }
+    }
+
+    startDaily() {
+        this.checkDailyStatus();
+        
+        if (this.state.dailyCompleted) {
+            this.showDailyResults();
+            return;
+        }
+        
+        // Seed random with today's date
+        const seed = this.getTodayKey().replace(/-/g, '');
+        const rng = this.seededRandom(parseInt(seed, 10));
+        
+        // Pick one from each category
+        const categories = Object.keys(this.clueBank);
+        const shuffledCats = this.shuffleWithRng(categories, rng);
+        
+        this.state.dailyQuestions = [];
+        for (let i = 0; i < 5; i++) {
+            const cat = shuffledCats[i % shuffledCats.length];
+            const clues = this.clueBank[cat];
+            const clueIndex = Math.floor(rng() * clues.length);
+            this.state.dailyQuestions.push({ ...clues[clueIndex], category: cat });
+        }
+        
+        this.state.dailyIndex = 0;
+        this.state.dailyResults = [];
+        
+        const today = new Date();
+        this.dom.dailyDateDisplay.textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        
+        this.renderDailyProgress();
+        this.loadDailyQuestion();
+        this.showScreen('daily');
+    }
+
+    seededRandom(seed) {
+        return function() {
+            seed = (seed * 9301 + 49297) % 233280;
+            return seed / 233280;
+        };
+    }
+
+    shuffleWithRng(arr, rng) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(rng() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    renderDailyProgress() {
+        this.dom.dailyProgressTrack.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+            const pip = document.createElement('div');
+            pip.className = 'progress-pip';
+            if (i < this.state.dailyIndex) pip.classList.add('complete');
+            if (i === this.state.dailyIndex) pip.classList.add('current');
+            this.dom.dailyProgressTrack.appendChild(pip);
+        }
+    }
+
+    loadDailyQuestion() {
+        const q = this.state.dailyQuestions[this.state.dailyIndex];
+        this.dom.dailyClueCard.dataset.question = `MOVIE ${this.state.dailyIndex + 1} OF 5`;
+        this.dom.dailyClueText.textContent = q.clue;
+        this.dom.dailyInput.value = '';
+        this.dom.dailyInput.disabled = false;
+        this.dom.dailyInput.focus();
+    }
+
+    submitDailyGuess() {
+        const guess = this.dom.dailyInput.value.trim();
+        if (!guess) return;
+        
+        const q = this.state.dailyQuestions[this.state.dailyIndex];
+        const correct = this.isFuzzyMatch(guess, q.title);
+        
+        this.state.dailyResults.push({
+            title: q.title,
+            guess: guess,
+            correct: correct,
+            points: correct ? 100 : 0
+        });
+        
+        this.dom.dailyInput.disabled = true;
+        this.nextDailyQuestion();
+    }
+
+    skipDailyQuestion() {
+        const q = this.state.dailyQuestions[this.state.dailyIndex];
+        
+        this.state.dailyResults.push({
+            title: q.title,
+            guess: '',
+            correct: false,
+            skipped: true,
+            points: 0
+        });
+        
+        this.nextDailyQuestion();
+    }
+
+    nextDailyQuestion() {
+        this.state.dailyIndex++;
+        this.renderDailyProgress();
+        
+        if (this.state.dailyIndex >= 5) {
+            this.finishDaily();
+        } else {
+            this.loadDailyQuestion();
+        }
+    }
+
+    finishDaily() {
+        const key = `plotTwistedDaily_${this.getTodayKey()}`;
+        localStorage.setItem(key, JSON.stringify(this.state.dailyResults));
+        this.state.dailyCompleted = true;
+        this.showDailyResults();
+    }
+
+    showDailyResults() {
+        const results = this.state.dailyResults;
+        const correct = results.filter(r => r.correct).length;
+        const total = results.reduce((sum, r) => sum + r.points, 0);
+        
+        const today = new Date();
+        this.dom.dailyResultsDate.textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        
+        // Stars
+        this.dom.dailyScoreDisplay.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+            const star = document.createElement('span');
+            star.className = `daily-star ${i < correct ? 'earned' : 'empty'}`;
+            star.textContent = '★';
+            this.dom.dailyScoreDisplay.appendChild(star);
+        }
+        
+        this.dom.dailyScoreText.textContent = `${correct}/5 Correct • ${total} pts`;
+        
+        // Breakdown
+        this.dom.dailyBreakdown.innerHTML = '';
+        results.forEach(r => {
+            const row = document.createElement('div');
+            row.className = 'daily-breakdown-row';
+            row.innerHTML = `
+                <span>${r.title}</span>
+                <span class="daily-breakdown-result">${r.correct ? '✅' : (r.skipped ? '⏭️' : '❌')}</span>
+            `;
+            this.dom.dailyBreakdown.appendChild(row);
+        });
+        
+        // Countdown
+        this.updateDailyCountdown();
+        
+        this.showScreen('dailyResults');
+    }
+
+    updateDailyCountdown() {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        
+        const diff = tomorrow - now;
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        this.dom.dailyNextPuzzle.textContent = `Next puzzle in ${hours}h ${minutes}m`;
+    }
+
+    shareDailyScore() {
+        const results = this.state.dailyResults;
+        const correct = results.filter(r => r.correct).length;
+        const total = results.reduce((sum, r) => sum + r.points, 0);
+        
+        const emoji = results.map(r => r.correct ? '⭐' : '☆').join('');
+        const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
+        const text = `🎬 Plot Twisted Daily - ${today}
+${emoji} ${correct}/5
+Score: ${total}
+
+Can you beat me?`;
+        
+        if (navigator.share) {
+            navigator.share({ text }).catch(() => this.copyToClipboard(text));
+        } else {
+            this.copyToClipboard(text);
+        }
+    }
+
+    // ============================================
+    // UTILITIES
+    // ============================================
+
     updatePot(animate = false) {
         if (animate) {
             this.dom.potValue.classList.add('dropping');
             setTimeout(() => this.dom.potValue.classList.remove('dropping'), 300);
         }
         this.dom.potValue.textContent = this.state.currentPot;
+        this.updateMultiplier();
     }
 
     updateTotalScore() {
@@ -2371,104 +2875,82 @@ Can you beat my score?`;
         const pips = this.dom.progressTrack.querySelectorAll('.progress-pip');
         pips.forEach((pip, i) => {
             pip.classList.remove('current', 'complete');
-            if (i < this.state.currentIndex) {
-                pip.classList.add('complete');
-            } else if (i === this.state.currentIndex) {
-                pip.classList.add('current');
-            }
+            if (i < this.state.currentIndex) pip.classList.add('complete');
+            else if (i === this.state.currentIndex) pip.classList.add('current');
         });
     }
 
-    updateStatsDisplay() {
-        const statContainer = this.dom.statSolved?.closest('.stat-item');
-        if (statContainer && statContainer.style.display === 'none') {
-            return;
-        }
-        this.dom.statSolved.textContent = this.stats.totalSolved;
-        const accuracy = this.stats.totalPlayed > 0 
-            ? Math.round((this.stats.totalSolved / this.stats.totalPlayed) * 100) 
-            : 0;
-        this.dom.statAccuracy.textContent = accuracy + '%';
-        this.dom.statStreak.textContent = this.stats.bestStreak;
-    }
+    levenshtein(a, b) {
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
-    hideTrackingUI() {
-        [this.dom.statSolved, this.dom.statAccuracy, this.dom.statStreak].forEach((stat) => {
-            const item = stat?.closest('.stat-item');
-            if (item) {
-                item.style.display = 'none';
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+                }
             }
-        });
-
-        const resetRow = this.dom.resetBtn?.closest('.setting-row');
-        if (resetRow) {
-            resetRow.style.display = 'none';
-        } else if (this.dom.resetBtn) {
-            this.dom.resetBtn.style.display = 'none';
         }
+        return matrix[b.length][a.length];
     }
 
-    startHomeQuoteRotator() {
-        if (!this.dom.homeQuoteRotator || !this.dom.homeQuoteText) return;
-
-        this.dom.homeQuoteRotator.style.display = '';
-        this.stopHomeQuoteRotator();
-
-        this.quoteIndex = Math.floor(Math.random() * HOME_QUOTES.length);
-        this.renderHomeQuote();
-
-        this.quoteInterval = setInterval(() => {
-            this.quoteIndex = (this.quoteIndex + 1) % HOME_QUOTES.length;
-            this.renderHomeQuote();
-        }, 6000);
+    normalizeTitle(str) {
+        return str
+            .toLowerCase()
+            .replace(/\([^)]*\)/g, '')
+            .replace(/^the\s+/g, '')
+            .replace(/[^a-z0-9]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+    
+    // Strip numbers for more lenient matching
+    stripNumbers(str) {
+        return str.replace(/[0-9]/g, '').replace(/\s+/g, ' ').trim();
     }
 
-    stopHomeQuoteRotator() {
-        if (this.quoteInterval) {
-            clearInterval(this.quoteInterval);
-            this.quoteInterval = null;
-        }
+    getDisplayTitle(title) {
+        return title.replace(/\([^)]*\)/g, '').trim();
     }
 
-    renderHomeQuote() {
-        const item = HOME_QUOTES[this.quoteIndex];
-        if (!item) return;
+    isFuzzyMatch(guess, actual) {
+        const g = this.normalizeTitle(guess);
+        const a = this.normalizeTitle(actual);
 
-        this.dom.homeQuoteText.textContent = `“${item.quote}”`;
-        if (this.dom.homeQuoteSource) {
-            this.dom.homeQuoteSource.textContent = `— ${item.source}`;
-        }
-    }
+        if (!g) return false;
+        if (g === a) return true;
 
-    loadStats() {
-        const saved = localStorage.getItem('plotTwistedStats');
-        return this.safeJsonParse(saved, {
-            totalSolved: 0,
-            totalPlayed: 0,
-            bestStreak: 0,
-            currentStreak: 0,
-            highScore: 0
-        }, 'stats');
-    }
-
-    saveStats() {
-        localStorage.setItem('plotTwistedStats', JSON.stringify(this.stats));
+        // Check with numbers
+        const distance = this.levenshtein(g, a);
+        const maxErrors = Math.floor(a.length * this.config.fuzzyThreshold);
+        if (distance <= Math.max(1, maxErrors)) return true;
+        
+        // Also check without numbers (forgive "Inside Out" for "Inside Out 2")
+        const gNoNum = this.stripNumbers(g);
+        const aNoNum = this.stripNumbers(a);
+        
+        if (gNoNum === aNoNum) return true;
+        
+        const distanceNoNum = this.levenshtein(gNoNum, aNoNum);
+        const maxErrorsNoNum = Math.floor(aNoNum.length * this.config.fuzzyThreshold);
+        
+        return distanceNoNum <= Math.max(1, maxErrorsNoNum);
     }
 
     loadSeenClues() {
         const saved = localStorage.getItem('plotTwistedSeen');
-        this.state.seenClues = this.safeJsonParse(saved, {}, 'seen clues');
+        this.state.seenClues = saved ? JSON.parse(saved) : {};
     }
 
     saveSeenClues() {
         localStorage.setItem('plotTwistedSeen', JSON.stringify(this.state.seenClues));
-    }
-
-    getUnseenCount(category) {
-        if (!this.clueBank || !this.clueBank[category]) return 0;
-        const total = this.clueBank[category].length;
-        const seen = (this.state.seenClues[category] || []).length;
-        return Math.max(0, total - seen);
     }
 
     shuffle(arr) {
