@@ -1,12 +1,34 @@
 {
   "name": "Plot Twisted: Movie Quiz",
-  "short_name": "PlotTwisted",
+  "short_name": "Plot Twisted",
+  "description": "Guess the movie from the twisted plot summary. Cinema noir trivia for the obsessed.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "orientation": "portrait",
+  "background_color": "#0d0810",
+  "theme_color": "#e8175d",
+  "orientation": "portrait-primary",
+  "categories": ["games", "entertainment"],
+  "lang": "en-US",
+  "screenshots": [],
   "icons": [
+    {
+      "src": "icons/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-64.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
