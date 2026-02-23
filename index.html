@@ -140,11 +140,12 @@ html, body {
    ============================================ */
 
 #startScreen {
-    /* Match the in-game cinematic background vibe */
+    /* Rich cinematic background to match the rest of the game */
     background:
-        radial-gradient(ellipse at 60% 20%, rgba(232, 23, 93, 0.16) 0%, transparent 55%),
-        radial-gradient(ellipse at 15% 80%, rgba(255, 173, 66, 0.18) 0%, transparent 55%),
-        linear-gradient(to bottom, var(--bg-dark) 0%, #050309 55%, #020006 100%);
+        radial-gradient(ellipse at 50% -10%, rgba(232, 23, 93, 0.22) 0%, transparent 60%),
+        radial-gradient(ellipse at 15% 90%, rgba(255, 173, 66, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 100% 10%, rgba(120, 90, 200, 0.15) 0%, transparent 55%),
+        linear-gradient(to bottom, #08040c 0%, #050208 45%, #020005 100%);
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -209,36 +210,38 @@ html, body {
 .home-content {
     position: relative;
     z-index: 1;
-    max-width: 420px;
+    max-width: 440px;
     width: 100%;
-    padding: 24px 22px;
+    padding: 26px 24px 30px;
+    margin-top: 10px;
     border-radius: 18px;
-    /* Cinematic card similar to the clue card */
+    /* Cinematic card panel to match in-game UI */
     background:
-        radial-gradient(circle at top left, rgba(232, 23, 93, 0.18) 0%, transparent 55%),
+        radial-gradient(circle at top left, rgba(232, 23, 93, 0.20) 0%, transparent 55%),
+        radial-gradient(circle at bottom right, rgba(255, 196, 120, 0.18) 0%, transparent 60%),
         rgba(8, 5, 12, 0.96);
     box-shadow:
-        0 0 0 1px rgba(60, 46, 80, 0.9),
+        0 0 0 1px rgba(60, 46, 80, 0.95),
         0 18px 40px rgba(0, 0, 0, 0.9),
-        0 0 30px rgba(232, 23, 93, 0.35);
+        0 0 32px rgba(232, 23, 93, 0.45);
 }
 
-/* Subtle steel-window grid overlay like the in-game panels */
+/* Subtle grid overlay like the in-game panels */
 .home-content::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
     background-size: 22px 22px;
     opacity: 0.18;
     pointer-events: none;
     mix-blend-mode: soft-light;
 }
 
-/* Ensure content sits above the grid overlay */
+/* Ensure inner content sits above the overlay */
 .home-content > * {
     position: relative;
     z-index: 1;
@@ -947,11 +950,11 @@ html, body {
 /* On-Screen Keyboard — Cinema Ticket Booth Style */
 .keyboard {
     width: 100%;
-    max-width: 540px;
+    max-width: 620px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding: 14px 10px;
+    gap: 6px;
+    padding: 16px 12px;
     background: #0f0b14;
     border: none;
     border-radius: 0;
@@ -969,18 +972,18 @@ html, body {
 
 .key {
     flex: 1;
-    max-width: 40px;
-    min-width: 30px;
-    height: 44px;
+    max-width: 52px;
+    min-width: 34px;
+    height: 52px;
     padding: 0;
     font-family: var(--font-title);
-    font-size: 1rem;
+    font-size: 1.08rem;
     font-weight: 400;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     background: #1c1424;
-    color: rgba(242,238,245,0.75);
+    color: rgba(242,238,245,0.82);
     border: 1px solid rgba(50,40,62,1);
-    border-radius: 1px;
+    border-radius: 2px;
     cursor: pointer;
     transition: all 0.12s ease;
     display: flex;
