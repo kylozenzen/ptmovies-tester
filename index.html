@@ -74,11 +74,29 @@ body::before {
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    background-image: 
-        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-    background-size: 40px 20px;
+    /* Subway tile grid */
+    background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 30px;
     background-attachment: fixed;
+}
+
+/* Checkerboard floor at the very bottom — like the cinema floor */
+body::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        repeating-conic-gradient(rgba(255,255,255,0.04) 0% 25%, transparent 0% 50%);
+    background-size: 20px 20px;
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+    mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -167,18 +185,21 @@ html, body {
     z-index: -1;
 }
 
-/* Steel grid overlay — like the cinema window frames */
+/* Steel grid overlay — thick actual window frame bars */
 #startScreen::after {
     content: '';
     position: absolute;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    background-image: 
-        linear-gradient(rgba(255,255,255,0.025) 2px, transparent 2px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 2px, transparent 2px);
-    background-size: 80px 80px;
-    background-attachment: fixed;
+    background-image:
+        /* Thick vertical bars */
+        linear-gradient(90deg, transparent calc(33.33% - 3px), rgba(20,15,28,1) calc(33.33% - 3px), rgba(20,15,28,1) calc(33.33% + 3px), transparent calc(33.33% + 3px)),
+        linear-gradient(90deg, transparent calc(66.66% - 3px), rgba(20,15,28,1) calc(66.66% - 3px), rgba(20,15,28,1) calc(66.66% + 3px), transparent calc(66.66% + 3px)),
+        /* Thick horizontal bars */
+        linear-gradient(transparent calc(33.33% - 2px), rgba(20,15,28,1) calc(33.33% - 2px), rgba(20,15,28,1) calc(33.33% + 2px), transparent calc(33.33% + 2px)),
+        linear-gradient(transparent calc(66.66% - 2px), rgba(20,15,28,1) calc(66.66% - 2px), rgba(20,15,28,1) calc(66.66% + 2px), transparent calc(66.66% + 2px));
+    opacity: 0.5;
 }
 
 .home-content {
@@ -538,10 +559,35 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background: var(--bg-dark);
-    border-bottom: 1px solid rgba(232, 23, 93, 0.3);
-    box-shadow: 0 2px 20px rgba(232,23,93,0.08);
+    padding: 12px 20px;
+    background: #0a0710;
+    border-bottom: none;
+    box-shadow:
+        0 0 0 1px rgba(50,40,62,1),
+        0 2px 0 rgba(20,15,25,1),
+        0 3px 0 rgba(40,30,55,1);
+    position: relative;
+    /* Marquee light strip on top */
+}
+
+/* Top marquee light strip */
+.game-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(232,23,93,0.3) 10%,
+        rgba(232,23,93,0.7) 25%,
+        rgba(255,61,127,0.9) 50%,
+        rgba(232,23,93,0.7) 75%,
+        rgba(232,23,93,0.3) 90%,
+        transparent 100%
+    );
+    box-shadow: 0 0 12px rgba(232,23,93,0.4), 0 0 30px rgba(232,23,93,0.2);
 }
 
 .game-logo {
@@ -602,65 +648,143 @@ html, body {
     overflow-y: auto;
 }
 
-/* Progress */
+/* Progress — Marquee Bulb Lights */
 .progress-track {
     display: flex;
-    gap: 8px;
+    gap: 14px;
+    align-items: center;
+    padding: 8px 16px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    position: relative;
+}
+
+/* Horizontal cable line behind bulbs */
+.progress-track::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 50%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
 }
 
 .progress-pip {
-    width: 12px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--bg-elevated);
-    transition: all 0.3s ease;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(30,20,35,1);
+    border: 2px solid rgba(255,255,255,0.12);
+    transition: all 0.4s ease;
+    position: relative;
+    z-index: 1;
+    /* Screw/socket look */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05);
 }
 
-.progress-pip.complete { background: var(--gold-primary); box-shadow: 0 0 6px var(--gold-glow); }
+/* Lit bulb — yellow, like the chair */
+.progress-pip.complete {
+    background: #f5c518;
+    border-color: #f5c518;
+    box-shadow:
+        inset 0 1px 3px rgba(255,255,100,0.6),
+        0 0 8px rgba(245,197,24,0.9),
+        0 0 20px rgba(245,197,24,0.5),
+        0 0 40px rgba(245,197,24,0.2);
+}
 
+/* Current bulb — pulsing */
 .progress-pip.current {
-    background: var(--gold-light);
-    box-shadow: 0 0 14px var(--gold-glow), 0 0 30px rgba(232,23,93,0.3);
-    width: 24px;
+    background: rgba(245,197,24,0.3);
+    border-color: rgba(245,197,24,0.6);
+    box-shadow:
+        0 0 6px rgba(245,197,24,0.5),
+        0 0 14px rgba(245,197,24,0.3);
+    animation: bulbPulse 1.4s ease-in-out infinite;
 }
 
-/* Clue Card */
+@keyframes bulbPulse {
+    0%, 100% { box-shadow: 0 0 6px rgba(245,197,24,0.5), 0 0 14px rgba(245,197,24,0.3); }
+    50% { box-shadow: 0 0 10px rgba(245,197,24,0.8), 0 0 24px rgba(245,197,24,0.5), 0 0 40px rgba(245,197,24,0.2); }
+}
+
+/* Clue Card — Steel Grid Window Pane */
 .clue-card {
     width: 100%;
     max-width: 500px;
-    background: var(--bg-card);
-    border: 1px solid rgba(232, 23, 93, 0.25);
-    border-radius: 0px;
-    padding: 25px 20px;
     position: relative;
-    box-shadow: var(--shadow-deep), 0 0 30px rgba(232,23,93,0.08);
-    /* Steel grid window pane look */
-    outline: 4px solid rgba(20,15,25,1);
-    outline-offset: 4px;
+    background: rgba(8,5,12,0.95);
+    border: none;
+    padding: 0;
+    /* Outer steel frame */
+    box-shadow:
+        0 0 0 3px rgba(60,50,70,1),
+        0 0 0 4px rgba(20,15,25,1),
+        0 0 0 7px rgba(50,40,60,1),
+        0 0 0 8px rgba(15,10,20,1),
+        0 0 40px rgba(232,23,93,0.08),
+        var(--shadow-deep);
+    overflow: hidden;
 }
 
+/* Letterboard "NOW SHOWING" header */
 .clue-card::before {
-    content: '★ NOW SHOWING ★';
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--font-title);
-    font-size: 0.75rem;
-    color: var(--gold-light);
-    background: var(--bg-deep);
-    padding: 4px 16px;
-    letter-spacing: 0.2em;
-    text-shadow: 0 0 15px var(--gold-glow);
+    content: 'N O W   S H O W I N G';
+    display: block;
+    position: static;
+    transform: none;
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #f2eef5;
+    background: #1a1520;
+    padding: 10px 16px;
+    letter-spacing: 0.18em;
+    border-bottom: 3px solid rgba(60,50,70,1);
+    text-align: left;
+    /* Individual letter tile look */
+    text-shadow: none;
     white-space: nowrap;
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.4);
+}
+
+/* Steel cross-dividers — horizontal bar */
+.clue-card::after {
+    content: '';
+    position: absolute;
+    top: 42px;    /* Below the header */
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(40,30,50,1);
+    box-shadow: 0 1px 0 rgba(80,60,90,0.4), 0 -1px 0 rgba(10,8,14,1);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Steel grid dividers overlaid on card content */
+.clue-card-inner {
+    padding: 24px 20px 20px;
+    position: relative;
+    /* Vertical steel bar down the center */
+    background-image:
+        linear-gradient(rgba(40,30,50,0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(40,30,50,0.6) 1px, transparent 1px);
+    background-size: 100% 120px, 50% 100%;
+    background-position: center top, 50% 0;
 }
 
 .clue-text {
     font-family: var(--font-typewriter);
-    font-size: 1.15rem;
-    line-height: 1.6;
+    font-size: 1.1rem;
+    line-height: 1.7;
     text-align: center;
     color: var(--cream);
+    position: relative;
+    z-index: 1;
 }
 
 .clue-category {
@@ -668,13 +792,15 @@ html, body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 15px;
+    margin-top: 16px;
     padding-top: 12px;
-    border-top: 1px solid rgba(232, 23, 93, 0.15);
-    font-size: 0.8rem;
+    border-top: 1px solid rgba(60,50,70,0.6);
+    font-size: 0.75rem;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.15em;
+    position: relative;
+    z-index: 1;
 }
 
 /* Points Pot */
@@ -722,7 +848,7 @@ html, body {
     50% { transform: scale(1.15); color: var(--red-light); }
 }
 
-/* Title Reveal */
+/* Title Reveal — Neon Tube Treatment */
 .title-reveal {
     width: 100%;
     max-width: 500px;
@@ -730,23 +856,26 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 15px;
-    background: var(--bg-dark);
-    border: 1px solid var(--gold-dark);
+    padding: 16px 15px;
+    background: rgba(5,3,8,0.98);
+    border: none;
     border-radius: 0;
-    box-shadow: 0 0 25px rgba(232,23,93,0.12), inset 0 0 20px rgba(0,0,0,0.3);
-    outline: 3px solid rgba(15,10,20,1);
-    outline-offset: 3px;
+    /* Same steel frame as clue card */
+    box-shadow:
+        0 0 0 3px rgba(60,50,70,1),
+        0 0 0 4px rgba(20,15,25,1),
+        0 0 0 7px rgba(50,40,60,1),
+        inset 0 0 30px rgba(0,0,0,0.5);
 }
 
 .title-letters {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 4px;
+    gap: 3px;
     font-family: var(--font-title);
     font-size: clamp(1.3rem, 5vw, 1.8rem);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
 }
 
 .letter-slot {
@@ -754,12 +883,21 @@ html, body {
     align-items: center;
     justify-content: center;
     min-width: 0.7em;
-    color: var(--gold-light);
+    color: #ff3d7f;
     transition: all 0.3s ease;
-    text-shadow: 0 0 10px var(--gold-glow);
+    /* Neon tube glow */
+    text-shadow:
+        0 0 8px rgba(255,61,127,1),
+        0 0 20px rgba(232,23,93,0.7),
+        0 0 40px rgba(232,23,93,0.3);
+    filter: drop-shadow(0 0 3px rgba(255,61,127,0.8));
 }
 
-.letter-slot.hidden { color: var(--text-muted); text-shadow: none; }
+.letter-slot.hidden {
+    color: rgba(40,30,50,1);
+    text-shadow: none;
+    filter: none;
+}
 
 .letter-slot.revealed {
     animation: letterReveal 0.4s ease;
@@ -772,78 +910,85 @@ html, body {
     100% { transform: scale(1) rotateX(0); opacity: 1; }
 }
 
-/* On-Screen Keyboard — steel grid key style */
+/* On-Screen Keyboard — Cinema Ticket Booth Style */
 .keyboard {
     width: 100%;
     max-width: 540px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 12px 8px;
-    background: var(--bg-card);
-    border: 1px solid rgba(232,23,93,0.2);
+    gap: 5px;
+    padding: 14px 10px;
+    background: #0f0b14;
+    border: none;
     border-radius: 0;
-    box-shadow: 0 0 20px rgba(232,23,93,0.06);
+    box-shadow:
+        0 0 0 2px rgba(60,50,70,1),
+        0 0 0 3px rgba(15,10,20,1),
+        0 0 0 5px rgba(45,35,55,1);
 }
 
 .keyboard-row {
     display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 4px;
 }
 
 .key {
     flex: 1;
-    max-width: 42px;
-    min-width: 32px;
-    height: 46px;
+    max-width: 40px;
+    min-width: 30px;
+    height: 44px;
     padding: 0;
-    font-family: var(--font-body);
-    font-size: 1.05rem;
-    font-weight: 600;
-    background: var(--bg-dark);
-    color: var(--gold-light);
-    border: 1px solid rgba(232,23,93,0.25);
-    border-radius: 2px;
+    font-family: var(--font-title);
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    background: #1c1424;
+    color: rgba(242,238,245,0.75);
+    border: 1px solid rgba(50,40,62,1);
+    border-radius: 1px;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.12s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
-/* Only apply hover on devices that support it */
 @media (hover: hover) {
     .key:hover:not(:disabled) {
-        border-color: var(--gold-primary);
-        background: var(--bg-elevated);
-        transform: translateY(-2px);
-        box-shadow: 0 0 12px var(--gold-glow);
+        border-color: rgba(232,23,93,0.5);
+        background: #261c30;
+        color: var(--cream);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 8px rgba(232,23,93,0.2);
     }
 }
 
 .key:active:not(:disabled) {
-    transform: translateY(0);
-    background: var(--bg-elevated);
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.5);
 }
 
 .key:disabled {
     cursor: not-allowed;
-    opacity: 0.4;
+    opacity: 0.35;
 }
 
+/* Correct — yellow, like the chair */
 .key.correct {
-    background: var(--gold-primary);
-    border-color: var(--gold-light);
-    color: #fff;
-    box-shadow: 0 0 15px var(--gold-glow), 0 0 30px rgba(232,23,93,0.3);
+    background: #f5c518;
+    border-color: #f5c518;
+    color: #0d0810;
+    font-weight: 700;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.4), 0 0 12px rgba(245,197,24,0.7), 0 0 25px rgba(245,197,24,0.3);
 }
 
 .key.incorrect {
-    background: var(--bg-elevated);
-    border-color: rgba(255,255,255,0.05);
-    opacity: 0.3;
-    color: var(--cream-muted);
+    background: rgba(20,15,28,0.5);
+    border-color: rgba(30,25,38,1);
+    opacity: 0.25;
+    color: var(--text-muted);
 }
 
 /* Action Buttons */
@@ -939,30 +1084,37 @@ html, body {
 .daily-clue-card {
     width: 100%;
     max-width: 500px;
-    background: var(--bg-card);
-    border: 1px solid rgba(232, 23, 93, 0.25);
+    background: rgba(8,5,12,0.95);
+    border: none;
     border-radius: 0;
-    padding: 30px 25px;
+    padding: 0;
     position: relative;
-    box-shadow: var(--shadow-deep), 0 0 25px rgba(232,23,93,0.07);
-    outline: 3px solid rgba(15,10,20,1);
-    outline-offset: 3px;
+    box-shadow:
+        0 0 0 3px rgba(60,50,70,1),
+        0 0 0 4px rgba(20,15,25,1),
+        0 0 0 7px rgba(50,40,60,1),
+        0 0 40px rgba(232,23,93,0.08),
+        var(--shadow-deep);
+    overflow: hidden;
 }
 
 .daily-clue-card::before {
     content: attr(data-question);
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: var(--font-title);
-    font-size: 0.75rem;
-    color: var(--gold-light);
-    background: var(--bg-deep);
-    padding: 4px 16px;
-    letter-spacing: 0.2em;
-    text-shadow: 0 0 12px var(--gold-glow);
+    display: block;
+    position: static;
+    transform: none;
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: #f2eef5;
+    background: #1a1520;
+    padding: 10px 16px;
+    letter-spacing: 0.15em;
+    border-bottom: 3px solid rgba(60,50,70,1);
+    text-align: left;
     white-space: nowrap;
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.4);
 }
 
 .daily-input-container {
@@ -2118,8 +2270,10 @@ html, body {
         <div class="game-content">
             <div class="progress-track" id="progressTrack"></div>
             <div class="clue-card fade-in" id="clueCard">
+                <div class="clue-card-inner">
                 <div class="clue-text" id="clueText"></div>
                 <div class="clue-category" id="clueCategory"></div>
+                </div>
             </div>
             <div class="points-pot">
                 <span class="pot-label">Worth</span>
@@ -2146,7 +2300,9 @@ html, body {
         <div class="daily-content">
             <div class="progress-track" id="dailyProgressTrack"></div>
             <div class="daily-clue-card" id="dailyClueCard" data-question="MOVIE 1 OF 5">
+                <div class="clue-card-inner">
                 <div class="clue-text" id="dailyClueText"></div>
+                </div>
             </div>
             <div class="daily-input-container">
                 <input type="text" class="daily-input" id="dailyInput" placeholder="Type your guess..." autocomplete="off" autocapitalize="off">
