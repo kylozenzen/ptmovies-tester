@@ -2096,6 +2096,81 @@ html, body {
     50% {{ opacity: 1; transform: scale(1.2); box-shadow: 0 0 18px rgba(245,197,24,1), 0 0 36px rgba(245,197,24,0.5); }}
 }}
 
+
+/* ——— CINEMATIC MAIN MENU VISUALS ——— */
+
+#startScreen {
+    background: var(--bg-deep);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Load-screen-style cinematic background */
+.cinema-background {
+    position: absolute;
+    inset: 0;
+    background-image:
+        url('icons/splash-1024.png'),
+        linear-gradient(to bottom, rgba(10,10,15,0.9), rgba(0,0,0,0.95));
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    z-index: 1;
+}
+
+/* Floating movie quotes (reuse gameplay vibe) */
+.floating-quotes {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    animation: floatQuotes 18s infinite linear;
+    opacity: 0.15;
+    mix-blend-mode: screen;
+}
+
+/* Simple drifting animation */
+@keyframes floatQuotes {
+    0%   { transform: translateY(0) translateX(0); }
+    50%  { transform: translateY(-20px) translateX(10px); }
+    100% { transform: translateY(0) translateX(0); }
+}
+
+/* Make the main menu card feel like gameplay */
+.menu-card, #startScreen .menu, #startCard {
+    background: rgba(20,20,30,0.85);
+    border: 2px solid var(--gold);
+    box-shadow:
+        0 0 25px rgba(255,215,120,0.15),
+        inset 0 0 10px rgba(255,210,140,0.08);
+    backdrop-filter: blur(4px);
+    position: relative;
+    z-index: 5;
+}
+
+
+/* Let buttons match gameplay glow */
+#startScreen button {
+    border: 2px solid var(--gold);
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 10px rgba(255,215,120,0.25);
+    transition: 0.25s ease;
+}
+
+#startScreen button:hover {
+    box-shadow: 0 0 18px rgba(255,220,140,0.45);
+    transform: scale(1.03);
+}
+
+/* Cinematic header */
+#title, .game-title {
+    text-shadow:
+        0 0 8px rgba(255,220,160,0.8),
+        0 0 16px rgba(255,200,120,0.5);
+    color: var(--gold-light);
+}
+
     </style>
 </head>
 <body>
@@ -2130,6 +2205,8 @@ html, body {
 
     <!-- START SCREEN -->
     <div id="startScreen" class="screen active">
+        <div class="cinema-background"></div>
+        <div class="floating-quotes"></div>
         <div class="spotlight"></div>
         <div class="spotlight-secondary"></div>
         <div class="home-content">
