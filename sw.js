@@ -1,10 +1,11 @@
 // Plot Twisted - Service Worker
 // Cache-first strategy with background updates
 
-const CACHE_NAME = 'plot-twisted-v2';
+const CACHE_NAME = 'plot-twisted-v3';
 const STATIC_ASSETS = [
     './',
     './index.html',
+    './game.html',
     './manifest.json',
     './clues.json',
     './icons/icon-32.png',
@@ -103,7 +104,7 @@ self.addEventListener('fetch', event => {
                 .catch(() => {
                     // Offline fallback for navigation requests
                     if (request.mode === 'navigate') {
-                        return caches.match('./index.html');
+                        return caches.match('./game.html');
                     }
                     return new Response('Offline', { status: 503 });
                 });
