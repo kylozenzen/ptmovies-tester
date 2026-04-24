@@ -422,6 +422,63 @@ html, body {
 }
 
 /* ============================================
+   MODE SCREEN
+   ============================================ */
+#modeScreen {
+    background: var(--bg-deep);
+    overflow-y: auto;
+}
+
+.mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: clamp(12px, 2vw, 20px);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 clamp(16px, 4vw, 60px) 120px;
+}
+
+.mode-card {
+    background: var(--bg-card);
+    border: 2px solid var(--bg-elevated);
+    padding: clamp(20px, 3vw, 30px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.mode-card:hover {
+    border-color: var(--gold-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+.mode-card.selected {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 25px var(--gold-glow), inset 0 0 20px rgba(232,23,93,0.05);
+}
+
+.mode-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gold-light);
+    border: 1px solid rgba(232,23,93,0.4);
+    padding: 4px 8px;
+    margin-bottom: 10px;
+}
+
+.mode-title {
+    font-family: var(--font-title);
+    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+
+.mode-description { color: var(--cream-muted); line-height: 1.5; font-size: 0.92rem; }
+
+/* ============================================
    CATEGORY SCREEN — WIDE GRID
    ============================================ */
 #categoryScreen {
@@ -769,6 +826,34 @@ html, body {
 .btn-solve:active { transform: translateY(0); }
 .btn-solve:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
+.classic-controls {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.classic-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background: var(--bg-dark);
+    border: 1px solid rgba(232,23,93,0.3);
+    color: var(--gold-light);
+    text-align: center;
+}
+
+.classic-input:focus { outline: none; border-color: var(--gold-primary); box-shadow: 0 0 20px rgba(232,23,93,0.25); }
+.classic-input:disabled { opacity: 0.6; cursor: not-allowed; }
+.classic-feedback { min-height: 44px; color: var(--cream-muted); text-align: center; font-size: 0.95rem; line-height: 1.4; padding: 8px 12px; }
+.classic-feedback.correct { color: var(--gold-light); }
+.classic-feedback.incorrect { color: #ff9fb8; }
+.classic-actions { display: flex; gap: 10px; width: 100%; }
+.classic-actions .btn { flex: 1; border-radius: 0; padding: 12px 16px; }
+.btn-next-question { width: 100%; padding: 14px 20px; border-radius: 0; background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: #fff; box-shadow: 0 4px 20px var(--gold-glow); }
+.btn-next-question:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
 /* Mobile game layout — stack it */
 @media (max-width: 900px) {
     .game-body { flex-direction: column; overflow-y: auto; }
@@ -781,6 +866,7 @@ html, body {
     .clue-card { max-width: 100%; }
     .key { max-width: 40px; height: 44px; font-size: 0.95rem; }
     .keyboard-hint { display: none !important; }
+    .classic-actions { flex-direction: column; }
 }
 
 /* Desktop: show keyboard hint */
@@ -1120,6 +1206,32 @@ html, body {
 </div>
 
 <!-- ============================================
+     MODE SCREEN
+     ============================================ -->
+<div id="modeScreen" class="screen">
+    <div class="category-header">
+        <h2>Choose Your Mode</h2>
+        <p>Select how you want to play this round</p>
+    </div>
+    <div class="mode-grid">
+        <div class="mode-card selected" data-mode="classic" id="classicModeCard">
+            <div class="mode-badge">Recommended</div>
+            <div class="mode-title">Classic Mode</div>
+            <div class="mode-description">Type the title from the twisted clue.</div>
+        </div>
+        <div class="mode-card" data-mode="marquee" id="marqueeModeCard">
+            <div class="mode-badge">Reveal Mode</div>
+            <div class="mode-title">Marquee Mode</div>
+            <div class="mode-description">Reveal the title piece by piece.</div>
+        </div>
+    </div>
+    <div class="category-actions">
+        <button class="btn btn-back" id="modeBackBtn">← Back</button>
+        <button class="btn btn-start" id="modeContinueBtn">Continue →</button>
+    </div>
+</div>
+
+<!-- ============================================
      CATEGORY SCREEN
      ============================================ -->
 <div id="categoryScreen" class="screen">
@@ -1260,14 +1372,25 @@ html, body {
                 <span class="pot-value" id="potValue">500</span>
                 <span class="pot-multiplier" id="potMultiplier"></span>
             </div>
-            <div class="title-reveal" id="titleReveal">
-                <div class="title-letters" id="titleLetters"></div>
+            <div class="classic-controls" id="classicControls">
+                <input type="text" class="classic-input" id="classicAnswerInput" placeholder="Type the movie title..." autocomplete="off" autocapitalize="off">
+                <div class="classic-actions">
+                    <button class="btn btn-submit" id="classicSubmitBtn">Submit Answer</button>
+                    <button class="btn btn-giveup" id="classicRevealBtn">Skip / Reveal</button>
+                </div>
+                <div class="classic-feedback" id="classicFeedback"></div>
+                <button class="btn btn-next-question" id="classicNextBtn" disabled>Next Question →</button>
             </div>
-            <div class="keyboard" id="keyboard"></div>
-            <div class="keyboard-hint">Type letters on your keyboard · Enter to solve · Escape to cancel</div>
-            <div class="action-buttons">
-                <button class="btn btn-giveup" id="giveUpBtn">Give Up</button>
-                <button class="btn btn-solve" id="solveBtn">I Know It!</button>
+            <div id="marqueeControls">
+                <div class="title-reveal" id="titleReveal">
+                    <div class="title-letters" id="titleLetters"></div>
+                </div>
+                <div class="keyboard" id="keyboard"></div>
+                <div class="keyboard-hint">Type letters on your keyboard · Enter to solve · Escape to cancel</div>
+                <div class="action-buttons">
+                    <button class="btn btn-giveup" id="giveUpBtn">Give Up</button>
+                    <button class="btn btn-solve" id="solveBtn">I Know It!</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1501,13 +1624,15 @@ class PlotTwisted {
     constructor() {
         this.state = {
             currentScreen: 'start',
+            selectedMode: 'classic',
             selectedCategory: null,
             questions: [], currentIndex: 0,
             totalScore: 0, strikes: 3, currentPot: 500,
             revealedIndices: [], guessedLetters: [], results: [], seenClues: {},
+            classicQuestionDone: false,
             dailyQuestions: [], dailyIndex: 0, dailyResults: [], dailyCompleted: false
         };
-        this.config = { maxPot: 500, wrongLetterCost: 30, minPot: 50, questionsPerRound: 5, fuzzyThreshold: 0.18 };
+        this.config = { maxPot: 500, wrongLetterCost: 30, minPot: 50, questionsPerRound: 5, fuzzyThreshold: 0.18, classicBasePoints: 100, classicWrongGuessPenalty: 15, classicMinPoints: 40 };
         this.clueBank = null;
         this.settings = { sound: false, roastMode: 'clean' };
         this._physicalKeyHandler = null;
@@ -1543,6 +1668,7 @@ class PlotTwisted {
     cacheDOM() {
         this.screens = {
             start: document.getElementById('startScreen'),
+            mode: document.getElementById('modeScreen'),
             category: document.getElementById('categoryScreen'),
             howToPlay: document.getElementById('howToPlayScreen'),
             settings: document.getElementById('settingsScreen'),
@@ -1554,10 +1680,21 @@ class PlotTwisted {
         this.dom = {
             categoryGrid: document.getElementById('categoryGrid'),
             startGameBtn: document.getElementById('startGameBtn'),
+            modeContinueBtn: document.getElementById('modeContinueBtn'),
+            modeBackBtn: document.getElementById('modeBackBtn'),
+            classicModeCard: document.getElementById('classicModeCard'),
+            marqueeModeCard: document.getElementById('marqueeModeCard'),
             clueText: document.getElementById('clueText'),
             clueCategory: document.getElementById('clueCategory'),
             clueCard: document.getElementById('clueCard'),
             titleLetters: document.getElementById('titleLetters'),
+            marqueeControls: document.getElementById('marqueeControls'),
+            classicControls: document.getElementById('classicControls'),
+            classicAnswerInput: document.getElementById('classicAnswerInput'),
+            classicSubmitBtn: document.getElementById('classicSubmitBtn'),
+            classicRevealBtn: document.getElementById('classicRevealBtn'),
+            classicFeedback: document.getElementById('classicFeedback'),
+            classicNextBtn: document.getElementById('classicNextBtn'),
             potValue: document.getElementById('potValue'),
             potMultiplier: document.getElementById('potMultiplier'),
             totalScore: document.getElementById('totalScore'),
@@ -1599,7 +1736,7 @@ class PlotTwisted {
     }
 
     bindEvents() {
-        document.getElementById('quickPlayBtn').onclick = () => this.showCategoryScreen();
+        document.getElementById('quickPlayBtn').onclick = () => this.showModeScreen();
         document.getElementById('dailyBtn').onclick = () => this.startDaily();
         document.getElementById('howToPlayBtn').onclick = () => this.showScreen('howToPlay');
         document.getElementById('howToBackBtn').onclick = () => this.showScreen('start');
@@ -1608,7 +1745,11 @@ class PlotTwisted {
         this.dom.soundToggle.onclick = () => this.toggleSound();
         this.dom.roastModeSelect?.addEventListener('change', (e) => this.handleRoastModeChange(e.target.value));
         this.dom.resetBtn?.addEventListener('click', () => this.resetProgress());
-        document.getElementById('categoryBackBtn').onclick = () => this.showScreen('start');
+        this.dom.modeBackBtn.onclick = () => this.showScreen('start');
+        this.dom.modeContinueBtn.onclick = () => this.showCategoryScreen();
+        this.dom.classicModeCard.onclick = () => this.selectMode('classic');
+        this.dom.marqueeModeCard.onclick = () => this.selectMode('marquee');
+        document.getElementById('categoryBackBtn').onclick = () => this.showScreen('mode');
         this.dom.startGameBtn.onclick = () => this.startGame();
         this.dom.giveUpBtn.onclick = () => this.giveUp();
         this.dom.solveBtn.onclick = () => this.openSolveModal();
@@ -1624,6 +1765,10 @@ class PlotTwisted {
         this.dom.dailySubmitBtn.onclick = () => this.submitDailyGuess();
         this.dom.dailySkipBtn.onclick = () => this.skipDailyQuestion();
         this.dom.dailyInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); this.submitDailyGuess(); } });
+        this.dom.classicSubmitBtn?.addEventListener('click', () => this.submitClassicGuess());
+        this.dom.classicRevealBtn?.addEventListener('click', () => this.revealClassicAnswer());
+        this.dom.classicNextBtn?.addEventListener('click', () => this.advanceClassicQuestion());
+        this.dom.classicAnswerInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); this.submitClassicGuess(); } });
         document.getElementById('dailyShareBtn').onclick = () => this.shareDailyScore();
         document.getElementById('dailyMenuBtn').onclick = () => this.showScreen('start');
     }
@@ -1635,7 +1780,7 @@ class PlotTwisted {
             // Don't intercept if a text input is focused
             const tag = document.activeElement?.tagName;
             if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-            if (this.state.currentScreen !== 'game') return;
+            if (this.state.currentScreen !== 'game' || this.state.selectedMode !== 'marquee') return;
             if (this.dom.solveModal.classList.contains('active')) return;
             if (this.dom.resultOverlay.classList.contains('active')) return;
 
@@ -1708,6 +1853,15 @@ class PlotTwisted {
     }
 
     // ── Category Screen ───────────────────────────
+    showModeScreen() {
+        this.selectMode(this.state.selectedMode || 'classic');
+        this.showScreen('mode');
+    }
+    selectMode(mode) {
+        this.state.selectedMode = mode === 'marquee' ? 'marquee' : 'classic';
+        this.dom.classicModeCard?.classList.toggle('selected', this.state.selectedMode === 'classic');
+        this.dom.marqueeModeCard?.classList.toggle('selected', this.state.selectedMode === 'marquee');
+    }
     showCategoryScreen() {
         this.renderCategories();
         this.state.selectedCategory = null;
@@ -1752,26 +1906,55 @@ class PlotTwisted {
         this.state.totalScore = 0;
         this.state.strikes = 3;
         this.state.results = [];
+        this.state.classicQuestionDone = false;
         this.renderProgress();
         this.updateTotalScore();
         this.updateStrikes();
         this.showScreen('game');
+        this.configureGameModeUI();
         this.loadQuestion();
+    }
+
+    configureGameModeUI() {
+        const isClassic = this.state.selectedMode === 'classic';
+        this.dom.marqueeControls.style.display = isClassic ? 'none' : 'block';
+        this.dom.classicControls.style.display = isClassic ? 'flex' : 'none';
+        this.dom.strikesDisplay.closest('.game-stat').style.display = isClassic ? 'none' : 'block';
+        this.dom.potMultiplier.style.display = isClassic ? 'none' : 'inline';
+        this.dom.potValue.textContent = isClassic ? this.config.classicBasePoints : this.config.maxPot;
     }
 
     loadQuestion() {
         const q = this.state.questions[this.state.currentIndex];
-        this.state.currentPot = this.config.maxPot;
+        const isClassic = this.state.selectedMode === 'classic';
+        this.state.currentPot = isClassic ? this.config.classicBasePoints : this.config.maxPot;
         this.state.revealedIndices = [];
         this.state.guessedLetters = [];
+        this.state.classicQuestionDone = false;
         const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
         displayTitle.split('').forEach((char, i) => { if (/[0-9]/.test(char)) this.state.revealedIndices.push(i); });
         this.dom.clueText.textContent = q.clue;
         this.dom.clueCategory.textContent = this.state.selectedCategory;
         this.updatePot();
         this.updateProgress();
-        this.renderTitle();
-        this.renderKeyboard();
+        if (isClassic) this.loadClassicQuestion();
+        else {
+            this.renderTitle();
+            this.renderKeyboard();
+        }
+    }
+
+    loadClassicQuestion() {
+        this.state.currentPot = this.config.classicBasePoints;
+        this.updatePot();
+        this.dom.classicAnswerInput.value = '';
+        this.dom.classicAnswerInput.disabled = false;
+        this.dom.classicSubmitBtn.disabled = false;
+        this.dom.classicRevealBtn.disabled = false;
+        this.dom.classicFeedback.textContent = '';
+        this.dom.classicFeedback.className = 'classic-feedback';
+        this.dom.classicNextBtn.disabled = true;
+        setTimeout(() => this.dom.classicAnswerInput.focus(), 80);
     }
 
     renderTitle() {
@@ -1816,6 +1999,7 @@ class PlotTwisted {
     }
 
     guessLetter(letter) {
+        if (this.state.selectedMode !== 'marquee') return;
         if (this.state.guessedLetters.includes(letter)) return;
         this.state.guessedLetters.push(letter);
         const q = this.state.questions[this.state.currentIndex];
@@ -1855,6 +2039,7 @@ class PlotTwisted {
     }
 
     autoSolve() {
+        if (this.state.selectedMode !== 'marquee') return;
         const q = this.state.questions[this.state.currentIndex];
         const points = Math.round(this.state.currentPot * this.getMultiplier());
         this.state.results.push({ title: q.title, points, correct: true });
@@ -1864,6 +2049,7 @@ class PlotTwisted {
     }
 
     giveUp() {
+        if (this.state.selectedMode !== 'marquee') return;
         const q = this.state.questions[this.state.currentIndex];
         this.state.results.push({ title: q.title, points: 0, correct: false, gaveUp: true });
         const displayTitle = this.getDisplayTitle(q.title).toUpperCase();
@@ -1873,6 +2059,7 @@ class PlotTwisted {
     }
 
     openSolveModal() {
+        if (this.state.selectedMode !== 'marquee') return;
         this.dom.solveModal.classList.add('active');
         this.dom.solveInput.value = '';
         setTimeout(() => this.dom.solveInput.focus(), 100);
@@ -1880,6 +2067,7 @@ class PlotTwisted {
     closeSolveModal() { this.dom.solveModal.classList.remove('active'); }
 
     submitSolve() {
+        if (this.state.selectedMode !== 'marquee') return;
         const guess = this.dom.solveInput.value.trim();
         if (!guess) return;
         const q = this.state.questions[this.state.currentIndex];
@@ -1909,6 +2097,60 @@ class PlotTwisted {
         setTimeout(() => this.dom.clueCard.classList.remove('shake'), 400);
         if (this.state.strikes <= 0) { this.state.results.push({ title: q.title, points: 0, correct: false }); this.showResult(false, q.title, 0, true); }
         else this.showResult(false, q.title, 0, false);
+    }
+
+    submitClassicGuess() {
+        if (this.state.selectedMode !== 'classic' || this.state.classicQuestionDone) return;
+        const guess = this.dom.classicAnswerInput.value.trim();
+        if (!guess) return;
+        const q = this.state.questions[this.state.currentIndex];
+        if (this.normalizeAnswer(guess) === this.normalizeAnswer(q.title)) {
+            this.state.classicQuestionDone = true;
+            this.state.results.push({ title: q.title, points: this.state.currentPot, correct: true });
+            this.state.totalScore += this.state.currentPot;
+            this.updateTotalScore();
+            this.dom.classicFeedback.textContent = this.getClassicCorrectMessage();
+            this.dom.classicFeedback.className = 'classic-feedback correct';
+            this.dom.classicAnswerInput.disabled = true;
+            this.dom.classicSubmitBtn.disabled = true;
+            this.dom.classicRevealBtn.disabled = true;
+            this.dom.classicNextBtn.disabled = false;
+        } else {
+            this.state.currentPot = Math.max(this.config.classicMinPoints, this.state.currentPot - this.config.classicWrongGuessPenalty);
+            this.updatePot(true);
+            this.dom.classicFeedback.textContent = this.getClassicWrongMessage();
+            this.dom.classicFeedback.className = 'classic-feedback incorrect';
+            this.dom.classicAnswerInput.focus();
+            this.dom.classicAnswerInput.select();
+        }
+    }
+
+    revealClassicAnswer() {
+        if (this.state.selectedMode !== 'classic' || this.state.classicQuestionDone) return;
+        const q = this.state.questions[this.state.currentIndex];
+        this.state.classicQuestionDone = true;
+        this.state.results.push({ title: q.title, points: 0, correct: false, gaveUp: true });
+        this.dom.classicFeedback.textContent = `The answer was: ${q.title}. A humbling screening, honestly.`;
+        this.dom.classicFeedback.className = 'classic-feedback incorrect';
+        this.dom.classicAnswerInput.disabled = true;
+        this.dom.classicSubmitBtn.disabled = true;
+        this.dom.classicRevealBtn.disabled = true;
+        this.dom.classicNextBtn.disabled = false;
+    }
+
+    advanceClassicQuestion() {
+        if (this.state.selectedMode !== 'classic' || !this.state.classicQuestionDone) return;
+        this.nextQuestion();
+    }
+
+    getClassicCorrectMessage() {
+        const messages = ["Roll credits. You nailed it.", "Correct. Your streaming habits were not wasted.", "That’s the one. IMDb who?"];
+        return messages[Math.floor(Math.random() * messages.length)];
+    }
+
+    getClassicWrongMessage() {
+        const messages = ["Not it, but emotionally adjacent.", "Bold guess. Incorrect, but bold.", "The theater rejects this answer."];
+        return messages[Math.floor(Math.random() * messages.length)];
     }
 
     showResult(isCorrect, title, points, isGameOver = false, gaveUp = false) {
@@ -2081,7 +2323,17 @@ class PlotTwisted {
             else m[i][j] = 1 + Math.min(m[i-1][j-1], m[i][j-1], m[i-1][j]);
         } return m[b.length][a.length];
     }
-    normalizeTitle(str) { return str.toLowerCase().replace(/\([^)]*\)/g,'').replace(/^the\s+/g,'').replace(/[^a-z0-9]/g,' ').replace(/\s+/g,' ').trim(); }
+    normalizeAnswer(str) {
+        return String(str || '')
+            .toLowerCase()
+            .trim()
+            .replace(/\([^)]*\)/g, '')
+            .replace(/[\.\,\!\?'"`:;\-_/\\()[\]{}]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .replace(/^(the|a|an)\s+/, '')
+            .trim();
+    }
+    normalizeTitle(str) { return this.normalizeAnswer(str); }
     stripNumbers(str) { return str.replace(/[0-9]/g,'').replace(/\s+/g,' ').trim(); }
     getDisplayTitle(title) { return title.replace(/\([^)]*\)/g,'').trim(); }
     isFuzzyMatch(guess, actual) {
