@@ -87,11 +87,16 @@ body::after {
 
 html, body {
     height: 100%;
+    width: 100%;
     font-family: var(--font-body);
     background: var(--bg-deep);
     color: var(--cream);
-    overflow: hidden;
+    overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    overflow-y: hidden;
 }
 
 .film-grain {
@@ -424,24 +429,63 @@ html, body {
 /* ============================================
    MODE SCREEN
    ============================================ */
-#modeScreen {
+#modeScreen,
+#categoryScreen {
     background: var(--bg-deep);
     overflow-y: auto;
+    overflow-x: hidden;
 }
+
+.selection-shell {
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0 clamp(12px, 3vw, 28px) clamp(12px, 2vh, 20px);
+}
+
+.mode-header::before {
+    content: 'SELECT MODE';
+}
+
+.category-header {
+    text-align: center;
+    padding: clamp(20px, 3.5vw, 52px) 0 clamp(14px, 2vw, 24px);
+    position: relative;
+}
+.category-header::before {
+    content: 'SELECT GENRE';
+    font-family: var(--font-title);
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    color: var(--gold-primary);
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.75;
+}
+.category-header h2 {
+    font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 3rem);
+    color: var(--cream); margin-bottom: 8px;
+}
+.category-header p { font-size: 0.94rem; color: var(--cream-muted); max-width: 560px; margin: 0 auto; }
 
 .mode-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: clamp(12px, 2vw, 20px);
-    max-width: 900px;
+    grid-template-columns: 1fr;
+    gap: clamp(12px, 1.8vw, 18px);
+    width: 100%;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 clamp(16px, 4vw, 60px) 120px;
+    padding: 0 0 clamp(18px, 3vh, 28px);
 }
 
 .mode-card {
+    width: 100%;
+    max-width: 100%;
     background: var(--bg-card);
     border: 2px solid var(--bg-elevated);
-    padding: clamp(20px, 3vw, 30px);
+    padding: clamp(18px, 3vw, 28px);
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left;
@@ -449,20 +493,20 @@ html, body {
 
 .mode-card:hover {
     border-color: var(--gold-dark);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
 
 .mode-card.selected {
     border-color: var(--gold-primary);
-    box-shadow: 0 0 25px var(--gold-glow), inset 0 0 20px rgba(232,23,93,0.05);
+    box-shadow: 0 0 24px var(--gold-glow), inset 0 0 20px rgba(232,23,93,0.06);
 }
 
 .mode-badge {
     display: inline-block;
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.14em;
     color: var(--gold-light);
     border: 1px solid rgba(232,23,93,0.4);
     padding: 4px 8px;
@@ -471,55 +515,28 @@ html, body {
 
 .mode-title {
     font-family: var(--font-title);
-    font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+    font-size: clamp(1.2rem, 2.1vw, 1.55rem);
     letter-spacing: 0.08em;
     margin-bottom: 8px;
 }
 
-.mode-description { color: var(--cream-muted); line-height: 1.5; font-size: 0.92rem; }
-
-/* ============================================
-   CATEGORY SCREEN — WIDE GRID
-   ============================================ */
-#categoryScreen {
-    background: var(--bg-deep);
-    overflow-y: auto;
-}
-
-.category-header {
-    text-align: center;
-    padding: clamp(24px, 4vw, 60px) 20px clamp(16px, 2vw, 32px);
-    position: relative;
-}
-.category-header::before {
-    content: 'SELECT GENRE';
-    font-family: var(--font-title);
-    font-size: 0.7rem;
-    letter-spacing: 0.5em;
-    color: var(--gold-primary);
-    display: block;
-    margin-bottom: 10px;
-    opacity: 0.7;
-}
-.category-header h2 {
-    font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 3rem);
-    color: var(--cream); margin-bottom: 8px;
-}
-.category-header p { font-size: 0.9rem; color: var(--text-muted); }
+.mode-description { color: var(--cream-muted); line-height: 1.5; font-size: 0.95rem; }
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: clamp(12px, 2vw, 20px);
-    max-width: var(--content-max); margin: 0 auto;
-    padding: 0 clamp(16px, 4vw, 60px) 120px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(10px, 2vw, 18px);
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 0 clamp(20px, 2vh, 28px);
 }
 
 .category-card {
     background: var(--bg-card);
     border: 2px solid var(--bg-elevated);
     border-radius: 4px;
-    padding: clamp(20px, 3vw, 36px) clamp(16px, 2vw, 24px);
+    padding: clamp(18px, 2.8vw, 30px) clamp(12px, 2vw, 20px);
     text-align: center; cursor: pointer;
     transition: all 0.2s ease;
     position: relative; overflow: hidden;
@@ -527,29 +544,33 @@ html, body {
 .category-card::before {
     content: '';
     position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(232,23,93,0.04) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(232,23,93,0.05) 0%, transparent 60%);
     opacity: 0; transition: opacity 0.2s;
 }
-.category-card:hover { border-color: var(--gold-dark); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+.category-card:hover { border-color: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
 .category-card:hover::before { opacity: 1; }
-.category-card:active { transform: scale(0.98); }
+.category-card:active { transform: scale(0.985); }
 .category-card.selected {
     border-color: var(--gold-primary);
-    box-shadow: 0 0 25px var(--gold-glow), inset 0 0 20px rgba(232,23,93,0.05);
+    box-shadow: 0 0 25px var(--gold-glow), inset 0 0 20px rgba(232,23,93,0.07);
 }
 .category-card.selected::before { opacity: 1; }
 
-.category-icon { width: clamp(44px,5vw,60px); height: clamp(44px,5vw,60px); margin: 0 auto clamp(10px,2vw,16px); color: var(--gold-primary); filter: drop-shadow(0 0 8px var(--gold-glow)); }
+.category-icon { width: clamp(40px,5vw,54px); height: clamp(40px,5vw,54px); margin: 0 auto clamp(10px,2vw,14px); color: var(--gold-primary); filter: drop-shadow(0 0 8px var(--gold-glow)); }
 .category-icon svg { width: 100%; height: 100%; fill: currentColor; }
-.category-name { font-family: var(--font-title); font-size: clamp(1.1rem,2vw,1.4rem); color: var(--cream); letter-spacing: 0.1em; }
+.category-name { font-family: var(--font-title); font-size: clamp(1rem,2vw,1.3rem); color: var(--cream); letter-spacing: 0.09em; }
 
 .category-actions {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    padding: 16px clamp(16px,4vw,60px);
-    background: linear-gradient(to top, var(--bg-deep) 80%, transparent);
-    display: flex; gap: 12px; max-width: var(--content-max); margin: 0 auto;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    margin-top: auto;
+    padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(13,8,16,0.98) 70%, rgba(13,8,16,0.82) 92%, transparent);
+    display: flex;
+    gap: 12px;
 }
-.category-actions .btn { flex: 1; padding: 16px 24px; border-radius: 0; font-size: 0.95rem; }
+.category-actions .btn { flex: 1; padding: 15px 20px; border-radius: 0; font-size: 0.95rem; min-height: 48px; }
 .btn-back { background: var(--bg-elevated); color: var(--cream-muted); }
 .btn-start {
     background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
@@ -830,11 +851,44 @@ html, body {
     display: none;
     width: 100%;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+}
+
+.classic-feedback-panel {
+    min-height: 132px;
+    width: 100%;
+    background: rgba(12, 8, 18, 0.85);
+    border: 1px solid rgba(232,23,93,0.24);
+    padding: 12px 14px;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+}
+
+.classic-reveal {
+    min-height: 48px;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.18);
+    color: var(--cream-muted);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    opacity: 0.65;
+    transform: translateY(0);
+    transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.classic-reveal.has-answer {
+    color: var(--cream);
+    border-style: solid;
+    border-color: rgba(245,197,24,0.5);
+    background: rgba(245,197,24,0.1);
+    opacity: 1;
 }
 
 .classic-input {
     width: 100%;
+    min-height: 50px;
     padding: 14px 16px;
     font-family: var(--font-body);
     font-size: 1rem;
@@ -846,32 +900,71 @@ html, body {
 
 .classic-input:focus { outline: none; border-color: var(--gold-primary); box-shadow: 0 0 20px rgba(232,23,93,0.25); }
 .classic-input:disabled { opacity: 0.6; cursor: not-allowed; }
-.classic-feedback { min-height: 44px; color: var(--cream-muted); text-align: center; font-size: 0.95rem; line-height: 1.4; padding: 8px 12px; }
+.classic-feedback { min-height: 56px; color: var(--cream-muted); text-align: center; font-size: 0.96rem; line-height: 1.45; padding: 8px 8px; display: flex; align-items: center; justify-content: center; opacity: 0.85; transform: translateY(0); transition: opacity 0.2s ease, transform 0.2s ease; }
+.classic-feedback.has-content { opacity: 1; transform: translateY(-1px); }
 .classic-feedback.correct { color: var(--gold-light); }
 .classic-feedback.incorrect { color: #ff9fb8; }
 .classic-actions { display: flex; gap: 10px; width: 100%; }
-.classic-actions .btn { flex: 1; border-radius: 0; padding: 12px 16px; }
+.classic-actions .btn { flex: 1; border-radius: 0; padding: 13px 16px; min-height: 48px; }
 .btn-next-question { width: 100%; padding: 14px 20px; border-radius: 0; background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: #fff; box-shadow: 0 4px 20px var(--gold-glow); }
 .btn-next-question:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 
 /* Mobile game layout — stack it */
 @media (max-width: 900px) {
+    .selection-shell { padding-inline: 12px; }
     .game-body { flex-direction: column; overflow-y: auto; }
     .game-left {
         border-right: none; border-bottom: 1px solid rgba(50,40,62,0.5);
         padding: 16px; min-height: auto; flex: 0 0 auto;
     }
     .clue-panel-label { display: none; }
-    .game-right { width: 100%; flex: 1; padding: 12px 12px 20px; }
+    .game-right { width: 100%; flex: 1; padding: 12px 12px calc(18px + env(safe-area-inset-bottom)); }
     .clue-card { max-width: 100%; }
     .key { max-width: 40px; height: 44px; font-size: 0.95rem; }
     .keyboard-hint { display: none !important; }
+    .classic-feedback-panel { min-height: 120px; }
     .classic-actions { flex-direction: column; }
 }
 
 /* Desktop: show keyboard hint */
 @media (min-width: 901px) {
     .keyboard-hint { display: block; }
+}
+
+@media (min-width: 768px) {
+    .mode-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 900px;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .selection-shell {
+        width: min(100%, 1200px);
+        padding-inline: clamp(28px, 4vw, 48px);
+    }
+
+    .mode-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 860px;
+    }
+
+    .category-grid {
+        max-width: 1060px;
+    }
+
+    .game-body {
+        width: min(100%, 1320px);
+        margin: 0 auto;
+    }
+
+    .game-right {
+        width: min(46%, 540px);
+    }
 }
 
 /* ============================================
@@ -919,7 +1012,11 @@ html, body {
 .daily-input::placeholder { color: var(--text-muted); }
 .daily-input:disabled { opacity: 0.5; cursor: not-allowed; }
 .daily-actions { display: flex; gap: 12px; width: 100%; }
-.daily-actions .btn { flex: 1; padding: 16px 24px; border-radius: 0; }
+.daily-actions .btn { flex: 1; padding: 16px 24px; border-radius: 0; min-height: 48px; }
+@media (max-width: 640px) {
+    .daily-actions { flex-direction: column; }
+    .category-grid { grid-template-columns: 1fr; }
+}
 .btn-skip { background: var(--bg-elevated); color: var(--cream-muted); }
 .btn-submit-daily { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: #fff; }
 .btn-submit-daily:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--gold-glow); }
@@ -1209,7 +1306,8 @@ html, body {
      MODE SCREEN
      ============================================ -->
 <div id="modeScreen" class="screen">
-    <div class="category-header">
+    <div class="selection-shell">
+    <div class="category-header mode-header">
         <h2>Choose Your Mode</h2>
         <p>Select how you want to play this round</p>
     </div>
@@ -1229,12 +1327,14 @@ html, body {
         <button class="btn btn-back" id="modeBackBtn">← Back</button>
         <button class="btn btn-start" id="modeContinueBtn">Continue →</button>
     </div>
+    </div>
 </div>
 
 <!-- ============================================
      CATEGORY SCREEN
      ============================================ -->
 <div id="categoryScreen" class="screen">
+    <div class="selection-shell">
     <div class="category-header">
         <h2>Choose Your Genre</h2>
         <p>Pick a category to start playing</p>
@@ -1243,6 +1343,7 @@ html, body {
     <div class="category-actions">
         <button class="btn btn-back" id="categoryBackBtn">← Back</button>
         <button class="btn btn-start" id="startGameBtn" disabled>Start Game →</button>
+    </div>
     </div>
 </div>
 
@@ -1374,11 +1475,14 @@ html, body {
             </div>
             <div class="classic-controls" id="classicControls">
                 <input type="text" class="classic-input" id="classicAnswerInput" placeholder="Type the movie title..." autocomplete="off" autocapitalize="off">
+                <div class="classic-feedback-panel">
+                    <div class="classic-feedback" id="classicFeedback" aria-live="polite">Take your best shot. Typos are forgiven; bad guesses are remembered.</div>
+                    <div class="classic-reveal" id="classicRevealText">Need a hint? Use Skip / Reveal to see the answer here.</div>
+                </div>
                 <div class="classic-actions">
                     <button class="btn btn-submit" id="classicSubmitBtn">Submit Answer</button>
                     <button class="btn btn-giveup" id="classicRevealBtn">Skip / Reveal</button>
                 </div>
-                <div class="classic-feedback" id="classicFeedback"></div>
                 <button class="btn btn-next-question" id="classicNextBtn" disabled>Next Question →</button>
             </div>
             <div id="marqueeControls">
@@ -1694,6 +1798,7 @@ class PlotTwisted {
             classicSubmitBtn: document.getElementById('classicSubmitBtn'),
             classicRevealBtn: document.getElementById('classicRevealBtn'),
             classicFeedback: document.getElementById('classicFeedback'),
+            classicRevealText: document.getElementById('classicRevealText'),
             classicNextBtn: document.getElementById('classicNextBtn'),
             potValue: document.getElementById('potValue'),
             potMultiplier: document.getElementById('potMultiplier'),
@@ -1951,8 +2056,10 @@ class PlotTwisted {
         this.dom.classicAnswerInput.disabled = false;
         this.dom.classicSubmitBtn.disabled = false;
         this.dom.classicRevealBtn.disabled = false;
-        this.dom.classicFeedback.textContent = '';
+        this.dom.classicFeedback.textContent = 'Take your best shot. Typos are forgiven; bad guesses are remembered.';
         this.dom.classicFeedback.className = 'classic-feedback';
+        this.dom.classicRevealText.textContent = 'Need a hint? Use Skip / Reveal to see the answer here.';
+        this.dom.classicRevealText.className = 'classic-reveal';
         this.dom.classicNextBtn.disabled = true;
         setTimeout(() => this.dom.classicAnswerInput.focus(), 80);
     }
@@ -2110,7 +2217,9 @@ class PlotTwisted {
             this.state.totalScore += this.state.currentPot;
             this.updateTotalScore();
             this.dom.classicFeedback.textContent = this.getClassicCorrectMessage();
-            this.dom.classicFeedback.className = 'classic-feedback correct';
+            this.dom.classicFeedback.className = 'classic-feedback correct has-content';
+            this.dom.classicRevealText.textContent = `Answer locked in: ${q.title}.`;
+            this.dom.classicRevealText.className = 'classic-reveal has-answer';
             this.dom.classicAnswerInput.disabled = true;
             this.dom.classicSubmitBtn.disabled = true;
             this.dom.classicRevealBtn.disabled = true;
@@ -2119,7 +2228,7 @@ class PlotTwisted {
             this.state.currentPot = Math.max(this.config.classicMinPoints, this.state.currentPot - this.config.classicWrongGuessPenalty);
             this.updatePot(true);
             this.dom.classicFeedback.textContent = this.getClassicWrongMessage();
-            this.dom.classicFeedback.className = 'classic-feedback incorrect';
+            this.dom.classicFeedback.className = 'classic-feedback incorrect has-content';
             this.dom.classicAnswerInput.focus();
             this.dom.classicAnswerInput.select();
         }
@@ -2130,8 +2239,10 @@ class PlotTwisted {
         const q = this.state.questions[this.state.currentIndex];
         this.state.classicQuestionDone = true;
         this.state.results.push({ title: q.title, points: 0, correct: false, gaveUp: true });
-        this.dom.classicFeedback.textContent = `The answer was: ${q.title}. A humbling screening, honestly.`;
-        this.dom.classicFeedback.className = 'classic-feedback incorrect';
+        this.dom.classicFeedback.textContent = 'Reveal used. Onward to the next mystery.';
+        this.dom.classicFeedback.className = 'classic-feedback incorrect has-content';
+        this.dom.classicRevealText.textContent = `The answer was: ${q.title}. A humbling screening, honestly.`;
+        this.dom.classicRevealText.className = 'classic-reveal has-answer';
         this.dom.classicAnswerInput.disabled = true;
         this.dom.classicSubmitBtn.disabled = true;
         this.dom.classicRevealBtn.disabled = true;
