@@ -2,7 +2,7 @@
   "name": "Plot Twisted: Movie Quiz",
   "short_name": "Plot Twisted",
   "description": "Guess the movie from the twisted plot summary. Cinema noir trivia for the obsessed.",
-  "start_url": "./index.html",
+  "start_url": "./game.html",
   "display": "standalone",
   "background_color": "#0d0810",
   "theme_color": "#e8175d",
