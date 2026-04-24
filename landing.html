@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plot Twisted | The Cinematic Movie Guessing Ritual</title>
+  <meta name="description" content="A cinematic movie guessing game for people who remember the vibes, the twists, and the snacks—but never the title.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #0d0810;
+      --bg-dark: #130e17;
+      --bg-card: rgba(28, 20, 34, 0.7);
+      --bg-elevated: #1c1422;
+      --neon-pink: #e8175d;
+      --neon-pink-light: #ff3d7f;
+      --neon-glow: rgba(232, 23, 93, 0.4);
+      --neon-yellow: #f5c518;
+      --cream: #f2eef5;
+      --cream-muted: #b8afc4;
+      --font-display: 'Playfair Display', serif;
+      --font-title: 'Bebas Neue', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-typewriter: 'Special Elite', monospace;
+      --radius-lg: 24px;
+      --radius-md: 12px;
+      --header-h: 70px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--cream);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── SUBWAY NEON BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+          linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 30px;
+      background-attachment: fixed;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 100px;
+      pointer-events: none;
+      z-index: 0;
+      background-image: repeating-conic-gradient(rgba(255,255,255,0.03) 0% 25%, transparent 0% 50%);
+      background-size: 20px 20px;
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
+    }
+
+    .film-grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    .container {
+      width: min(1300px, 92vw);
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      height: var(--header-h);
+      backdrop-filter: blur(20px);
+      background: rgba(13, 8, 16, 0.75);
+      border-bottom: 1px solid rgba(232, 23, 93, 0.15);
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .brand-lockup {
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 0.7;
+    }
+    
+    .brand-lockup .p {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: var(--cream);
+      letter-spacing: 0.05em;
+    }
+    
+    .brand-lockup .t {
+      font-family: var(--font-title);
+      font-size: 0.85rem;
+      color: var(--neon-pink);
+      letter-spacing: 0.4em;
+      text-indent: 0.4em; 
+      text-shadow: 0 0 10px var(--neon-glow);
+    }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--neon-pink), #8b0000);
+      padding: 0.5rem 1.2rem;
+      border-radius: 2px;
+      color: #fff !important;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      box-shadow: 0 4px 15px var(--neon-glow);
+    }
+
+    .status-dot {
+      width: 6px; height: 6px;
+      background: var(--neon-yellow);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-yellow);
+      animation: pulse 2s infinite;
+    }
+
+    /* ── HERO SECTION (POSTER STYLE) ── */
+    .hero {
+      padding: calc(var(--header-h) + 10px) 0 40px; 
+      position: relative;
+      text-align: center;
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      background-image: 
+        radial-gradient(circle at center, rgba(232, 23, 93, 0.1) 0%, transparent 60%),
+        linear-gradient(to bottom, var(--bg-deep) 0%, transparent 40%, var(--bg-deep) 90%),
+        url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=2000');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3.8rem, 16vw, 11rem);
+      line-height: 0.8;
+      margin: 0;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-shadow: 0 4px 0 rgba(100,0,40,0.8), 0 0 80px var(--neon-glow);
+    }
+
+    h1 span.twisted-accent {
+      display: block;
+      color: var(--neon-pink-light);
+      font-family: var(--font-title);
+      font-size: 0.45em;
+      letter-spacing: clamp(10px, 4vw, 42px);
+      text-indent: clamp(10px, 4vw, 42px);
+      text-shadow: 0 0 20px rgba(255,61,127,0.8), 0 0 60px var(--neon-glow);
+      animation: neonFlicker 6s infinite;
+      margin-top: 5px;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-typewriter);
+      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+      color: var(--cream-muted);
+      max-width: 600px;
+      margin: 2rem auto;
+      line-height: 1.6;
+      border-top: 1px solid rgba(232, 23, 93, 0.2);
+      padding-top: 1.5rem;
+    }
+
+    /* ── INTERACTIVE DOSSIER ── */
+    .dossier-wrap {
+      margin-top: 2rem;
+      perspective: 1000px;
+    }
+
+    .dossier-card {
+      background: #0a0710;
+      border: 1px solid rgba(232, 23, 93, 0.3);
+      padding: clamp(1.5rem, 4vw, 3rem);
+      border-radius: 2px;
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(232, 23, 93, 0.05);
+      max-width: 500px;
+      margin: 0 auto;
+      text-align: left;
+      transform: rotateX(2deg);
+    }
+
+    .clue-label {
+      font-family: var(--font-title);
+      color: var(--neon-pink);
+      font-size: 0.75rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.3em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .clue-label::after { content:''; flex:1; height:1px; background: rgba(232,23,93,0.15); }
+
+    .clue-text {
+      font-family: var(--font-typewriter);
+      font-size: clamp(0.95rem, 3vw, 1.15rem);
+      min-height: 80px;
+      margin-bottom: 2rem;
+      color: var(--cream);
+      line-height: 1.6;
+    }
+
+    .reveal-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--neon-pink), #8b0000);
+      border: none;
+      color: #fff;
+      padding: 1.1rem;
+      font-family: var(--font-title);
+      font-size: 1.3rem;
+      letter-spacing: 4px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--neon-glow);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ── RE-DESIGNED STATS STRIP ── */
+    .stats-strip {
+      background: rgba(5, 3, 8, 0.95);
+      border-top: 1px solid rgba(232, 23, 93, 0.3);
+      border-bottom: 1px solid rgba(232, 23, 93, 0.3);
+      padding: 1.2rem 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .stats-grid {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 1.5rem;
+      border-right: 1px solid rgba(232, 23, 93, 0.2);
+      flex: 1;
+    }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-item h3 {
+      font-family: var(--font-title);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      color: var(--neon-pink-light);
+      margin: 0;
+      line-height: 1;
+      text-shadow: 0 0 15px var(--neon-glow);
+    }
+
+    .stat-item p {
+      font-size: 0.55rem;
+      color: var(--cream-muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-weight: 800;
+      margin-top: 2px;
+      opacity: 0.7;
+    }
+
+    /* ── THEATER PASSES (TICKET UI) ── */
+    .passes-section { padding: 80px 0; }
+    
+    .passes-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .theater-pass {
+      background: linear-gradient(160deg, rgba(28, 20, 34, 0.85), rgba(13, 8, 16, 0.95));
+      border: 1px solid rgba(232, 23, 93, 0.2);
+      padding: 3.5rem 2.5rem;
+      position: relative;
+      transition: all 0.3s;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .theater-pass::before, .theater-pass::after {
+      content: "";
+      position: absolute;
+      width: 28px; height: 28px;
+      background: var(--bg-deep);
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      border: 1px solid rgba(232, 23, 93, 0.15);
+    }
+    .theater-pass::before { left: -15px; }
+    .theater-pass::after { right: -15px; }
+
+    .theater-pass h4 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      margin: 0 0 1rem;
+      color: var(--cream);
+    }
+
+    .pass-id {
+      font-family: var(--font-typewriter);
+      font-size: 0.6rem;
+      color: var(--neon-pink);
+      margin-bottom: 1.5rem;
+      display: block;
+      letter-spacing: 2px;
+    }
+
+    /* ── ROAST & SHARE SECTION ── */
+    .features-promo {
+      padding: 80px 0;
+      background: radial-gradient(circle at center, #1a1520 0%, var(--bg-deep) 100%);
+      text-align: center;
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed rgba(232, 23, 93, 0.3);
+      padding: 3rem 2rem;
+      margin: 1rem;
+    }
+
+    .feature-card h5 {
+      font-family: var(--font-title);
+      font-size: 1.8rem;
+      color: var(--neon-yellow);
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 80px 0 40px;
+      border-top: 1px solid rgba(232, 23, 93, 0.15);
+      background: #030305;
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 10vw, 3rem);
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .footer-brand span {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 0.45em;
+      color: var(--neon-pink);
+      letter-spacing: 12px;
+      text-indent: 12px;
+      margin-top: -8px;
+    }
+
+    .nobody-tag {
+      font-family: var(--font-typewriter);
+      font-size: 0.65rem;
+      color: var(--cream-muted);
+      opacity: 0.4;
+      line-height: 1.8;
+      max-width: 400px;
+      margin: 2rem auto 0;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes neonFlicker {
+      0%, 92%, 96%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(255,61,127,0.9), 0 0 60px var(--neon-glow); }
+      93%, 95% { opacity: 0.7; text-shadow: none; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @media (min-width: 1025px) {
+      .stats-grid { gap: 1rem; }
+      .passes-grid { grid-template-columns: repeat(3, 1fr); }
+      .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1000px; margin: 0 auto; }
+    }
+
+    @media (max-width: 768px) {
+      .stat-item:nth-child(n+3) { display: none; }
+      .stat-item { padding: 0 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="film-grain"></div>
+
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="#" class="brand-lockup">
+        <span class="p">PLOT</span>
+        <span class="t">TWISTED</span>
+      </a>
+      <a href="/index.html" class="nav-cta">
+        <div class="status-dot"></div>
+        Enter Screening
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-content">
+        <span class="eyebrow">A _Nobody Studios Original Production</span>
+        <h1>PLOT<span class="twisted-accent">TWISTED</span></h1>
+        
+        <p class="hero-tagline">
+          The movie guessing ritual for those who remember the twist, but forget the title before the credits roll.
+        </p>
+
+        <div class="dossier-wrap">
+          <div class="dossier-card" id="demoClue">
+            <div class="clue-label">SUBJECT FILE // CASE #802</div>
+            <div class="clue-text" id="clueContent">"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy."</div>
+            <button class="reveal-btn" onclick="toggleReveal()">REVEAL MOVIE TITLE</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Unified Stats Ribbon -->
+    <section class="stats-strip">
+      <div class="container stats-grid">
+        <div class="stat-item">
+          <h3>1.2K+</h3>
+          <p>Twisted Plots</p>
+        </div>
+        <div class="stat-item">
+          <h3>94%</h3>
+          <p>Failure Rate</p>
+        </div>
+        <div class="stat-item">
+          <h3>DAILY</h3>
+          <p>Global Mystery</p>
+        </div>
+        <div class="stat-item">
+          <h3>ZERO</h3>
+          <p>Spoiler Mercy</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Theater Passes -->
+    <section id="modes" class="passes-section">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 5rem;">
+          <h2 style="font-family: var(--font-display); font-size: clamp(2.5rem, 8vw, 3.5rem); margin: 0; text-transform: uppercase;">Choose Your Pass</h2>
+          <p style="color: var(--cream-muted); letter-spacing: 5px; text-transform: uppercase; font-size: 0.75rem; margin-top: 15px;">Pick your entry point for the evening</p>
+        </div>
+
+        <div class="passes-grid">
+          <article class="theater-pass">
+            <span class="pass-id">[ TYPE: CLC-01 ]</span>
+            <h4>Classic Hardcase</h4>
+            <p>The purist's route. Read the description, face the pressure, and type the title from pure memory. No lifelines. No second takes.</p>
+          </article>
+          
+          <article class="theater-pass" style="border-color: var(--neon-pink); background: rgba(232, 23, 93, 0.08);">
+            <span class="pass-id" style="color: var(--neon-pink-light)">[ TYPE: MRQ-01 ]</span>
+            <div style="position: absolute; top: 20px; right: 30px; font-family: var(--font-typewriter); font-size: 0.6rem; color: var(--neon-pink); font-weight: 900;">RECOMMENDED</div>
+            <h4>Marquee Lounge</h4>
+            <p>A more casual screening. Solve clues using a Wheel of Fortune style visual grid. Buy letters when you're stuck and keep the vibe rolling.</p>
+          </article>
+
+          <article class="theater-pass">
+            <span class="pass-id">[ TYPE: DLY-01 ]</span>
+            <h4>The Daily Ritual</h4>
+            <p>One shared mystery for the entire collective. Guess correctly to build your streak and climb the global leaderboards every 24 hours.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Personality Section -->
+    <section class="features-promo">
+      <div class="container">
+        <h2 style="font-family: var(--font-display); font-size: 2.8rem; margin-bottom: 1rem; text-transform: uppercase;">The Roast & The Glory</h2>
+        <p style="color: var(--cream-muted); margin-bottom: 4rem;">Plot Twisted isn't just a game; it's a critic that hits back.</p>
+        
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h5>Vicious Roasts</h5>
+            <p style="color: var(--cream-muted);">Guess it wrong? Expect the game to roast your "bargain bin" logic. Guess it right? We might still judge your rewatch count.</p>
+          </div>
+          <div class="feature-card">
+            <h5>Social Bragging</h5>
+            <p style="color: var(--cream-muted);">Share your scorecard with friends on social. High-res summaries of your cinematic genius (or failure) ready for the grid.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Simple Editorial Curation Section -->
+    <section id="editorial" style="padding: 100px 0; background: #050308; border-top: 1px solid rgba(232, 23, 93, 0.1);">
+      <div class="container" style="text-align: center;">
+        <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase;">After Bedtime Cinema</h2>
+        <p style="color: var(--cream-muted); max-width: 600px; margin: 0 auto 3rem;">Editorial picks and 90-minute movie lists for exhausted parents and night owls.</p>
+        <div style="font-family: var(--font-title); font-size: 1.5rem; color: var(--neon-pink); letter-spacing: 5px; animation: pulse 3s infinite;">COMING SOON TO THE BOX OFFICE</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-brand">PLOT<span>TWISTED</span></div>
+      <div class="nobody-tag">
+        AN ORIGINAL _NOBODY STUDIOS PRODUCTION &copy; 2026<br>
+        <span style="display: block; margin-top: 10px; font-size: 0.6rem; opacity: 0.7;">Dedicated to the ones who remember the vibe, but never the title.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const demoData = [
+      { clue: "\"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy.\"", title: "BATMAN BEGINS" },
+      { clue: "\"A group of guys spend a weekend looking for their friend because he slept on a roof.\"", title: "THE HANGOVER" },
+      { clue: "\"An old man takes his house for a walk to avoid a nursing home.\"", title: "UP" }
+    ];
+    let currentIdx = 0;
+
+    function toggleReveal() {
+      const btn = document.querySelector('#demoClue .reveal-btn');
+      const content = document.getElementById('clueContent');
+      
+      if (btn.innerText === "REVEAL MOVIE TITLE") {
+        btn.innerText = demoData[currentIdx].title;
+        btn.style.background = "rgba(232, 23, 93, 0.2)";
+        btn.style.color = "var(--neon-pink-light)";
+        btn.style.border = "1px solid var(--neon-pink)";
+      } else {
+        currentIdx = (currentIdx + 1) % demoData.length;
+        content.innerText = demoData[currentIdx].clue;
+        btn.innerText = "REVEAL MOVIE TITLE";
+        btn.style.background = "linear-gradient(135deg, var(--neon-pink), #8b0000)";
+        btn.style.color = "#fff";
+        btn.style.border = "none";
+      }
+    }
+  </script>
+</body>
+</html>
