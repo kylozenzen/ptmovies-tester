@@ -1082,13 +1082,6 @@ body {
 .toggle.active { background: var(--gold-primary); }
 .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; background: var(--cream); border-radius: 50%; transition: transform 0.2s; }
 .toggle.active::after { transform: translateX(22px); }
-#roastModeSelect {
-    padding: 8px 12px; font-family: var(--font-body); font-size: 0.9rem;
-    background: var(--bg-elevated); color: var(--cream);
-    border: 1px solid var(--text-muted); border-radius: 4px; cursor: pointer;
-}
-.btn-reset { padding: 10px 20px; font-size: 0.85rem; background: var(--red-primary); color: var(--cream); border-radius: 4px; }
-.btn-reset:hover { background: var(--red-light); }
 .settings-about { color: var(--cream-muted); font-size: 0.9rem; }
 .settings-about a { color: var(--gold-primary); text-decoration: none; }
 .settings-about a:hover { text-decoration: underline; }
@@ -1400,27 +1393,6 @@ body {
                     </div>
                     <div class="toggle" id="soundToggle"></div>
                 </div>
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <label class="setting-label" for="roastModeSelect">Roast Intensity</label>
-                        <div class="setting-desc">Choose how spicy the feedback gets</div>
-                    </div>
-                    <select id="roastModeSelect">
-                        <option value="clean">Clean</option>
-                        <option value="spicy">Spicy</option>
-                        <option value="nsfw">NSFW</option>
-                    </select>
-                </div>
-            </div>
-            <div class="settings-section">
-                <h3>Data</h3>
-                <div class="setting-row">
-                    <div class="setting-info">
-                        <div class="setting-label">Reset Progress</div>
-                        <div class="setting-desc">Clear all stats and seen clues</div>
-                    </div>
-                    <button class="btn btn-reset" id="resetBtn">Reset</button>
-                </div>
             </div>
             <div class="settings-section">
                 <h3>About</h3>
@@ -1637,18 +1609,73 @@ const DAILY_QUOTES = [
     { quote: "If it can be written, or thought, it can be filmed.", source: "Stanley Kubrick" }
 ];
 
-const PRAISE_MESSAGES = {
-    clean: ["You guessed that like you've seen it 47 times.", "Cinema brain activated. Nice pull.", "Textbook. If there were a textbook for this.", "Critics could never compete with that recall.", "That was so fast I'm checking for spoilers.", "Someone's been paying attention.", "You didn't guess. You remembered.", "Award-winning stuff right there.", "Your movie memory is doing heavy lifting.", "That answer landed smooth.", "Perfect. Somewhere a director feels validated.", "You didn't even hesitate. Iconic.", "Main-character-energy accurate.", "You saw the clue and said 'I know that trauma.'"],
-    spicy: ["Okay, film buff. Touch grass later, maybe?", "How many times have you rewatched this?", "Your brain is 70% water, 30% movie quotes.", "That was suspiciously fast. Are you the director?", "You got that right like it emotionally damaged you.", "Your recall is terrifying. Join my trivia team.", "You really said 'Oh, that's my Roman Empire.'", "The way you snapped that answer out… stay dangerous."],
-    nsfw: ["Well damn, you didn't even let the clue breathe.", "You smoked that answer like it owed you money.", "Okay Rotten Tomatoes, we get it.", "That was so fast it felt illegal.", "You didn't guess. You absolutely knew. Terrifying.", "That answer was feral-level correct.", "You cooked that. No notes. Unhinged talent.", "You grabbed that answer by the throat.", "That was disrespectfully accurate."]
+const FEEDBACK_SEEDS = {
+    opener: ["Plot twist", "Director's note", "Marquee bulletin", "Cinema dispatch", "Producer memo", "Projection room update", "Snack bar whisper", "Streaming alert", "Critics corner", "Cutting-room report"],
+    closer: ["and the popcorn noticed.", "roll credits accordingly.", "somewhere a projector nodded.", "the trailer crowd gasped.", "the ushers wrote that down.", "your watchlist felt that.", "ticket stubs were harmed.", "cinema history shifted slightly.", "the sequel is pending.", "your couch witnessed greatness."]
 };
 
-const INSULT_MESSAGES = {
-    clean: ["Strong start, wrong universe.", "Close, but the multiverse says no.", "That guess is going to the cutting room floor.", "Good energy, incorrect timeline.", "Bold of you to answer so wrong so fast.", "You aimed for Oscar season, landed in straight-to-DVD.", "Plot twist: that was not it.", "The vibes were there. The title was not.", "That answer needs a reboot.", "Wrong, but at least you committed."],
-    spicy: ["You didn't miss by a mile, you missed by a franchise.", "That answer belongs in a gas station bargain bin.", "Peak confidence, zero correctness.", "I see the vision, but the vision is blindfolded.", "If wrong answers were streaming, you'd be trending.", "You're not even in the same cinematic universe.", "Your answer has strong 'first draft' energy."],
-    nsfw: ["That answer got dragged into the alley.", "That was so wrong I checked if we're playing the same game.", "Your guess just got ratio'd by the correct answer.", "That was straight-up disaster. Director-apologizes bad.", "The plot filed a restraining order.", "If wrong answers were crimes, you'd be wanted.", "You cooked that guess but the stove wasn't on."]
-};
+function buildResponsePool(prefixes, actions, closers, count = 60) {
+    const responses = [];
+    for (const prefix of prefixes) {
+        for (const action of actions) {
+            for (const closer of closers) {
+                responses.push(`${prefix}: ${action} ${closer}`.trim());
+                if (responses.length >= count) return responses;
+            }
+        }
+    }
+    return responses;
+}
 
+const FEEDBACK_BANK = {
+    fallback: buildResponsePool(FEEDBACK_SEEDS.opener, ["something happened", "the reels are spinning", "the clue refuses to elaborate", "dramatic tension intensifies", "the box office remains uncertain", "your movie fate is pending"], FEEDBACK_SEEDS.closer, 60),
+    correctAnswer: buildResponsePool(
+        ["Roll credits", "Spotlight on you", "Box-office bulletin", "Projector approves", "Studio memo", "Critics agree"],
+        ["you nailed that title", "your recall just won opening weekend", "you solved it with premium cinema brain", "that guess landed like a final-act reveal", "you just outplayed the clue", "your watchlist finally paid rent"],
+        FEEDBACK_SEEDS.closer,
+        60
+    ),
+    wrongAnswer: buildResponsePool(
+        ["Hard cut", "Director's sigh", "Cinematic update", "Plot detour", "Trailer voice", "Audience poll"],
+        ["that guess missed the franchise", "your confidence arrived before accuracy", "the clue rejected that sequel", "that answer had reboot energy", "you guessed in the wrong cinematic universe", "nice swing, wrong screenplay"],
+        FEEDBACK_SEEDS.closer,
+        60
+    ),
+    nearMiss: buildResponsePool(
+        ["Almost", "Close-up", "Critic whisper", "Preview screening", "Second-act tension", "Editing room"],
+        ["you were one typo from glory", "that was emotionally correct", "you nearly stuck the landing", "your guess brushed the right title", "you were trailer-close to the answer", "the clue felt that near miss"],
+        FEEDBACK_SEEDS.closer,
+        60
+    ),
+    skip: buildResponsePool(
+        ["Skip logged", "Tactical retreat", "Ushers report", "Intermission notice", "Strategic surrender", "Popcorn tribunal"],
+        ["you exited before the third act", "the clue remains undefeated", "your movie memory requested a stunt double", "that one moved to your emotional watchlist", "you chose peace over points", "the theater accepts your surrender"],
+        FEEDBACK_SEEDS.closer,
+        60
+    ),
+    giveUp: buildResponsePool(
+        ["White flag", "Final answer", "Projection booth", "Cinema confession", "Director commentary", "Last-call"],
+        ["you gave the clue custody of this round", "the answer survived another challenger", "your brain called in a stand-in", "you surrendered with dramatic timing", "that mystery won today's box office", "you left before the post-credits scene"],
+        FEEDBACK_SEEDS.closer,
+        60
+    ),
+    revealAnswer: buildResponsePool(
+        ["The reveal", "Curtain lift", "Plot twist", "Theater disclosure", "Answer unlocked", "Stage whisper"],
+        ["it was [TITLE]", "[TITLE] was the title all along", "[TITLE] takes this round", "the answer card says [TITLE]", "[TITLE] just stepped into the spotlight", "the clue was pointing to [TITLE]"],
+        ["please process privately.", "a humbling screening, honestly.", "the popcorn is disappointed.", "take a respectful bow.", "that one stings a little.", "credits are rolling now."],
+        60
+    ),
+    modeSelected: buildResponsePool(["Mode selected"], ["new rules, same chaos", "the reels are spinning", "choose violence responsibly", "cinema fate locked in", "good luck, protagonist", "may your guesses be legendary"], FEEDBACK_SEEDS.closer, 60),
+    categorySelected: buildResponsePool(["Category locked"], ["the genre gods are watching", "your niche knowledge is up", "this aisle smells like trivia", "prepare your inner film nerd", "time for specialized cinema chaos", "the clue vault is opening"], FEEDBACK_SEEDS.closer, 60),
+    gameStart: buildResponsePool(["And action"], ["five clues enter, only legends survive", "your scorecard starts now", "the opening scene begins", "lights down, brain up", "time to test your movie instincts", "camera rolling on round one"], FEEDBACK_SEEDS.closer, 60),
+    lowScoreResult: buildResponsePool(["End credits"], ["a character-building performance", "the score was indie, not blockbuster", "today was a director's cut of chaos", "you survived, mostly", "the comeback arc writes itself", "not your award season yet"], FEEDBACK_SEEDS.closer, 60),
+    midScoreResult: buildResponsePool(["End credits"], ["solid streaming-night performance", "respectable box office numbers", "you held your own in theaters", "that was a strong matinee run", "good pace, good instincts", "the sequel is greenlit"], FEEDBACK_SEEDS.closer, 60),
+    highScoreResult: buildResponsePool(["End credits"], ["certified blockbuster behavior", "you cooked with premium cinema knowledge", "critics and audiences both approve", "that's elite marquee work", "award-worthy guessing", "the franchise trusts you now"], FEEDBACK_SEEDS.closer, 60),
+    perfectScoreResult: buildResponsePool(["Standing ovation"], ["flawless run, no notes", "you just speedran movie memory", "perfect score unlocked", "that was cinema dominance", "the clue bank fears you", "you cleared the board like a legend"], FEEDBACK_SEEDS.closer, 60),
+    dailyChallengeSuccess: buildResponsePool(["Daily complete"], ["you beat today's screening", "your daily cinema streak looks strong", "today's puzzle applauds you", "excellent daily reel reading", "you showed up and delivered", "the daily board approves"], FEEDBACK_SEEDS.closer, 60),
+    dailyChallengeMiss: buildResponsePool(["Daily complete"], ["today's puzzle won this round", "the daily clues fought back", "tomorrow gets your revenge arc", "consider this a training montage", "the streak lives to fight again", "close the app dramatically"], FEEDBACK_SEEDS.closer, 60),
+    copyResultSuccess: buildResponsePool(["Clipboard"], ["results copied like a pro", "scorecard now ready to flex", "bragging rights exported", "sharing link-up complete", "receipts saved", "your movie stats are portable"], FEEDBACK_SEEDS.closer, 60)
+};
 // ============================================
 // CINEMA LOADING
 // ============================================
@@ -1738,7 +1765,8 @@ class PlotTwisted {
         };
         this.config = { maxPot: 500, wrongLetterCost: 30, minPot: 50, questionsPerRound: 5, fuzzyThreshold: 0.18, classicBasePoints: 100, classicWrongGuessPenalty: 15, classicMinPoints: 40 };
         this.clueBank = null;
-        this.settings = { sound: false, roastMode: 'clean' };
+        this.settings = { sound: false };
+        this.lastFeedbackByCategory = {};
         this._physicalKeyHandler = null;
     }
 
@@ -1752,6 +1780,7 @@ class PlotTwisted {
         new InstallPromptManager();
         this.loadDailyQuote();
         this.checkDailyStatus();
+        this.runMatcherSmokeTests();
         this.showScreen('start');
     }
 
@@ -1818,13 +1847,11 @@ class PlotTwisted {
             resultPoints: document.getElementById('resultPoints'),
             continueBtn: document.getElementById('continueBtn'),
             soundToggle: document.getElementById('soundToggle'),
-            roastModeSelect: document.getElementById('roastModeSelect'),
             finalScore: document.getElementById('finalScore'),
             finalSubtitle: document.getElementById('finalSubtitle'),
             finalBreakdown: document.getElementById('finalBreakdown'),
             dailyQuote: document.getElementById('dailyQuote'),
             dailyQuoteSource: document.getElementById('dailyQuoteSource'),
-            resetBtn: document.getElementById('resetBtn'),
             dailyDateDisplay: document.getElementById('dailyDateDisplay'),
             dailyProgressTrack: document.getElementById('dailyProgressTrack'),
             dailyClueCard: document.getElementById('dailyClueCard'),
@@ -1848,8 +1875,6 @@ class PlotTwisted {
         document.getElementById('settingsBtn').onclick = () => this.showScreen('settings');
         document.getElementById('settingsBackBtn').onclick = () => this.showScreen('start');
         this.dom.soundToggle.onclick = () => this.toggleSound();
-        this.dom.roastModeSelect?.addEventListener('change', (e) => this.handleRoastModeChange(e.target.value));
-        this.dom.resetBtn?.addEventListener('click', () => this.resetProgress());
         this.dom.modeBackBtn.onclick = () => this.showScreen('start');
         this.dom.modeContinueBtn.onclick = () => this.showCategoryScreen();
         this.dom.classicModeCard.onclick = () => this.selectMode('classic');
@@ -1921,17 +1946,15 @@ class PlotTwisted {
     // ── Settings ──────────────────────────────────
     loadSettings() {
         const saved = localStorage.getItem('plotTwistedSettings');
-        this.settings = saved ? JSON.parse(saved) : { sound: false, roastMode: 'clean' };
+        this.settings = saved ? JSON.parse(saved) : { sound: false };
+        if (typeof this.settings.sound !== 'boolean') this.settings.sound = false;
+        delete this.settings.roastMode;
+        localStorage.removeItem('roastIntensity');
         this.dom.soundToggle?.classList.toggle('active', this.settings.sound);
-        if (this.dom.roastModeSelect) this.dom.roastModeSelect.value = this.settings.roastMode;
+        this.saveSettings();
     }
     saveSettings() { localStorage.setItem('plotTwistedSettings', JSON.stringify(this.settings)); }
     toggleSound() { this.settings.sound = !this.settings.sound; this.dom.soundToggle?.classList.toggle('active', this.settings.sound); this.saveSettings(); }
-    handleRoastModeChange(mode) {
-        if (mode === 'nsfw' && !confirm('NSFW mode includes explicit language. Continue?')) { this.dom.roastModeSelect.value = this.settings.roastMode; return; }
-        this.settings.roastMode = mode; this.saveSettings();
-    }
-    resetProgress() { if (confirm('Clear all stats and seen clues?')) { localStorage.removeItem('plotTwistedSeen'); this.state.seenClues = {}; this.showScreen('start'); } }
 
     // ── Screens ───────────────────────────────────
     showScreen(name) {
@@ -1966,6 +1989,7 @@ class PlotTwisted {
         this.state.selectedMode = mode === 'marquee' ? 'marquee' : 'classic';
         this.dom.classicModeCard?.classList.toggle('selected', this.state.selectedMode === 'classic');
         this.dom.marqueeModeCard?.classList.toggle('selected', this.state.selectedMode === 'marquee');
+        this.showToastFeedback('modeSelected');
     }
     showCategoryScreen() {
         this.renderCategories();
@@ -1992,6 +2016,7 @@ class PlotTwisted {
         document.querySelector(`.category-card[data-category="${name}"]`)?.classList.add('selected');
         this.state.selectedCategory = name;
         this.dom.startGameBtn.disabled = false;
+        this.showToastFeedback('categorySelected');
     }
 
     // ── Game Start ────────────────────────────────
@@ -2018,6 +2043,7 @@ class PlotTwisted {
         this.showScreen('game');
         this.configureGameModeUI();
         this.loadQuestion();
+        this.showToastFeedback('gameStart');
     }
 
     configureGameModeUI() {
@@ -2056,7 +2082,7 @@ class PlotTwisted {
         this.dom.classicAnswerInput.disabled = false;
         this.dom.classicSubmitBtn.disabled = false;
         this.dom.classicRevealBtn.disabled = false;
-        this.dom.classicFeedback.textContent = 'Take your best shot. Typos are forgiven; bad guesses are remembered.';
+        this.dom.classicFeedback.textContent = this.getFeedbackMessage('fallback');
         this.dom.classicFeedback.className = 'classic-feedback';
         this.dom.classicRevealText.textContent = 'Need a hint? Use Skip / Reveal to see the answer here.';
         this.dom.classicRevealText.className = 'classic-reveal';
@@ -2179,7 +2205,7 @@ class PlotTwisted {
         if (!guess) return;
         const q = this.state.questions[this.state.currentIndex];
         this.closeSolveModal();
-        if (this.isFuzzyMatch(guess, q.title)) this.handleCorrect();
+        if (this.isAnswerMatch(guess, q.title, q)) this.handleCorrect();
         else this.handleIncorrect();
     }
 
@@ -2211,12 +2237,12 @@ class PlotTwisted {
         const guess = this.dom.classicAnswerInput.value.trim();
         if (!guess) return;
         const q = this.state.questions[this.state.currentIndex];
-        if (this.normalizeAnswer(guess) === this.normalizeAnswer(q.title)) {
+        if (this.isAnswerMatch(guess, q.title, q)) {
             this.state.classicQuestionDone = true;
             this.state.results.push({ title: q.title, points: this.state.currentPot, correct: true });
             this.state.totalScore += this.state.currentPot;
             this.updateTotalScore();
-            this.dom.classicFeedback.textContent = this.getClassicCorrectMessage();
+            this.dom.classicFeedback.textContent = this.getFeedbackMessage('correctAnswer');
             this.dom.classicFeedback.className = 'classic-feedback correct has-content';
             this.dom.classicRevealText.textContent = `Answer locked in: ${q.title}.`;
             this.dom.classicRevealText.className = 'classic-reveal has-answer';
@@ -2227,7 +2253,7 @@ class PlotTwisted {
         } else {
             this.state.currentPot = Math.max(this.config.classicMinPoints, this.state.currentPot - this.config.classicWrongGuessPenalty);
             this.updatePot(true);
-            this.dom.classicFeedback.textContent = this.getClassicWrongMessage();
+            this.dom.classicFeedback.textContent = this.getFeedbackMessage('wrongAnswer');
             this.dom.classicFeedback.className = 'classic-feedback incorrect has-content';
             this.dom.classicAnswerInput.focus();
             this.dom.classicAnswerInput.select();
@@ -2239,9 +2265,9 @@ class PlotTwisted {
         const q = this.state.questions[this.state.currentIndex];
         this.state.classicQuestionDone = true;
         this.state.results.push({ title: q.title, points: 0, correct: false, gaveUp: true });
-        this.dom.classicFeedback.textContent = 'Reveal used. Onward to the next mystery.';
+        this.dom.classicFeedback.textContent = this.getFeedbackMessage('giveUp');
         this.dom.classicFeedback.className = 'classic-feedback incorrect has-content';
-        this.dom.classicRevealText.textContent = `The answer was: ${q.title}. A humbling screening, honestly.`;
+        this.dom.classicRevealText.textContent = this.getFeedbackMessage('revealAnswer', { title: q.title });
         this.dom.classicRevealText.className = 'classic-reveal has-answer';
         this.dom.classicAnswerInput.disabled = true;
         this.dom.classicSubmitBtn.disabled = true;
@@ -2254,20 +2280,11 @@ class PlotTwisted {
         this.nextQuestion();
     }
 
-    getClassicCorrectMessage() {
-        const messages = ["Roll credits. You nailed it.", "Correct. Your streaming habits were not wasted.", "That’s the one. IMDb who?"];
-        return messages[Math.floor(Math.random() * messages.length)];
-    }
-
-    getClassicWrongMessage() {
-        const messages = ["Not it, but emotionally adjacent.", "Bold guess. Incorrect, but bold.", "The theater rejects this answer."];
-        return messages[Math.floor(Math.random() * messages.length)];
-    }
-
     showResult(isCorrect, title, points, isGameOver = false, gaveUp = false) {
         const resultCard = document.querySelector('.result-card');
         resultCard.classList.remove('celebrate');
-        const commentary = this.getRoastMessage(isCorrect);
+        const category = isCorrect ? 'correctAnswer' : (gaveUp ? 'giveUp' : 'wrongAnswer');
+        const commentary = this.getFeedbackMessage(category, { title });
         this.dom.resultIcon.textContent = isCorrect ? '🎬' : (gaveUp ? '🏳️' : '❌');
         this.dom.resultTitle.textContent = commentary;
         this.dom.resultTitle.className = `result-title ${isCorrect ? 'correct' : 'incorrect'}`;
@@ -2287,12 +2304,6 @@ class PlotTwisted {
         this.dom.resultOverlay.classList.add('active');
     }
 
-    getRoastMessage(isCorrect) {
-        const mode = this.settings?.roastMode || 'clean';
-        const list = isCorrect ? (PRAISE_MESSAGES[mode] || PRAISE_MESSAGES.clean) : (INSULT_MESSAGES[mode] || INSULT_MESSAGES.clean);
-        return list[Math.floor(Math.random() * list.length)];
-    }
-
     nextQuestion() {
         this.state.currentIndex++;
         if (this.state.currentIndex >= this.state.questions.length) this.endGame();
@@ -2310,6 +2321,9 @@ class PlotTwisted {
             row.innerHTML = `<span class="breakdown-title">${r.title}</span><span class="breakdown-points ${r.correct ? 'earned' : 'missed'}">${r.correct ? '+' + r.points : '—'}</span>`;
             this.dom.finalBreakdown.appendChild(row);
         });
+        const ratio = this.state.results.length ? solved / this.state.results.length : 0;
+        const endCategory = ratio === 1 ? 'perfectScoreResult' : ratio >= 0.8 ? 'highScoreResult' : ratio >= 0.4 ? 'midScoreResult' : 'lowScoreResult';
+        this.dom.finalSubtitle.textContent = `${solved} of ${this.state.results.length} movies solved • ${this.getFeedbackMessage(endCategory)}`;
         this.showScreen('gameOver');
     }
 
@@ -2320,7 +2334,7 @@ class PlotTwisted {
         if (navigator.share) navigator.share({ text }).catch(() => this.copyToClipboard(text));
         else this.copyToClipboard(text);
     }
-    copyToClipboard(text) { navigator.clipboard.writeText(text).then(() => alert('Score copied!')).catch(() => {}); }
+    copyToClipboard(text) { navigator.clipboard.writeText(text).then(() => alert(this.getFeedbackMessage('copyResultSuccess'))).catch(() => {}); }
     playAgain() { if (this.state.selectedCategory) this.startGame(); else this.showCategoryScreen(); }
 
     // ── Daily Challenge ────────────────────────────
@@ -2368,7 +2382,7 @@ class PlotTwisted {
         const guess = this.dom.dailyInput.value.trim();
         if (!guess) return;
         const q = this.state.dailyQuestions[this.state.dailyIndex];
-        const correct = this.isFuzzyMatch(guess, q.title);
+        const correct = this.isAnswerMatch(guess, q.title, q);
         this.state.dailyResults.push({ title: q.title, guess, correct, points: correct ? 100 : 0 });
         this.dom.dailyInput.disabled = true;
         this.nextDailyQuestion();
@@ -2392,7 +2406,8 @@ class PlotTwisted {
         this.dom.dailyResultsDate.textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
         this.dom.dailyScoreDisplay.innerHTML = '';
         for (let i = 0; i < 5; i++) { const star = document.createElement('span'); star.className = `daily-star ${i < correct ? 'earned' : 'empty'}`; star.textContent = '★'; this.dom.dailyScoreDisplay.appendChild(star); }
-        this.dom.dailyScoreText.textContent = `${correct}/5 Correct • ${total} pts`;
+        const dailyCategory = correct >= 3 ? 'dailyChallengeSuccess' : 'dailyChallengeMiss';
+        this.dom.dailyScoreText.textContent = `${correct}/5 Correct • ${total} pts • ${this.getFeedbackMessage(dailyCategory)}`;
         this.dom.dailyBreakdown.innerHTML = '';
         results.forEach(r => { const row = document.createElement('div'); row.className = 'daily-breakdown-row'; row.innerHTML = `<span>${r.title}</span><span class="daily-breakdown-result">${r.correct ? '✅' : (r.skipped ? '⏭️' : '❌')}</span>`; this.dom.dailyBreakdown.appendChild(row); });
         const now = new Date(); const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate()+1); tomorrow.setHours(0,0,0,0);
@@ -2427,6 +2442,24 @@ class PlotTwisted {
         const pips = this.dom.progressTrack.querySelectorAll('.progress-pip');
         pips.forEach((pip, i) => { pip.classList.remove('current','complete'); if (i < this.state.currentIndex) pip.classList.add('complete'); else if (i === this.state.currentIndex) pip.classList.add('current'); });
     }
+    showToastFeedback(category, vars = {}) {
+        const message = this.getFeedbackMessage(category, vars);
+        if (this.dom.classicFeedback && this.state.selectedMode === 'classic' && this.state.currentScreen === 'game' && !this.state.classicQuestionDone) {
+            this.dom.classicFeedback.textContent = message;
+            this.dom.classicFeedback.className = 'classic-feedback has-content';
+        }
+    }
+    getFeedbackMessage(category, vars = {}) {
+        const pool = FEEDBACK_BANK[category] || FEEDBACK_BANK.fallback || ['Cue dramatic silence.'];
+        if (!pool.length) return 'Cue dramatic silence.';
+        let index = Math.floor(Math.random() * pool.length);
+        if (pool.length > 1 && this.lastFeedbackByCategory[category] === index) {
+            index = (index + 1 + Math.floor(Math.random() * (pool.length - 1))) % pool.length;
+        }
+        this.lastFeedbackByCategory[category] = index;
+        const title = vars.title || '';
+        return pool[index].replaceAll('[TITLE]', title);
+    }
     levenshtein(a, b) {
         const m = []; for (let i = 0; i <= b.length; i++) m[i] = [i]; for (let j = 0; j <= a.length; j++) m[0][j] = j;
         for (let i = 1; i <= b.length; i++) for (let j = 1; j <= a.length; j++) {
@@ -2439,7 +2472,11 @@ class PlotTwisted {
             .toLowerCase()
             .trim()
             .replace(/\([^)]*\)/g, '')
-            .replace(/[\.\,\!\?'"`:;\-_/\\()[\]{}]/g, ' ')
+            .replace(/[’‘`]/g, "'")
+            .replace(/&/g, ' and ')
+            .replace(/[:\-–—_\/\\]/g, ' ')
+            .replace(/[^\w\s']/g, ' ')
+            .replace(/'/g, '')
             .replace(/\s+/g, ' ')
             .replace(/^(the|a|an)\s+/, '')
             .trim();
@@ -2447,14 +2484,92 @@ class PlotTwisted {
     normalizeTitle(str) { return this.normalizeAnswer(str); }
     stripNumbers(str) { return str.replace(/[0-9]/g,'').replace(/\s+/g,' ').trim(); }
     getDisplayTitle(title) { return title.replace(/\([^)]*\)/g,'').trim(); }
+    getTitleBaseParts(title) {
+        const cleaned = String(title || '').replace(/\([^)]*\)/g, '').trim();
+        return cleaned.split(/\s*[:\-–—]\s*/).filter(Boolean);
+    }
+    getAnswerAliases(title, clueObject = {}) {
+        const rawAliases = new Set([title, ...(Array.isArray(clueObject.aliases) ? clueObject.aliases : [])]);
+        const parts = this.getTitleBaseParts(title);
+        if (parts.length) {
+            rawAliases.add(parts[0]);
+            if (parts.length > 1) rawAliases.add(parts.slice(1).join(' '));
+        }
+        const normalizedTitle = this.normalizeAnswer(title);
+        if (normalizedTitle.includes(' movie')) rawAliases.add(normalizedTitle.replace(' movie', '').trim());
+        if (parts.length) {
+            const base = this.normalizeAnswer(parts[0]);
+            const franchise = base
+                .replace(/\bpart\s+\w+$/i, '')
+                .replace(/\bchapter\s+\w+$/i, '')
+                .replace(/\bepisode\s+\w+$/i, '')
+                .replace(/\bthe\s+last\b/i, '')
+                .trim();
+            if (franchise) rawAliases.add(franchise);
+        }
+        const aliases = new Set();
+        rawAliases.forEach((entry) => {
+            const normalized = this.normalizeAnswer(entry);
+            if (!normalized) return;
+            aliases.add(normalized);
+            aliases.add(normalized.replace(/\bmovie\b/g, '').replace(/\s+/g, ' ').trim());
+        });
+        return Array.from(aliases).filter(Boolean);
+    }
+    similarityScore(a, b) {
+        if (!a || !b) return 0;
+        const maxLen = Math.max(a.length, b.length);
+        if (!maxLen) return 1;
+        return 1 - (this.levenshtein(a, b) / maxLen);
+    }
+    containsWholePhrase(text, phrase) {
+        if (!text || !phrase) return false;
+        const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return new RegExp(`(^|\\s)${escaped}(\\s|$)`).test(text);
+    }
+    isAnswerMatch(userGuess, correctTitle, clueObject = {}) {
+        const guess = this.normalizeAnswer(userGuess);
+        const normalizedCorrect = this.normalizeAnswer(correctTitle);
+        if (!guess || !normalizedCorrect) return false;
+        if (normalizedCorrect.length < 4 || guess.length < 3) return guess === normalizedCorrect;
+        if (guess === normalizedCorrect) return true;
+        const aliases = this.getAnswerAliases(correctTitle, clueObject);
+        if (aliases.includes(guess)) return true;
+        if (guess.length >= 4 && aliases.some(alias => this.containsWholePhrase(alias, guess) || (alias.length >= 4 && this.containsWholePhrase(guess, alias)))) return true;
+        const tokensGuess = new Set(guess.split(' ').filter(Boolean));
+        for (const alias of aliases) {
+            if (this.similarityScore(guess, alias) >= 0.83) return true;
+            const aliasTokens = alias.split(' ').filter(Boolean);
+            const overlap = aliasTokens.filter(t => tokensGuess.has(t)).length;
+            if (overlap >= Math.min(2, aliasTokens.length) && overlap / aliasTokens.length >= 0.66 && guess.length >= 4) return true;
+        }
+        return false;
+    }
     isFuzzyMatch(guess, actual) {
-        const g = this.normalizeTitle(guess); const a = this.normalizeTitle(actual);
-        if (!g) return false; if (g === a) return true;
-        const d = this.levenshtein(g, a); const max = Math.floor(a.length * this.config.fuzzyThreshold);
-        if (d <= Math.max(1, max)) return true;
-        const gn = this.stripNumbers(g); const an = this.stripNumbers(a);
-        if (gn === an) return true;
-        return this.levenshtein(gn, an) <= Math.max(1, Math.floor(an.length * this.config.fuzzyThreshold));
+        return this.isAnswerMatch(guess, actual, {});
+    }
+    runMatcherSmokeTests() {
+        const mustPass = [
+            ['Ice Age', 'Ice Age: The Meltdown'],
+            ['ice age', 'Ice Age: Continental Drift'],
+            ['Puss in Boots', 'Puss in Boots: The Last Wish'],
+            ['Star Wars', 'Star Wars: The Empire Strikes Back'],
+            ['Empire Strikes Back', 'Star Wars: The Empire Strikes Back'],
+            ['Jurassic World', 'Jurassic World: Fallen Kingdom'],
+            ['Matrix', 'The Matrix Reloaded'],
+            ['Spongebob', 'The SpongeBob Movie: Sponge Out of Water'],
+            ['Lion King', 'The Lion King'],
+            ['Cloudy with a Chance of Meatballs', 'Cloudy with a Chance of Meatballs 2']
+        ];
+        const mustFail = [
+            ['it', 'The Matrix'],
+            ['cars', 'Scars of Dracula']
+        ];
+        const failed = [
+            ...mustPass.filter(([g, a]) => !this.isAnswerMatch(g, a)),
+            ...mustFail.filter(([g, a]) => this.isAnswerMatch(g, a))
+        ];
+        if (failed.length) console.warn('Matcher smoke tests failed:', failed);
     }
     loadSeenClues() { const s = localStorage.getItem('plotTwistedSeen'); this.state.seenClues = s ? JSON.parse(s) : {}; }
     saveSeenClues() { localStorage.setItem('plotTwistedSeen', JSON.stringify(this.state.seenClues)); }
