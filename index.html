@@ -8,25 +8,38 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+
   <style>
+    /* ============================================================
+       DESIGN TOKENS — game.html variables verbatim
+       ============================================================ */
     :root {
-      --bg-deep: #0d0810;
-      --bg-dark: #130e17;
-      --bg-card: rgba(28, 20, 34, 0.7);
-      --bg-elevated: #1c1422;
-      --neon-pink: #e8175d;
-      --neon-pink-light: #ff3d7f;
-      --neon-glow: rgba(232, 23, 93, 0.4);
-      --neon-yellow: #f5c518;
-      --cream: #f2eef5;
-      --cream-muted: #b8afc4;
+      --bg-deep:      #0d0810;
+      --bg-dark:      #130e17;
+      --bg-card:      #1c1422;
+      --bg-elevated:  #261c2e;
+      --gold-primary: #e8175d;
+      --gold-light:   #ff3d7f;
+      --gold-dark:    #a80f42;
+      --gold-glow:    rgba(232,23,93,0.5);
+      --red-primary:  #8b0000;
+      --neon-yellow:  #f5c518;
+      --neon-yellow-glow: rgba(245,197,24,0.6);
+      --cream:        #f2eef5;
+      --cream-muted:  #b8afc4;
+      --text-muted:   #6d6179;
       --font-display: 'Playfair Display', serif;
-      --font-title: 'Bebas Neue', sans-serif;
-      --font-body: 'Inter', sans-serif;
-      --font-typewriter: 'Special Elite', monospace;
-      --radius-lg: 24px;
-      --radius-md: 12px;
-      --header-h: 70px;
+      --font-title:   'Bebas Neue', sans-serif;
+      --font-body:    'Inter', sans-serif;
+      --font-type:    'Special Elite', monospace;
+      --shadow-deep:  0 10px 40px rgba(0,0,0,0.7);
+      --header-h:     66px;
+
+      /* Theater-specific additions (from Box Office doc) */
+      --brass:        #d4a853;
+      --brass-glow:   rgba(212,168,83,0.5);
+      --velvet-dark:  #0a0507;
+      --curtain-red:  #8b0000;
     }
 
     * { box-sizing: border-box; }
@@ -41,38 +54,22 @@
       overflow-x: hidden;
     }
 
-    /* ── SUBWAY NEON BACKGROUND ── */
+    /* Subway tile grid — from game.html */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
       background-image:
-          linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
       background-size: 60px 30px;
       background-attachment: fixed;
     }
 
-    body::after {
-      content: '';
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 100px;
-      pointer-events: none;
-      z-index: 0;
-      background-image: repeating-conic-gradient(rgba(255,255,255,0.03) 0% 25%, transparent 0% 50%);
-      background-size: 20px 20px;
-      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
-      mask-image: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%);
-    }
-
+    /* Film grain — from game.html */
     .film-grain {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 999;
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
       opacity: 0.04;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     }
@@ -80,517 +77,925 @@
     .container {
       width: min(1300px, 92vw);
       margin: 0 auto;
-      position: relative;
-      z-index: 2;
+      position: relative; z-index: 2;
     }
 
-    /* ── HEADER ── */
+    /* ============================================================
+       NAV — game.html header treatment
+       ============================================================ */
     .site-header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1000;
-      height: var(--header-h);
+      position: fixed; top: 0; width: 100%;
+      z-index: 1000; height: var(--header-h);
+      background: rgba(10,7,16,0.97);
       backdrop-filter: blur(20px);
-      background: rgba(13, 8, 16, 0.75);
-      border-bottom: 1px solid rgba(232, 23, 93, 0.15);
-      display: flex;
-      align-items: center;
+      /* game.html's triple-rule shadow */
+      box-shadow:
+        0 0 0 1px rgba(50,40,62,1),
+        0 2px 0 rgba(20,15,25,1),
+        0 3px 0 rgba(40,30,55,1);
+    }
+    /* game.html's pink top-edge bar */
+    .site-header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(232,23,93,0.3) 10%,
+        rgba(232,23,93,0.7) 25%,
+        rgba(255,61,127,0.9) 50%,
+        rgba(232,23,93,0.7) 75%,
+        rgba(232,23,93,0.3) 90%,
+        transparent 100%);
+      box-shadow: 0 0 12px rgba(232,23,93,0.4), 0 0 30px rgba(232,23,93,0.2);
     }
 
-    .nav-wrap {
-      display: flex;
-      align-items: center;
+    .nav-inner {
+      height: var(--header-h);
+      display: flex; align-items: center;
       justify-content: space-between;
-      width: 100%;
     }
 
-    .brand-lockup {
+    .brand {
       text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      line-height: 0.7;
+      display: flex; flex-direction: column;
+      align-items: flex-start; line-height: 0.8;
     }
-    
-    .brand-lockup .p {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 1.2rem;
-      color: var(--cream);
-      letter-spacing: 0.05em;
+    .brand .plot {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 1.3rem; color: var(--cream);
+      letter-spacing: 0.04em;
     }
-    
-    .brand-lockup .t {
+    .brand .twisted {
       font-family: var(--font-title);
-      font-size: 0.85rem;
-      color: var(--neon-pink);
-      letter-spacing: 0.4em;
-      text-indent: 0.4em; 
-      text-shadow: 0 0 10px var(--neon-glow);
+      font-size: 0.78rem; color: var(--gold-light);
+      letter-spacing: 0.5em; text-indent: 0.5em;
+      text-shadow: 0 0 12px var(--gold-glow);
+      animation: neonFlicker 6s infinite;
     }
+
+    .nav-links {
+      display: none; gap: 2.5rem;
+    }
+    @media (min-width: 768px) { .nav-links { display: flex; } }
+    .nav-links a {
+      font-family: var(--font-title); font-size: 0.85rem;
+      letter-spacing: 0.2em; color: var(--cream-muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--cream); }
 
     .nav-cta {
-      background: linear-gradient(135deg, var(--neon-pink), #8b0000);
-      padding: 0.5rem 1.2rem;
-      border-radius: 2px;
-      color: #fff !important;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      box-shadow: 0 4px 15px var(--neon-glow);
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      padding: 0.55rem 1.5rem; color: #fff;
+      text-decoration: none; font-family: var(--font-title);
+      font-size: 0.9rem; letter-spacing: 0.2em;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px var(--gold-glow);
+      transition: all 0.2s;
     }
-
-    .status-dot {
-      width: 6px; height: 6px;
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--gold-glow);
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
       background: var(--neon-yellow);
-      border-radius: 50%;
       box-shadow: 0 0 8px var(--neon-yellow);
-      animation: pulse 2s infinite;
+      animation: dotPulse 2s infinite;
     }
 
-    /* ── HERO SECTION (POSTER STYLE) ── */
+    /* ============================================================
+       HERO — Box Office marquee-frame poster treatment
+       ============================================================ */
     .hero {
-      padding: calc(var(--header-h) + 10px) 0 40px; 
-      position: relative;
-      text-align: center;
-      min-height: 80vh;
-      display: flex;
+      padding-top: var(--header-h);
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Spotlight radial — from Box Office doc */
+    .hero-spotlight {
+      position: absolute;
+      top: var(--header-h); left: 0; right: 0;
+      height: 700px; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse at top, rgba(212,168,83,0.08) 0%, transparent 65%);
+    }
+
+    /* Cinematic bg photo */
+    .hero-cinebg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=60&w=2000')
+        center/cover no-repeat;
+      filter: brightness(0.15) saturate(0.3);
+    }
+    .hero-cinebg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, var(--bg-deep) 100%);
+    }
+
+    .hero-body {
+      position: relative; z-index: 2;
+      flex: 1; display: flex; align-items: center;
+      padding: clamp(40px,7vh,90px) 0 clamp(40px,6vh,80px);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(40px, 6vw, 80px);
       align-items: center;
-      background-image: 
-        radial-gradient(circle at center, rgba(232, 23, 93, 0.1) 0%, transparent 60%),
-        linear-gradient(to bottom, var(--bg-deep) 0%, transparent 40%, var(--bg-deep) 90%),
-        url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&q=80&w=2000');
-      background-size: cover;
-      background-position: center;
+    }
+    @media (min-width: 960px) {
+      .hero-grid { grid-template-columns: 1fr 1fr; }
     }
 
-    .hero-content {
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
+    /* LEFT: marquee-framed title — Box Office corner-dot frame */
+    .marquee-frame {
+      position: relative;
+      border: 2px solid var(--brass);
+      padding: clamp(20px, 3vw, 40px);
+    }
+    /* corner dots */
+    .marquee-frame::before,
+    .marquee-frame::after,
+    .marquee-frame .corner-bl,
+    .marquee-frame .corner-br {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--brass);
+      box-shadow: 0 0 10px var(--brass-glow), 0 0 20px var(--brass-glow);
+    }
+    .marquee-frame::before { top: -7px; left: -7px; }
+    .marquee-frame::after  { top: -7px; right: -7px; }
+    .marquee-frame .corner-bl { bottom: -7px; left: -7px; }
+    .marquee-frame .corner-br { bottom: -7px; right: -7px; }
+
+    .frame-inner {
+      background: rgba(5,3,8,0.7);
+      padding: clamp(24px, 4vw, 48px) clamp(20px, 3vw, 36px);
+      border: 1px solid rgba(50,40,62,0.6);
     }
 
-    h1 {
-      font-family: var(--font-display);
-      font-size: clamp(3.8rem, 16vw, 11rem);
-      line-height: 0.8;
-      margin: 0;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: var(--cream);
-      text-shadow: 0 4px 0 rgba(100,0,40,0.8), 0 0 80px var(--neon-glow);
+    .title-eyebrow {
+      font-family: var(--font-title); font-size: 0.7rem;
+      letter-spacing: 0.5em; color: var(--gold-primary);
+      text-shadow: 0 0 15px var(--gold-glow);
+      margin-bottom: clamp(12px, 2vw, 20px);
     }
 
-    h1 span.twisted-accent {
+    /* game.html title scale + shadows exactly */
+    .title-plot {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(5.5rem, 13vw, 12rem);
+      color: var(--cream); letter-spacing: 0.01em; line-height: 0.82;
+      text-shadow:
+        0 4px 0 rgba(100,0,40,0.8),
+        0 8px 0 rgba(0,0,0,0.5),
+        0 0 60px rgba(232,23,93,0.6),
+        0 0 120px rgba(232,23,93,0.25);
       display: block;
-      color: var(--neon-pink-light);
+    }
+    .title-twisted {
       font-family: var(--font-title);
-      font-size: 0.45em;
-      letter-spacing: clamp(10px, 4vw, 42px);
-      text-indent: clamp(10px, 4vw, 42px);
-      text-shadow: 0 0 20px rgba(255,61,127,0.8), 0 0 60px var(--neon-glow);
+      font-size: clamp(2.4rem, 6vw, 5.5rem);
+      color: var(--gold-light); letter-spacing: 0.35em;
+      text-shadow: 0 0 20px rgba(255,61,127,0.9), 0 0 60px var(--gold-glow);
       animation: neonFlicker 6s infinite;
-      margin-top: 5px;
+      display: block; margin-top: -0.06em;
     }
 
     .hero-tagline {
-      font-family: var(--font-typewriter);
-      font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+      font-family: var(--font-type);
+      font-size: clamp(0.85rem, 1.2vw, 1rem);
       color: var(--cream-muted);
-      max-width: 600px;
-      margin: 2rem auto;
-      line-height: 1.6;
-      border-top: 1px solid rgba(232, 23, 93, 0.2);
-      padding-top: 1.5rem;
+      margin: clamp(16px, 2.5vw, 26px) 0 clamp(20px, 3vw, 32px);
+      line-height: 1.7; letter-spacing: 0.03em;
     }
 
-    /* ── INTERACTIVE DOSSIER ── */
-    .dossier-wrap {
-      margin-top: 2rem;
-      perspective: 1000px;
+    .hero-btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      font-family: var(--font-title); letter-spacing: 0.15em;
+      text-transform: uppercase; text-decoration: none;
+      border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+      padding: clamp(12px, 1.4vw, 15px) clamp(24px, 2.5vw, 32px);
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      color: #fff;
+      box-shadow: 0 4px 20px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px var(--gold-glow), 0 0 60px rgba(232,23,93,0.3);
+    }
+    .btn-ghost {
+      background: transparent; color: var(--cream-muted);
+      border: 1px solid var(--text-muted);
+    }
+    .btn-ghost:hover { border-color: var(--cream-muted); color: var(--cream); }
+
+    /* RIGHT: dossier / clue card — game.html clue-card frame exactly */
+    .dossier-shell {
+      display: flex; flex-direction: column; gap: 10px;
     }
 
-    .dossier-card {
-      background: #0a0710;
-      border: 1px solid rgba(232, 23, 93, 0.3);
-      padding: clamp(1.5rem, 4vw, 3rem);
-      border-radius: 2px;
-      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(232, 23, 93, 0.05);
-      max-width: 500px;
-      margin: 0 auto;
-      text-align: left;
-      transform: rotateX(2deg);
+    .dossier-label {
+      font-family: var(--font-title); font-size: 0.65rem;
+      letter-spacing: 0.4em; color: var(--brass);
+      text-shadow: 0 0 12px var(--brass-glow);
+      padding-left: 4px;
     }
 
-    .clue-label {
-      font-family: var(--font-title);
-      color: var(--neon-pink);
-      font-size: 0.75rem;
-      margin-bottom: 1.5rem;
-      letter-spacing: 0.3em;
+    .clue-card {
+      background: rgba(8,5,12,0.98); border: none;
+      /* game.html clue-card box-shadow stack verbatim */
+      box-shadow:
+        0 0 0 3px rgba(60,50,70,1),
+        0 0 0 4px rgba(20,15,25,1),
+        0 0 0 7px rgba(50,40,60,1),
+        0 0 0 8px rgba(15,10,20,1),
+        0 0 40px rgba(232,23,93,0.08),
+        var(--shadow-deep);
+      overflow: hidden; position: relative;
+    }
+
+    /* "NOW SHOWING" header — game.html clue-card::before */
+    .clue-card-header {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem; font-weight: bold;
+      color: #f2eef5; background: #1a1520;
+      padding: 10px 16px; letter-spacing: 0.18em;
+      border-bottom: 3px solid rgba(60,50,70,1);
+      white-space: nowrap;
+      box-shadow: inset 0 -4px 8px rgba(0,0,0,0.4);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    /* double-rule under header — clue-card::after */
+    .clue-card-rule {
+      height: 3px;
+      background: rgba(40,30,50,1);
+      box-shadow: 0 1px 0 rgba(80,60,90,0.4), 0 -1px 0 rgba(10,8,14,1);
+    }
+
+    .clue-card-inner {
+      padding: clamp(18px, 3vw, 28px) clamp(18px, 2.5vw, 24px) clamp(16px, 2vw, 22px);
+    }
+
+    .clue-serial {
+      font-family: var(--font-title); font-size: 0.6rem;
+      letter-spacing: 0.3em; color: var(--gold-primary);
+      margin-bottom: 14px;
       display: flex; align-items: center; gap: 10px;
     }
-    .clue-label::after { content:''; flex:1; height:1px; background: rgba(232,23,93,0.15); }
+    .clue-serial::after { content:''; flex:1; height:1px; background:rgba(232,23,93,0.2); }
 
     .clue-text {
-      font-family: var(--font-typewriter);
-      font-size: clamp(0.95rem, 3vw, 1.15rem);
-      min-height: 80px;
-      margin-bottom: 2rem;
-      color: var(--cream);
-      line-height: 1.6;
+      font-family: var(--font-type);
+      font-size: clamp(0.92rem, 1.4vw, 1.05rem);
+      line-height: 1.75; color: var(--cream);
+      min-height: 72px; margin-bottom: 18px;
+    }
+
+    /* progress pips — game.html */
+    .pip-row {
+      display: flex; gap: 7px; margin-bottom: 14px;
+    }
+    .pip {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: rgba(30,20,35,1); border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.4s ease;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+    .pip.done {
+      background: var(--neon-yellow); border-color: var(--neon-yellow);
+      box-shadow: 0 0 8px rgba(245,197,24,0.9), 0 0 20px rgba(245,197,24,0.4);
+    }
+    .pip.active {
+      background: rgba(245,197,24,0.25); border-color: rgba(245,197,24,0.6);
+      animation: pipPulse 1.4s ease-in-out infinite;
     }
 
     .reveal-btn {
-      width: 100%;
-      background: linear-gradient(135deg, var(--neon-pink), #8b0000);
-      border: none;
-      color: #fff;
-      padding: 1.1rem;
-      font-family: var(--font-title);
-      font-size: 1.3rem;
-      letter-spacing: 4px;
-      cursor: pointer;
-      box-shadow: 0 4px 20px var(--neon-glow);
-      border-radius: 2px;
-      transition: all 0.3s;
+      width: 100%; border: none; color: #fff;
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      padding: 14px; font-family: var(--font-title);
+      font-size: 1.05rem; letter-spacing: 0.25em;
+      cursor: pointer; box-shadow: 0 4px 20px var(--gold-glow);
+      transition: all 0.2s;
+    }
+    .reveal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--gold-glow);
+    }
+    .reveal-btn.shown {
+      background: rgba(232,23,93,0.12);
+      color: var(--gold-light);
+      border: 1px solid rgba(232,23,93,0.35);
+      box-shadow: 0 0 20px rgba(232,23,93,0.1);
+    }
+    .next-btn {
+      width: 100%; margin-top: 8px;
+      background: var(--bg-elevated); border: 1px solid var(--text-muted);
+      color: var(--cream-muted); padding: 10px;
+      font-family: var(--font-title); font-size: 0.8rem;
+      letter-spacing: 0.2em; cursor: pointer; transition: all 0.2s;
+      opacity: 0; pointer-events: none;
+    }
+    .next-btn.vis { opacity: 1; pointer-events: auto; }
+    .next-btn:hover { border-color: var(--cream-muted); color: var(--cream); }
+
+    .dossier-note {
+      text-align: center; font-size: 0.6rem;
+      color: var(--text-muted); letter-spacing: 0.12em;
+      text-transform: uppercase;
     }
 
-    /* ── RE-DESIGNED STATS STRIP ── */
+    /* ============================================================
+       BRASS DIVIDER
+       ============================================================ */
+    .brass-divider {
+      position: relative;
+      width: 100%; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(212,168,83,0.35), transparent);
+      margin: 0;
+    }
+    .brass-divider .icon {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      background: var(--bg-deep);
+      padding: 0 12px;
+      color: rgba(212,168,83,0.4);
+      font-size: 1rem;
+    }
+
+    /* ============================================================
+       SCROLLING MARQUEE STRIP
+       ============================================================ */
+    .marquee-strip {
+      background: rgba(5,3,8,0.98);
+      border-top: 1px solid rgba(232,23,93,0.25);
+      border-bottom: 1px solid rgba(232,23,93,0.25);
+      padding: 14px 0; overflow: hidden;
+      position: relative; z-index: 2;
+    }
+    .marquee-inner {
+      display: flex; width: max-content;
+      animation: marqueeScroll 28s linear infinite;
+    }
+    .marquee-item {
+      font-family: var(--font-title); font-size: 0.72rem;
+      letter-spacing: 0.45em; color: var(--cream-muted);
+      padding: 0 36px;
+      display: flex; align-items: center; gap: 14px;
+      white-space: nowrap;
+    }
+    .mbulb {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--neon-yellow);
+      box-shadow: 0 0 10px rgba(245,197,24,0.9), 0 0 20px rgba(245,197,24,0.3);
+      animation: mbulbPulse 1.2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .mbulb.b { animation-delay: 0.4s; }
+
+    /* ============================================================
+       STATS STRIP
+       ============================================================ */
     .stats-strip {
-      background: rgba(5, 3, 8, 0.95);
-      border-top: 1px solid rgba(232, 23, 93, 0.3);
-      border-bottom: 1px solid rgba(232, 23, 93, 0.3);
-      padding: 1.2rem 0;
-      backdrop-filter: blur(10px);
+      background: rgba(12,8,18,0.95);
+      padding: clamp(1.5rem, 3vw, 2.5rem) 0;
     }
-
-    .stats-grid {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      gap: 0.5rem;
+    .stats-row {
+      display: flex; justify-content: space-around;
     }
-
-    .stat-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 1.5rem;
-      border-right: 1px solid rgba(232, 23, 93, 0.2);
+    .stat {
+      display: flex; flex-direction: column;
+      align-items: center; padding: 0 1rem;
+      border-right: 1px solid rgba(212,168,83,0.12);
       flex: 1;
     }
-    .stat-item:last-child { border-right: none; }
-
-    .stat-item h3 {
+    .stat:last-child { border-right: none; }
+    .stat-num {
       font-family: var(--font-title);
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      color: var(--neon-pink-light);
-      margin: 0;
-      line-height: 1;
-      text-shadow: 0 0 15px var(--neon-glow);
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      color: var(--gold-light); margin: 0; line-height: 1;
+      text-shadow: 0 0 15px var(--gold-glow);
+    }
+    .stat-label {
+      font-size: 0.5rem; color: var(--cream-muted);
+      text-transform: uppercase; letter-spacing: 0.2em;
+      font-weight: 700; margin-top: 4px; opacity: 0.6;
+    }
+    @media (max-width: 640px) {
+      .stat:nth-child(n+3) { display: none; }
     }
 
-    .stat-item p {
-      font-size: 0.55rem;
-      color: var(--cream-muted);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 800;
-      margin-top: 2px;
-      opacity: 0.7;
-    }
+    /* ============================================================
+       NOW SHOWING — TICKET CARDS
+       Box Office perforated ticket + game.html card treatment
+       ============================================================ */
+    .showings { padding: clamp(60px, 8vw, 100px) 0; }
 
-    /* ── THEATER PASSES (TICKET UI) ── */
-    .passes-section { padding: 80px 0; }
-    
-    .passes-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
+    .section-hed {
+      margin-bottom: clamp(36px, 5vw, 56px);
+      display: flex; align-items: center; gap: 0;
     }
-
-    .theater-pass {
-      background: linear-gradient(160deg, rgba(28, 20, 34, 0.85), rgba(13, 8, 16, 0.95));
-      border: 1px solid rgba(232, 23, 93, 0.2);
-      padding: 3.5rem 2.5rem;
-      position: relative;
-      transition: all 0.3s;
-      overflow: hidden;
-      border-radius: 8px;
+    .section-hed-text {
+      padding-left: 20px;
+      border-left: 4px solid var(--gold-primary);
     }
-
-    .theater-pass::before, .theater-pass::after {
-      content: "";
-      position: absolute;
-      width: 28px; height: 28px;
-      background: var(--bg-deep);
-      border-radius: 50%;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 2;
-      border: 1px solid rgba(232, 23, 93, 0.15);
+    .section-hed .eyebrow {
+      font-family: var(--font-title); font-size: 0.65rem;
+      letter-spacing: 0.4em; color: var(--gold-primary); opacity: 0.75;
+      margin-bottom: 6px;
     }
-    .theater-pass::before { left: -15px; }
-    .theater-pass::after { right: -15px; }
-
-    .theater-pass h4 {
+    .section-hed h2 {
       font-family: var(--font-display);
-      font-size: 1.8rem;
-      margin: 0 0 1rem;
-      color: var(--cream);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      color: var(--cream); margin: 0; text-transform: uppercase;
     }
 
-    .pass-id {
-      font-family: var(--font-typewriter);
-      font-size: 0.6rem;
-      color: var(--neon-pink);
-      margin-bottom: 1.5rem;
-      display: block;
-      letter-spacing: 2px;
+    .tickets-grid {
+      display: grid; gap: 24px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 768px) {
+      .tickets-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
-    /* ── ROAST & SHARE SECTION ── */
-    .features-promo {
-      padding: 80px 0;
-      background: radial-gradient(circle at center, #1a1520 0%, var(--bg-deep) 100%);
-      text-align: center;
+    /* Ticket card — Box Office perforated aesthetic + game.html depth */
+    .ticket {
+      background: var(--bg-card);
+      border: 2px solid rgba(50,40,62,1);
+      display: flex; overflow: hidden;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+    .ticket:hover {
+      border-color: var(--gold-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px var(--gold-glow), inset 0 0 20px rgba(232,23,93,0.04);
+    }
+    .ticket.featured {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 24px var(--gold-glow);
     }
 
-    .feature-card {
+    /* Left perforation strip — Box Office ticket-edge */
+    .ticket-stub {
+      width: clamp(52px, 8vw, 72px);
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.4);
+      border-right: 2px dashed rgba(60,50,70,0.8);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative;
+      /* perforations top/bottom */
+    }
+    /* perforation holes */
+    .ticket-stub::before,
+    .ticket-stub::after {
+      content: '';
+      position: absolute; left: 50%;
+      transform: translateX(-50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--bg-deep);
+      border: 1px solid rgba(50,40,62,0.5);
+    }
+    .ticket-stub::before { top: -7px; }
+    .ticket-stub::after  { bottom: -7px; }
+
+    .stub-serial {
+      font-family: var(--font-type); font-size: 0.52rem;
+      color: var(--cream-muted); opacity: 0.5;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 0.2em;
+      user-select: none;
+    }
+
+    .ticket-content {
+      flex: 1; padding: clamp(18px, 2.5vw, 26px) clamp(16px, 2.5vw, 22px);
+      display: flex; flex-direction: column;
+      /* Box Office velvet-gradient bg */
+      background: linear-gradient(135deg, rgba(26,14,22,0.85) 0%, rgba(13,8,16,0.95) 100%);
+    }
+
+    .ticket-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; margin-bottom: 12px;
+    }
+    .ticket-badge {
+      font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--gold-light);
+      border: 1px solid rgba(232,23,93,0.35);
+      padding: 3px 9px;
+    }
+    .ticket-icon { font-size: 1.6rem; filter: drop-shadow(0 0 8px var(--gold-glow)); }
+
+    .ticket-name {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(1.2rem, 2vw, 1.55rem);
+      color: var(--cream); margin: 0 0 10px; line-height: 1.2;
+    }
+    .ticket-desc {
+      color: var(--cream-muted); font-size: 0.88rem;
+      line-height: 1.6; flex: 1; margin-bottom: 16px;
+    }
+
+    .ticket-footer {
+      display: flex; justify-content: space-between;
+      align-items: center; padding-top: 12px;
+      border-top: 1px solid rgba(60,50,70,0.5);
+    }
+    .admit-block { display: flex; flex-direction: column; }
+    .admit-label { font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; }
+    .admit-count {
+      font-family: var(--font-title); font-size: 1.05rem;
+      color: var(--gold-light); letter-spacing: 0.1em;
+    }
+    .play-link {
+      font-family: var(--font-title); font-size: 0.72rem;
+      letter-spacing: 0.2em; color: var(--gold-primary);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 5px;
+      transition: all 0.2s;
+    }
+    .play-link:hover { color: var(--gold-light); transform: translateX(2px); }
+
+    /* ============================================================
+       FEATURE PANELS
+       ============================================================ */
+    .features { padding: clamp(60px, 8vw, 100px) 0; }
+    .features-grid {
+      display: grid; gap: 20px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 768px) {
+      .features-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .feature-panel {
       background: rgba(255,255,255,0.02);
-      border: 1px dashed rgba(232, 23, 93, 0.3);
-      padding: 3rem 2rem;
-      margin: 1rem;
+      border: 1px dashed rgba(232,23,93,0.3);
+      padding: clamp(28px, 4vw, 42px) clamp(24px, 3vw, 36px);
     }
-
-    .feature-card h5 {
-      font-family: var(--font-title);
-      font-size: 1.8rem;
-      color: var(--neon-yellow);
-      letter-spacing: 2px;
-      margin-bottom: 1rem;
+    .feature-panel h5 {
+      font-family: var(--font-title); font-size: 1.5rem;
+      color: var(--neon-yellow); letter-spacing: 0.15em;
+      margin: 0 0 12px;
     }
+    .feature-panel p { color: var(--cream-muted); font-size: 0.9rem; line-height: 1.65; }
 
-    /* ── FOOTER ── */
+    /* ============================================================
+       FOOTER
+       ============================================================ */
     footer {
-      padding: 80px 0 40px;
-      border-top: 1px solid rgba(232, 23, 93, 0.15);
+      padding: clamp(60px, 8vw, 90px) 0 40px;
+      border-top: 1px solid rgba(232,23,93,0.15);
       background: #030305;
       text-align: center;
     }
-
     .footer-brand {
-      font-family: var(--font-display);
-      font-size: clamp(2rem, 10vw, 3rem);
-      color: var(--cream);
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      font-weight: 900;
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2.2rem, 10vw, 3.5rem);
+      color: var(--cream); text-transform: uppercase; line-height: 0.82;
     }
-
     .footer-brand span {
-      display: block;
-      font-family: var(--font-title);
-      font-size: 0.45em;
-      color: var(--neon-pink);
-      letter-spacing: 12px;
-      text-indent: 12px;
-      margin-top: -8px;
+      display: block; font-family: var(--font-title);
+      font-size: 0.4em; color: var(--gold-light);
+      letter-spacing: 0.55em; text-indent: 0.55em;
+      text-shadow: 0 0 16px var(--gold-glow);
+      margin-top: 8px;
+    }
+    .footer-links {
+      display: flex; justify-content: center;
+      gap: 2rem; margin: 22px 0;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 0.65rem; color: var(--text-muted);
+      text-decoration: none; text-transform: uppercase;
+      letter-spacing: 0.15em; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold-light); }
+    .footer-copy {
+      font-family: var(--font-type); font-size: 0.58rem;
+      color: var(--text-muted); opacity: 0.4;
+      line-height: 1.9; margin-top: 16px;
     }
 
-    .nobody-tag {
-      font-family: var(--font-typewriter);
-      font-size: 0.65rem;
-      color: var(--cream-muted);
-      opacity: 0.4;
-      line-height: 1.8;
-      max-width: 400px;
-      margin: 2rem auto 0;
-    }
-
-    /* ── ANIMATIONS ── */
+    /* ============================================================
+       KEYFRAMES
+       ============================================================ */
     @keyframes neonFlicker {
-      0%, 92%, 96%, 100% { opacity: 1; text-shadow: 0 0 20px rgba(255,61,127,0.9), 0 0 60px var(--neon-glow); }
-      93%, 95% { opacity: 0.7; text-shadow: none; }
+      0%,92%,96%,100% { text-shadow:0 0 20px rgba(255,61,127,0.9),0 0 60px rgba(232,23,93,0.5); opacity:1; }
+      93%,95% { opacity:0.7; text-shadow:0 0 5px rgba(255,61,127,0.3); }
     }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
+    @keyframes dotPulse {
+      0%,100% { opacity:1; } 50% { opacity:0.5; }
     }
-
-    @media (min-width: 1025px) {
-      .stats-grid { gap: 1rem; }
-      .passes-grid { grid-template-columns: repeat(3, 1fr); }
-      .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1000px; margin: 0 auto; }
+    @keyframes pipPulse {
+      0%,100% { box-shadow:0 0 6px rgba(245,197,24,0.4),0 0 14px rgba(245,197,24,0.2); }
+      50% { box-shadow:0 0 10px rgba(245,197,24,0.8),0 0 24px rgba(245,197,24,0.5); }
     }
-
-    @media (max-width: 768px) {
-      .stat-item:nth-child(n+3) { display: none; }
-      .stat-item { padding: 0 0.5rem; }
+    @keyframes mbulbPulse {
+      0%,100% { opacity:0.3; transform:scale(0.8); }
+      50% { opacity:1; transform:scale(1.2); box-shadow:0 0 16px rgba(245,197,24,1),0 0 30px rgba(245,197,24,0.4); }
+    }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
   </style>
 </head>
 <body>
   <div class="film-grain"></div>
 
+  <!-- ── HEADER ── -->
   <header class="site-header">
-    <div class="container nav-wrap">
-      <a href="#" class="brand-lockup">
-        <span class="p">PLOT</span>
-        <span class="t">TWISTED</span>
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <span class="plot">PLOT</span>
+        <span class="twisted">TWISTED</span>
       </a>
+      <nav class="nav-links">
+        <a href="#showings">Screenings</a>
+        <a href="#showings">Daily</a>
+        <a href="/game.html">Play</a>
+      </nav>
       <a href="/game.html" class="nav-cta">
-        <div class="status-dot"></div>
-        Enter Screening
+        <div class="live-dot"></div>
+        Now Screening
       </a>
     </div>
   </header>
 
   <main>
+
+    <!-- ── HERO ── -->
     <section class="hero">
-      <div class="container hero-content">
-        <span class="eyebrow">A _Nobody Studios Original Production</span>
-        <h1>PLOT<span class="twisted-accent">TWISTED</span></h1>
-        
-        <p class="hero-tagline">
-          The movie guessing ritual for those who remember the twist, but forget the title before the credits roll.
-        </p>
+      <div class="hero-cinebg"></div>
+      <div class="hero-spotlight"></div>
 
-        <div class="dossier-wrap">
-          <div class="dossier-card" id="demoClue">
-            <div class="clue-label">SUBJECT FILE // CASE #802</div>
-            <div class="clue-text" id="clueContent">"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy."</div>
-            <button class="reveal-btn" onclick="toggleReveal()">REVEAL MOVIE TITLE</button>
+      <div class="hero-body">
+        <div class="container">
+          <div class="hero-grid">
+
+            <!-- Title in brass marquee frame -->
+            <div>
+              <div class="marquee-frame">
+                <span class="corner-bl"></span>
+                <span class="corner-br"></span>
+                <div class="frame-inner">
+                  <div class="title-eyebrow">★ A _Nobody Studios Production ★</div>
+                  <span class="title-plot">PLOT</span>
+                  <span class="title-twisted">TWISTED</span>
+                  <p class="hero-tagline">The movie guessing ritual for those who remember the twist, but forget the title before the credits roll.</p>
+                  <div class="hero-btn-row">
+                    <a href="/game.html" class="btn btn-primary">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
+                      Enter Screening
+                    </a>
+                    <a href="#showings" class="btn btn-ghost">See Modes</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dossier card -->
+            <div class="dossier-shell">
+              <div class="dossier-label">TONIGHT'S DOSSIER</div>
+              <div class="clue-card">
+                <div class="clue-card-header">
+                  <span>N O W &nbsp; S H O W I N G</span>
+                  <span id="clueNum" style="opacity:0.5;">1 / 5</span>
+                </div>
+                <div class="clue-card-rule"></div>
+                <div class="clue-card-inner">
+                  <div class="clue-serial" id="clueSerial">CASE #802</div>
+                  <div class="clue-text" id="clueText">"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy."</div>
+                  <div class="pip-row" id="pipRow"></div>
+                  <button class="reveal-btn" id="revealBtn" onclick="handleReveal()">REVEAL TITLE</button>
+                  <button class="next-btn" id="nextBtn" onclick="nextClue()">NEXT CLUE →</button>
+                </div>
+              </div>
+              <p class="dossier-note">Sample clues — full game has 1,200+</p>
+            </div>
+
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Unified Stats Ribbon -->
+    <!-- ── MARQUEE STRIP ── -->
+    <div class="marquee-strip" aria-hidden="true">
+      <div class="marquee-inner" id="marqueeInner"></div>
+    </div>
+
+    <!-- ── STATS ── -->
     <section class="stats-strip">
-      <div class="container stats-grid">
-        <div class="stat-item">
-          <h3>1.2K+</h3>
-          <p>Twisted Plots</p>
-        </div>
-        <div class="stat-item">
-          <h3>94%</h3>
-          <p>Failure Rate</p>
-        </div>
-        <div class="stat-item">
-          <h3>DAILY</h3>
-          <p>Global Mystery</p>
-        </div>
-        <div class="stat-item">
-          <h3>ZERO</h3>
-          <p>Spoiler Mercy</p>
-        </div>
+      <div class="container stats-row">
+        <div class="stat"><div class="stat-num">1.2K+</div><div class="stat-label">Twisted Plots</div></div>
+        <div class="stat"><div class="stat-num">94%</div><div class="stat-label">Failure Rate</div></div>
+        <div class="stat"><div class="stat-num">DAILY</div><div class="stat-label">Global Mystery</div></div>
+        <div class="stat"><div class="stat-num">ZERO</div><div class="stat-label">Spoiler Mercy</div></div>
       </div>
     </section>
 
-    <!-- Theater Passes -->
-    <section id="modes" class="passes-section">
+    <!-- ── TICKET DIVIDER ── -->
+    <div class="brass-divider"><span class="icon">🎬</span></div>
+
+    <!-- ── NOW SHOWING: MODES ── -->
+    <section id="showings" class="showings">
       <div class="container">
-        <div style="text-align: center; margin-bottom: 5rem;">
-          <h2 style="font-family: var(--font-display); font-size: clamp(2.5rem, 8vw, 3.5rem); margin: 0; text-transform: uppercase;">Choose Your Pass</h2>
-          <p style="color: var(--cream-muted); letter-spacing: 5px; text-transform: uppercase; font-size: 0.75rem; margin-top: 15px;">Pick your entry point for the evening</p>
-        </div>
-
-        <div class="passes-grid">
-          <article class="theater-pass">
-            <span class="pass-id">[ TYPE: CLC-01 ]</span>
-            <h4>Classic Hardcase</h4>
-            <p>The purist's route. Read the description, face the pressure, and type the title from pure memory. No lifelines. No second takes.</p>
-          </article>
-          
-          <article class="theater-pass" style="border-color: var(--neon-pink); background: rgba(232, 23, 93, 0.08);">
-            <span class="pass-id" style="color: var(--neon-pink-light)">[ TYPE: MRQ-01 ]</span>
-            <div style="position: absolute; top: 20px; right: 30px; font-family: var(--font-typewriter); font-size: 0.6rem; color: var(--neon-pink); font-weight: 900;">RECOMMENDED</div>
-            <h4>Marquee Lounge</h4>
-            <p>A more casual screening. Solve clues using a Wheel of Fortune style visual grid. Buy letters when you're stuck and keep the vibe rolling.</p>
-          </article>
-
-          <article class="theater-pass">
-            <span class="pass-id">[ TYPE: DLY-01 ]</span>
-            <h4>The Daily Ritual</h4>
-            <p>One shared mystery for the entire collective. Guess correctly to build your streak and climb the global leaderboards every 24 hours.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- Personality Section -->
-    <section class="features-promo">
-      <div class="container">
-        <h2 style="font-family: var(--font-display); font-size: 2.8rem; margin-bottom: 1rem; text-transform: uppercase;">The Roast & The Glory</h2>
-        <p style="color: var(--cream-muted); margin-bottom: 4rem;">Plot Twisted isn't just a game; it's a critic that hits back.</p>
-        
-        <div class="feature-grid">
-          <div class="feature-card">
-            <h5>Vicious Roasts</h5>
-            <p style="color: var(--cream-muted);">Guess it wrong? Expect the game to roast your "bargain bin" logic. Guess it right? We might still judge your rewatch count.</p>
-          </div>
-          <div class="feature-card">
-            <h5>Social Bragging</h5>
-            <p style="color: var(--cream-muted);">Share your scorecard with friends on social. High-res summaries of your cinematic genius (or failure) ready for the grid.</p>
+        <div class="section-hed">
+          <div class="section-hed-text">
+            <div class="eyebrow">SELECT YOUR SCREENING</div>
+            <h2>Now Showing</h2>
           </div>
         </div>
+
+        <div class="tickets-grid">
+
+          <!-- Classic -->
+          <div class="ticket">
+            <div class="ticket-stub">
+              <span class="stub-serial">SRL: CLC-01 — ADMIT ONE</span>
+            </div>
+            <div class="ticket-content">
+              <div class="ticket-top">
+                <span class="ticket-badge">Classic</span>
+                <span class="ticket-icon">📝</span>
+              </div>
+              <div class="ticket-name">Classic Hardcase</div>
+              <div class="ticket-desc">Read the twisted summary. Type the title from memory alone. No lifelines. No letter reveals. Pure recall or nothing.</div>
+              <div class="ticket-footer">
+                <div class="admit-block">
+                  <span class="admit-label">Admit</span>
+                  <span class="admit-count">ONE</span>
+                </div>
+                <a href="/game.html" class="play-link">PLAY →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Marquee — featured -->
+          <div class="ticket featured">
+            <div class="ticket-stub" style="background:rgba(232,23,93,0.08); border-right-color:rgba(232,23,93,0.3);">
+              <span class="stub-serial">SRL: MRQ-01 — RECOMMENDED</span>
+            </div>
+            <div class="ticket-content">
+              <div class="ticket-top">
+                <span class="ticket-badge" style="color:var(--gold-light); border-color:rgba(255,61,127,0.4);">Recommended</span>
+                <span class="ticket-icon">🎰</span>
+              </div>
+              <div class="ticket-name">Marquee Mode</div>
+              <div class="ticket-desc">Wheel of Fortune meets the multiplex. Reveal letters one by one. Solve early with 80% hidden and score a 1.5× multiplier.</div>
+              <div class="ticket-footer">
+                <div class="admit-block">
+                  <span class="admit-label">Admit</span>
+                  <span class="admit-count">ONE</span>
+                </div>
+                <a href="/game.html" class="play-link">PLAY →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily -->
+          <div class="ticket">
+            <div class="ticket-stub">
+              <span class="stub-serial">SRL: DLY-01 — DAILY RITUAL</span>
+            </div>
+            <div class="ticket-content">
+              <div class="ticket-top">
+                <span class="ticket-badge">Daily</span>
+                <span class="ticket-icon">📅</span>
+              </div>
+              <div class="ticket-name">The Daily Ritual</div>
+              <div class="ticket-desc">Five movies. One guess each. Same clues for every player on the planet, every 24 hours. No hints. Share your scorecard.</div>
+              <div class="ticket-footer">
+                <div class="admit-block">
+                  <span class="admit-label">Admit</span>
+                  <span class="admit-count">ALL</span>
+                </div>
+                <a href="/game.html" class="play-link">PLAY →</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
 
-    <!-- Simple Editorial Curation Section -->
-    <section id="editorial" style="padding: 100px 0; background: #050308; border-top: 1px solid rgba(232, 23, 93, 0.1);">
-      <div class="container" style="text-align: center;">
-        <h2 style="font-family: var(--font-display); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase;">After Bedtime Cinema</h2>
-        <p style="color: var(--cream-muted); max-width: 600px; margin: 0 auto 3rem;">Editorial picks and 90-minute movie lists for exhausted parents and night owls.</p>
-        <div style="font-family: var(--font-title); font-size: 1.5rem; color: var(--neon-pink); letter-spacing: 5px; animation: pulse 3s infinite;">COMING SOON TO THE BOX OFFICE</div>
+    <!-- ── FEATURES ── -->
+    <section class="features">
+      <div class="container">
+        <div class="section-hed">
+          <div class="section-hed-text">
+            <div class="eyebrow">THE PERSONALITY</div>
+            <h2>The Roast &amp; The Glory</h2>
+          </div>
+        </div>
+        <div class="features-grid">
+          <div class="feature-panel">
+            <h5>VICIOUS ROASTS</h5>
+            <p>Guess wrong and the game has notes. "Your answer has strong straight-to-DVD energy." Guess right and it might still question your rewatch count.</p>
+          </div>
+          <div class="feature-panel">
+            <h5>SOCIAL BRAGGING</h5>
+            <p>Daily scorecard exports as a shareable emoji grid. Post your result, flex your streak, and invite everyone you know to fail just as publicly.</p>
+          </div>
+        </div>
       </div>
     </section>
+
   </main>
 
+  <!-- ── FOOTER ── -->
   <footer>
     <div class="container">
       <div class="footer-brand">PLOT<span>TWISTED</span></div>
-      <div class="nobody-tag">
-        AN ORIGINAL _NOBODY STUDIOS PRODUCTION &copy; 2026<br>
-        <span style="display: block; margin-top: 10px; font-size: 0.6rem; opacity: 0.7;">Dedicated to the ones who remember the vibe, but never the title.</span>
+      <nav class="footer-links">
+        <a href="/game.html">Play Now</a>
+        <a href="#showings">Modes</a>
+        <a href="https://x.com/Ben_Soup" target="_blank" rel="noopener">@Ben_Soup</a>
+      </nav>
+      <div class="footer-copy">
+        AN ORIGINAL _NOBODY STUDIOS PRODUCTION © 2026<br>
+        <span style="opacity:0.7;">Dedicated to the ones who remember the vibe, but never the title.</span>
       </div>
     </div>
   </footer>
 
   <script>
-    const demoData = [
-      { clue: "\"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy.\"", title: "BATMAN BEGINS" },
-      { clue: "\"A group of guys spend a weekend looking for their friend because he slept on a roof.\"", title: "THE HANGOVER" },
-      { clue: "\"An old man takes his house for a walk to avoid a nursing home.\"", title: "UP" }
+    /* ── Demo clues ─────────────────────────────── */
+    const DEMO = [
+      { serial:"CASE #802", clue:'"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy."',           title:"BATMAN BEGINS" },
+      { serial:"CASE #417", clue:'"An old man ties balloons to his house to escape a retirement home and accidentally kidnaps a child."',   title:"UP" },
+      { serial:"CASE #231", clue:'"A group of guys spend an entire weekend looking for their friend who slept on a roof."',                  title:"THE HANGOVER" },
+      { serial:"CASE #609", clue:'"A farm boy with severe father issues learns to trust an invisible energy drink and blows up a government building."', title:"STAR WARS: A NEW HOPE" },
+      { serial:"CASE #158", clue:'"A woman in a red dress keeps reappearing everywhere, and everyone around her refuses to explain why."',   title:"THE MATRIX" },
     ];
-    let currentIdx = 0;
+    let idx = 0, shown = false;
 
-    function toggleReveal() {
-      const btn = document.querySelector('#demoClue .reveal-btn');
-      const content = document.getElementById('clueContent');
-      
-      if (btn.innerText === "REVEAL MOVIE TITLE") {
-        btn.innerText = demoData[currentIdx].title;
-        btn.style.background = "rgba(232, 23, 93, 0.2)";
-        btn.style.color = "var(--neon-pink-light)";
-        btn.style.border = "1px solid var(--neon-pink)";
-      } else {
-        currentIdx = (currentIdx + 1) % demoData.length;
-        content.innerText = demoData[currentIdx].clue;
-        btn.innerText = "REVEAL MOVIE TITLE";
-        btn.style.background = "linear-gradient(135deg, var(--neon-pink), #8b0000)";
-        btn.style.color = "#fff";
-        btn.style.border = "none";
-      }
+    function buildPips() {
+      const row = document.getElementById('pipRow');
+      row.innerHTML = '';
+      DEMO.forEach((_,i) => {
+        const p = document.createElement('div');
+        p.className = 'pip' + (i < idx ? ' done' : i === idx ? ' active' : '');
+        row.appendChild(p);
+      });
+      document.getElementById('clueNum').textContent = `${idx+1} / ${DEMO.length}`;
     }
+
+    function handleReveal() {
+      if (shown) return;
+      shown = true;
+      const btn = document.getElementById('revealBtn');
+      btn.textContent = DEMO[idx].title;
+      btn.classList.add('shown');
+      document.getElementById('nextBtn').classList.add('vis');
+    }
+
+    function nextClue() {
+      idx = (idx + 1) % DEMO.length;
+      shown = false;
+      const btn = document.getElementById('revealBtn');
+      btn.textContent = 'REVEAL TITLE';
+      btn.classList.remove('shown');
+      document.getElementById('nextBtn').classList.remove('vis');
+      document.getElementById('clueSerial').textContent = DEMO[idx].serial;
+      document.getElementById('clueText').textContent   = DEMO[idx].clue;
+      buildPips();
+    }
+
+    buildPips();
+
+    /* ── Scrolling marquee ──────────────────────── */
+    (function() {
+      const ITEMS = [
+        "NOW PLAYING","DAILY CHALLENGE LIVE","1,200+ CLUES",
+        "MARQUEE MODE","NOBODY APPROVED THIS","CLASSIC MODE",
+        "RATE YOUR CINEMATIC IQ","NO SPOILER MERCY",
+        "GUESS THE MOVIE","STREAMING HITS","DAILY RITUAL",
+      ];
+      const inner = document.getElementById('marqueeInner');
+      [...ITEMS, ...ITEMS].forEach(t => {
+        const el = document.createElement('div');
+        el.className = 'marquee-item';
+        el.innerHTML = `<span class="mbulb"></span>${t}<span class="mbulb b"></span>`;
+        inner.appendChild(el);
+      });
+    })();
   </script>
 </body>
 </html>
