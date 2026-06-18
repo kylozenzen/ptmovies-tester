@@ -2,2562 +2,1000 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Plot Twisted</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0C0A08">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Plot Twisted">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plot Twisted | The Cinematic Movie Guessing Ritual</title>
+  <meta name="description" content="A cinematic movie guessing game for people who remember the vibes, the twists, and the snacks—but never the title.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Bebas+Neue&family=Special+Elite&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,500&family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
 
-<style>
-/* ============================================================
-   PLOT TWISTED — CINEMA NOIR REDESIGN
-   Palette: void dark + warm surfaces + gold/red/teal accents
-   ============================================================ */
-:root {
-  --void:          #0C0A08;
-  --deep:          #111009;
-  --surface:       #1A1710;
-  --panel:         #201D16;
-  --lift:          #2A261C;
-  --lift2:         #343028;
-  --rule:          rgba(255,255,255,0.07);
-  --rule-md:       rgba(255,255,255,0.11);
-  --rule-strong:   rgba(255,255,255,0.16);
-  --gold:          #D4A843;
-  --gold-dim:      #9A7A28;
-  --gold-glow:     rgba(212,168,67,0.18);
-  --gold-glow-md:  rgba(212,168,67,0.28);
-  --red:           #C41E3A;
-  --red-dim:       #7A1224;
-  --red-glow:      rgba(196,30,58,0.25);
-  --cream:         #F0E8D8;
-  --cream-dim:     #B8A888;
-  --cream-faint:   #6A5E50;
-  --teal:          #2A8878;
-  --teal-dim:      #1A5548;
-  --bulb:          #F5C842;
-  --bulb-glow:     rgba(245,200,66,0.5);
-  --font-display:  'Playfair Display', Georgia, serif;
-  --font-title:    'Bebas Neue', Impact, sans-serif;
-  --font-body:     'DM Mono', 'Courier New', monospace;
-  --font-clue:     'Special Elite', 'Courier New', cursive;
-}
+  <style>
+    /* ============================================================
+       DESIGN TOKENS — game.html variables verbatim
+       ============================================================ */
+    :root {
+      --bg-deep:      #0d0810;
+      --bg-dark:      #130e17;
+      --bg-card:      #1c1422;
+      --bg-elevated:  #261c2e;
+      --gold-primary: #e8175d;
+      --gold-light:   #ff3d7f;
+      --gold-dark:    #a80f42;
+      --gold-glow:    rgba(232,23,93,0.5);
+      --red-primary:  #8b0000;
+      --neon-yellow:  #f5c518;
+      --neon-yellow-glow: rgba(245,197,24,0.6);
+      --cream:        #f2eef5;
+      --cream-muted:  #b8afc4;
+      --text-muted:   #6d6179;
+      --font-display: 'Playfair Display', serif;
+      --font-title:   'Bebas Neue', sans-serif;
+      --font-body:    'Inter', sans-serif;
+      --font-type:    'Special Elite', monospace;
+      --shadow-deep:  0 10px 40px rgba(0,0,0,0.7);
+      --header-h:     66px;
 
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;width:100%;overflow:hidden;}
-body{
-  font-family:var(--font-body);
-  background:var(--void);
-  color:var(--cream);
-  -webkit-tap-highlight-color:transparent;
-}
+      /* Theater-specific additions (from Box Office doc) */
+      --brass:        #d4a853;
+      --brass-glow:   rgba(212,168,83,0.5);
+      --velvet-dark:  #0a0507;
+      --curtain-red:  #8b0000;
+    }
 
-/* ── SCREENS ── */
-.screen{display:none;position:fixed;inset:0;flex-direction:column;opacity:0;transition:opacity 0.35s ease;}
-.screen.active{display:flex;opacity:1;}
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
-/* ── BULB ANIMATIONS ── */
-@keyframes bulbFlicker{
-  0%,88%,100%{opacity:1;}
-  90%{opacity:0.55;}
-  92%{opacity:1;}
-  95%{opacity:0.3;}
-  97%{opacity:1;}
-}
-@keyframes bulbPulse{
-  0%,100%{box-shadow:0 0 6px 2px var(--bulb-glow),0 0 14px var(--bulb-glow);}
-  50%{box-shadow:0 0 10px 3px var(--bulb-glow),0 0 24px rgba(245,200,66,0.3);}
-}
-@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-7px);}40%,80%{transform:translateX(7px);}}
-@keyframes resultPop{0%{transform:scale(0.7);opacity:0;}60%{transform:scale(1.06);}100%{transform:scale(1);opacity:1;}}
-@keyframes letterReveal{0%{transform:scaleY(0) translateY(-4px);opacity:0;}100%{transform:scaleY(1) translateY(0);opacity:1;}}
-@keyframes spin{to{transform:rotate(360deg);}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-.shake{animation:shake 0.38s ease;}
-.fade-up{animation:fadeUp 0.4s ease both;}
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--cream);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-/* ============================================================
-   CINEMA LOADING
-   ============================================================ */
-.cinema-loading{
-  position:fixed;inset:0;z-index:9000;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--void);
-  flex-direction:column;gap:24px;
-  transition:opacity 0.6s ease;
-}
-.cinema-loading.fade-out{opacity:0;pointer-events:none;}
-.cinema-loading.hidden{display:none;}
+    /* Subway tile grid — from game.html */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 30px;
+      background-attachment: fixed;
+    }
 
-.cinema-bulb-row{display:flex;gap:12px;align-items:center;}
-.cinema-bulb{
-  width:10px;height:10px;border-radius:50%;
-  background:var(--bulb);
-  box-shadow:0 0 8px 3px var(--bulb-glow);
-  animation:bulbFlicker 2.4s ease-in-out infinite;
-}
-.cinema-bulb:nth-child(2){animation-delay:0.3s;}
-.cinema-bulb:nth-child(3){animation-delay:0.6s;}
-.cinema-bulb:nth-child(4){animation-delay:0.9s;}
-.cinema-bulb:nth-child(5){animation-delay:1.2s;}
+    /* Film grain — from game.html */
+    .film-grain {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
 
-.cinema-title{
-  font-family:var(--font-display);font-weight:900;
-  font-size:clamp(3.5rem,12vw,7rem);
-  color:var(--cream);line-height:0.85;text-align:center;
-  letter-spacing:-1px;
-}
-.cinema-sub{
-  font-family:var(--font-title);
-  font-size:clamp(1rem,4vw,1.8rem);
-  color:var(--gold);letter-spacing:0.6em;
-  text-align:center;
-}
-.cinema-dots{display:flex;gap:8px;}
-.cinema-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--cream-faint);
-  animation:bulbFlicker 1.2s ease-in-out infinite;
-}
-.cinema-dot:nth-child(2){animation-delay:0.2s;}
-.cinema-dot:nth-child(3){animation-delay:0.4s;}
+    .container {
+      width: min(1300px, 92vw);
+      margin: 0 auto;
+      position: relative; z-index: 2;
+    }
 
-/* ============================================================
-   SHARED BUTTON BASE
-   ============================================================ */
-.btn{
-  font-family:var(--font-title);
-  letter-spacing:0.18em;
-  text-transform:uppercase;
-  border:none;cursor:pointer;
-  transition:all 0.15s ease;
-  -webkit-tap-highlight-color:transparent;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-}
-.btn:disabled{opacity:0.4;cursor:not-allowed;}
+    /* ============================================================
+       NAV — game.html header treatment
+       ============================================================ */
+    .site-header {
+      position: fixed; top: 0; width: 100%;
+      z-index: 1000; height: var(--header-h);
+      background: rgba(10,7,16,0.97);
+      backdrop-filter: blur(20px);
+      /* game.html's triple-rule shadow */
+      box-shadow:
+        0 0 0 1px rgba(50,40,62,1),
+        0 2px 0 rgba(20,15,25,1),
+        0 3px 0 rgba(40,30,55,1);
+    }
+    /* game.html's pink top-edge bar */
+    .site-header::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(232,23,93,0.3) 10%,
+        rgba(232,23,93,0.7) 25%,
+        rgba(255,61,127,0.9) 50%,
+        rgba(232,23,93,0.7) 75%,
+        rgba(232,23,93,0.3) 90%,
+        transparent 100%);
+      box-shadow: 0 0 12px rgba(232,23,93,0.4), 0 0 30px rgba(232,23,93,0.2);
+    }
 
-/* ============================================================
-   MARQUEE HEADER (shared across game screens)
-   ============================================================ */
-.marquee-header{
-  background:var(--deep);
-  border-bottom:1px solid var(--rule-strong);
-  flex-shrink:0;
-  position:relative;
-  z-index:10;
-}
+    .nav-inner {
+      height: var(--header-h);
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
 
-/* Bulb rail */
-.bulb-rail{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 16px;height:20px;
-  background:var(--void);
-  border-bottom:1px solid var(--rule);
-}
-.bulb-strip{display:flex;gap:9px;align-items:center;}
-.bulb{
-  width:7px;height:7px;border-radius:50%;
-  background:var(--bulb);
-  box-shadow:0 0 6px 2px var(--bulb-glow);
-  animation:bulbFlicker 3s ease-in-out infinite;
-}
-.bulb:nth-child(2){animation-delay:0.35s;}
-.bulb:nth-child(3){animation-delay:0.7s;}
-.bulb:nth-child(4){animation-delay:1.05s;}
-.bulb:nth-child(5){animation-delay:1.4s;}
-.bulb:nth-child(6){animation-delay:1.75s;}
-.bulb.dim{background:rgba(245,200,66,0.15);box-shadow:none;animation:none;}
-.rail-center-text{
-  font-size:8px;letter-spacing:0.35em;
-  color:var(--cream-faint);text-transform:uppercase;
-}
+    .brand {
+      text-decoration: none;
+      display: flex; flex-direction: column;
+      align-items: flex-start; line-height: 0.8;
+    }
+    .brand .plot {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 1.3rem; color: var(--cream);
+      letter-spacing: 0.04em;
+    }
+    .brand .twisted {
+      font-family: var(--font-title);
+      font-size: 0.78rem; color: var(--gold-light);
+      letter-spacing: 0.5em; text-indent: 0.5em;
+      text-shadow: 0 0 12px var(--gold-glow);
+      animation: neonFlicker 6s infinite;
+    }
 
-/* Header main row */
-.header-main{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:8px 20px;gap:16px;
-}
-.header-logo{
-  display:flex;flex-direction:column;align-items:flex-start;
-  text-decoration:none;line-height:0.85;
-}
-.logo-plot{
-  font-family:var(--font-display);font-weight:900;
-  font-size:clamp(1.1rem,2.5vw,1.5rem);
-  color:var(--cream);letter-spacing:-0.02em;
-}
-.logo-twisted{
-  font-family:var(--font-title);
-  font-size:clamp(0.55rem,1.2vw,0.7rem);
-  color:var(--gold);letter-spacing:0.55em;
-}
+    .nav-links {
+      display: none; gap: 2.5rem;
+    }
+    @media (min-width: 768px) { .nav-links { display: flex; } }
+    .nav-links a {
+      font-family: var(--font-title); font-size: 0.85rem;
+      letter-spacing: 0.2em; color: var(--cream-muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--cream); }
 
-.header-stats{display:flex;gap:10px;align-items:center;}
-.hstat{
-  display:flex;flex-direction:column;align-items:center;
-  padding:5px 12px;
-  border:1px solid var(--rule-md);
-  background:var(--surface);
-  min-width:64px;
-}
-.hstat-label{font-size:7px;letter-spacing:0.2em;color:var(--cream-faint);text-transform:uppercase;margin-bottom:2px;}
-.hstat-value{
-  font-family:var(--font-display);font-weight:900;
-  font-size:clamp(1rem,2.2vw,1.3rem);color:var(--cream);line-height:1;
-}
-.hstat-value.gold{color:var(--gold);}
+    .nav-cta {
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      padding: 0.55rem 1.5rem; color: #fff;
+      text-decoration: none; font-family: var(--font-title);
+      font-size: 0.9rem; letter-spacing: 0.2em;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px var(--gold-glow);
+      transition: all 0.2s;
+    }
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--gold-glow);
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--neon-yellow);
+      box-shadow: 0 0 8px var(--neon-yellow);
+      animation: dotPulse 2s infinite;
+    }
 
-.strikes-row{display:flex;gap:4px;padding-top:2px;}
-.spip{
-  width:9px;height:9px;border-radius:50%;
-  background:var(--red);
-  box-shadow:0 0 6px rgba(196,30,58,0.6);
-  transition:all 0.3s;
-}
-.spip.out{background:var(--lift);box-shadow:none;}
+    /* ============================================================
+       HERO — Box Office marquee-frame poster treatment
+       ============================================================ */
+    .hero {
+      padding-top: var(--header-h);
+      position: relative; min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
 
-.header-actions{display:flex;gap:8px;}
-.hbtn{
-  padding:6px 13px;
-  background:transparent;
-  border:1px solid var(--rule-md);
-  color:var(--cream-faint);
-  font-family:var(--font-title);
-  font-size:10px;letter-spacing:0.18em;
-  cursor:pointer;transition:all 0.15s;
-}
-.hbtn:hover{border-color:var(--rule-strong);color:var(--cream-dim);}
-.hbtn.danger{border-color:var(--red-dim);color:var(--red);}
-.hbtn.danger:hover{background:rgba(196,30,58,0.1);}
+    /* Spotlight radial — from Box Office doc */
+    .hero-spotlight {
+      position: absolute;
+      top: var(--header-h); left: 0; right: 0;
+      height: 700px; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse at top, rgba(212,168,83,0.08) 0%, transparent 65%);
+    }
 
-/* Nav ticker */
-.header-ticker{
-  background:var(--surface);
-  border-top:1px solid var(--rule);
-  padding:5px 20px;
-  display:flex;align-items:center;gap:0;
-  overflow:hidden;
-}
-.ticker-label{
-  font-size:7px;letter-spacing:0.3em;color:var(--gold);
-  text-transform:uppercase;white-space:nowrap;
-  padding-right:14px;border-right:1px solid var(--rule-strong);
-  margin-right:14px;
-}
-.ticker-items{display:flex;gap:20px;}
-.ticker-item{
-  font-size:8px;letter-spacing:0.15em;
-  color:var(--cream-faint);text-transform:uppercase;white-space:nowrap;
-}
-.ticker-item.active{color:var(--cream-dim);}
-.ticker-item.active::before{content:'▶ ';color:var(--gold);}
+    /* Cinematic bg photo */
+    .hero-cinebg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=60&w=2000')
+        center/cover no-repeat;
+      filter: brightness(0.15) saturate(0.3);
+    }
+    .hero-cinebg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, var(--bg-deep) 100%);
+    }
 
-/* ============================================================
-   START SCREEN
-   ============================================================ */
-#startScreen{
-  background:var(--void);
-  overflow-y:auto;
-}
-.start-bg{
-  position:fixed;inset:0;z-index:0;
-  background:
-    radial-gradient(ellipse at 30% 60%,rgba(212,168,67,0.06) 0%,transparent 55%),
-    radial-gradient(ellipse at 70% 30%,rgba(196,30,58,0.05) 0%,transparent 45%),
-    var(--void);
-}
-/* Film perf strips on edges */
-.start-perfs{
-  position:fixed;top:0;bottom:0;
-  width:20px;
-  background:var(--deep);
-  display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;
-  border-right:1px solid var(--rule);
-  z-index:1;
-}
-.start-perfs.right{right:0;border-right:none;border-left:1px solid var(--rule);}
-.perf-hole{
-  width:10px;height:14px;border-radius:2px;
-  background:var(--void);border:1px solid var(--rule-md);
-}
-.start-layout{
-  position:relative;z-index:2;
-  min-height:100vh;
-  display:flex;align-items:stretch;
-  padding:0 20px;
-}
-.start-left{
-  flex:1;
-  display:flex;flex-direction:column;
-  justify-content:center;align-items:flex-start;
-  padding:clamp(40px,6vw,80px) clamp(20px,4vw,60px);
-  border-right:1px solid var(--rule-strong);
-}
-.start-eyebrow{
-  font-size:8px;letter-spacing:0.45em;
-  color:var(--gold);text-transform:uppercase;
-  margin-bottom:clamp(10px,2vw,20px);
-  display:flex;align-items:center;gap:10px;
-}
-.start-eyebrow::before{
-  content:'';display:block;
-  width:24px;height:1px;background:var(--gold-dim);
-}
-.start-title-plot{
-  font-family:var(--font-display);font-weight:900;
-  font-size:clamp(5rem,13vw,12rem);
-  color:var(--cream);line-height:0.82;
-  letter-spacing:-2px;display:block;
-}
-.start-title-twisted{
-  font-family:var(--font-title);
-  font-size:clamp(1.8rem,5vw,5rem);
-  color:var(--gold);letter-spacing:0.4em;
-  display:block;margin-top:-0.05em;
-  animation:bulbFlicker 5s ease-in-out infinite;
-}
-.start-tagline{
-  font-family:var(--font-clue);
-  font-size:clamp(0.85rem,1.3vw,1rem);
-  color:var(--cream-dim);
-  margin-top:clamp(14px,2.5vw,28px);
-  max-width:440px;line-height:1.75;
-}
-/* Film strip on left edge of left panel */
-.film-strip-left{
-  position:absolute;left:20px;top:0;bottom:0;
-  width:22px;
-  background:var(--deep);
-  border-right:1px solid var(--rule);
-  display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;
-}
+    .hero-body {
+      position: relative; z-index: 2;
+      flex: 1; display: flex; align-items: center;
+      padding: clamp(40px,7vh,90px) 0 clamp(40px,6vh,80px);
+    }
 
-.start-right{
-  width:clamp(280px,36vw,460px);
-  display:flex;flex-direction:column;justify-content:center;
-  padding:clamp(36px,5vw,70px) clamp(24px,4vw,48px);
-  gap:12px;
-}
-/* Marquee bulbs above start buttons */
-.start-bulb-row{
-  display:flex;justify-content:center;gap:8px;margin-bottom:4px;
-}
-.start-bulb-row .bulb{width:6px;height:6px;}
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: clamp(40px, 6vw, 80px);
+      align-items: center;
+    }
+    @media (min-width: 960px) {
+      .hero-grid { grid-template-columns: 1fr 1fr; }
+    }
 
-.btn-primary-start{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;padding:clamp(14px,2vw,18px) 20px;
-  font-size:clamp(0.85rem,1.4vw,1rem);
-  background:var(--red-dim);color:var(--cream);
-  border:1px solid var(--red);
-  box-shadow:0 4px 20px var(--red-glow),inset 0 1px 0 rgba(255,255,255,0.06);
-}
-.btn-primary-start:hover:not(:disabled){
-  background:var(--red);
-  box-shadow:0 6px 30px rgba(196,30,58,0.4);
-  transform:translateY(-1px);
-}
-.btn-daily-start{
-  background:transparent;color:var(--gold);
-  border:1px solid var(--gold-dim);
-  box-shadow:0 0 15px var(--gold-glow);
-}
-.btn-daily-start:hover:not(:disabled){
-  border-color:var(--gold);
-  box-shadow:0 0 25px var(--gold-glow-md);
-  transform:translateY(-1px);
-}
-.btn-ghost-start{
-  background:transparent;color:var(--cream-faint);
-  border:1px solid var(--rule-md);font-size:0.8rem;
-}
-.btn-ghost-start:hover{border-color:var(--rule-strong);color:var(--cream-dim);}
-.menu-half-row{display:flex;gap:10px;}
-.menu-half-row .btn{flex:1;}
+    /* LEFT: marquee-framed title — Box Office corner-dot frame */
+    .marquee-frame {
+      position: relative;
+      border: 2px solid var(--brass);
+      padding: clamp(20px, 3vw, 40px);
+    }
+    /* corner dots */
+    .marquee-frame::before,
+    .marquee-frame::after,
+    .marquee-frame .corner-bl,
+    .marquee-frame .corner-br {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--brass);
+      box-shadow: 0 0 10px var(--brass-glow), 0 0 20px var(--brass-glow);
+    }
+    .marquee-frame::before { top: -7px; left: -7px; }
+    .marquee-frame::after  { top: -7px; right: -7px; }
+    .marquee-frame .corner-bl { bottom: -7px; left: -7px; }
+    .marquee-frame .corner-br { bottom: -7px; right: -7px; }
 
-.start-divider{
-  display:flex;align-items:center;gap:12px;margin:4px 0;
-}
-.start-divider-line{flex:1;height:1px;background:var(--rule-strong);}
-.start-divider-icon{color:var(--gold-dim);font-size:10px;}
+    .frame-inner {
+      background: rgba(5,3,8,0.7);
+      padding: clamp(24px, 4vw, 48px) clamp(20px, 3vw, 36px);
+      border: 1px solid rgba(50,40,62,0.6);
+    }
 
-.start-quote-wrap{
-  margin-top:24px;padding-top:20px;
-  border-top:1px solid var(--rule);
-}
-.start-quote{
-  font-family:var(--font-clue);font-style:italic;
-  font-size:0.9rem;color:var(--cream-dim);
-  line-height:1.7;margin-bottom:8px;
-}
-.start-quote-src{
-  font-size:7px;letter-spacing:0.2em;
-  color:var(--cream-faint);text-transform:uppercase;
-}
+    .title-eyebrow {
+      font-family: var(--font-title); font-size: 0.7rem;
+      letter-spacing: 0.5em; color: var(--gold-primary);
+      text-shadow: 0 0 15px var(--gold-glow);
+      margin-bottom: clamp(12px, 2vw, 20px);
+    }
 
-@media(max-width:768px){
-  .start-layout{flex-direction:column;padding:0 12px;}
-  .start-left{border-right:none;border-bottom:1px solid var(--rule-strong);padding:48px 16px 28px;align-items:center;text-align:center;}
-  .start-right{width:100%;padding:24px 12px 36px;}
-  .film-strip-left{display:none;}
-  .start-perfs{display:none;}
-}
+    /* game.html title scale + shadows exactly */
+    .title-plot {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(5.5rem, 13vw, 12rem);
+      color: var(--cream); letter-spacing: 0.01em; line-height: 0.82;
+      text-shadow:
+        0 4px 0 rgba(100,0,40,0.8),
+        0 8px 0 rgba(0,0,0,0.5),
+        0 0 60px rgba(232,23,93,0.6),
+        0 0 120px rgba(232,23,93,0.25);
+      display: block;
+    }
+    .title-twisted {
+      font-family: var(--font-title);
+      font-size: clamp(2.4rem, 6vw, 5.5rem);
+      color: var(--gold-light); letter-spacing: 0.35em;
+      text-shadow: 0 0 20px rgba(255,61,127,0.9), 0 0 60px var(--gold-glow);
+      animation: neonFlicker 6s infinite;
+      display: block; margin-top: -0.06em;
+    }
 
-/* ============================================================
-   MODE SCREEN & CATEGORY SCREEN
-   ============================================================ */
-#modeScreen,#categoryScreen{
-  background:var(--void);overflow-y:auto;overflow-x:hidden;
-}
-.selection-shell{
-  width:min(100%,1160px);margin:0 auto;
-  display:flex;flex-direction:column;
-  padding:0 clamp(12px,3vw,28px) clamp(16px,3vh,28px);
-  min-height:100%;
-}
-.sel-header{
-  text-align:center;
-  padding:clamp(24px,4vw,52px) 0 clamp(16px,2.5vw,28px);
-}
-.sel-eyebrow{
-  font-size:7px;letter-spacing:0.4em;
-  color:var(--gold);text-transform:uppercase;
-  margin-bottom:10px;display:block;
-}
-.sel-header h2{
-  font-family:var(--font-display);
-  font-size:clamp(1.6rem,4vw,2.8rem);
-  color:var(--cream);margin-bottom:8px;font-weight:700;
-}
-.sel-header p{
-  font-size:0.9rem;color:var(--cream-faint);max-width:500px;margin:0 auto;
-}
+    .hero-tagline {
+      font-family: var(--font-type);
+      font-size: clamp(0.85rem, 1.2vw, 1rem);
+      color: var(--cream-muted);
+      margin: clamp(16px, 2.5vw, 26px) 0 clamp(20px, 3vw, 32px);
+      line-height: 1.7; letter-spacing: 0.03em;
+    }
 
-/* Mode cards */
-.mode-grid{
-  display:grid;grid-template-columns:1fr;
-  gap:clamp(10px,1.5vw,16px);
-  max-width:820px;margin:0 auto;width:100%;
-  padding-bottom:clamp(16px,2vh,24px);
-}
-@media(min-width:640px){.mode-grid{grid-template-columns:repeat(2,1fr);}}
-.mode-card{
-  background:var(--surface);
-  border:1px solid var(--rule-md);
-  padding:clamp(18px,2.5vw,26px);
-  cursor:pointer;transition:all 0.18s;
-  position:relative;overflow:hidden;
-}
-.mode-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(212,168,67,0.04) 0%,transparent 60%);
-  opacity:0;transition:opacity 0.2s;
-}
-.mode-card:hover{border-color:var(--gold-dim);transform:translateY(-2px);}
-.mode-card:hover::before{opacity:1;}
-.mode-card.selected{
-  border-color:var(--gold);
-  box-shadow:0 0 20px var(--gold-glow),inset 0 0 16px rgba(212,168,67,0.04);
-}
-.mode-card.selected::before{opacity:1;}
-.mode-badge{
-  display:inline-block;
-  font-size:7px;letter-spacing:0.18em;text-transform:uppercase;
-  color:var(--gold);border:1px solid var(--gold-dim);
-  padding:3px 8px;margin-bottom:10px;
-}
-.mode-title{
-  font-family:var(--font-title);
-  font-size:clamp(1.1rem,2vw,1.4rem);
-  letter-spacing:0.1em;margin-bottom:6px;color:var(--cream);
-}
-.mode-desc{color:var(--cream-faint);font-size:0.88rem;line-height:1.55;}
+    .hero-btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      font-family: var(--font-title); letter-spacing: 0.15em;
+      text-transform: uppercase; text-decoration: none;
+      border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: clamp(0.9rem, 1.3vw, 1.05rem);
+      padding: clamp(12px, 1.4vw, 15px) clamp(24px, 2.5vw, 32px);
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      color: #fff;
+      box-shadow: 0 4px 20px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 40px var(--gold-glow), 0 0 60px rgba(232,23,93,0.3);
+    }
+    .btn-ghost {
+      background: transparent; color: var(--cream-muted);
+      border: 1px solid var(--text-muted);
+    }
+    .btn-ghost:hover { border-color: var(--cream-muted); color: var(--cream); }
 
-/* Category grid */
-.category-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:clamp(8px,1.5vw,14px);
-  max-width:920px;margin:0 auto;width:100%;
-  padding-bottom:clamp(16px,2vh,24px);
-}
-@media(min-width:768px){
-  .category-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
-}
-.category-card{
-  background:var(--surface);
-  border:1px solid var(--rule-md);
-  padding:clamp(16px,2.5vw,28px) clamp(12px,2vw,20px);
-  text-align:center;cursor:pointer;
-  transition:all 0.18s;position:relative;overflow:hidden;
-}
-.category-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(212,168,67,0.04) 0%,transparent 60%);
-  opacity:0;transition:opacity 0.2s;
-}
-.category-card:hover{border-color:var(--gold-dim);transform:translateY(-2px);}
-.category-card:hover::before{opacity:1;}
-.category-card.selected{
-  border-color:var(--gold);
-  box-shadow:0 0 18px var(--gold-glow),inset 0 0 12px rgba(212,168,67,0.04);
-}
-.category-card.selected::before{opacity:1;}
-.cat-icon{
-  width:clamp(36px,4.5vw,48px);height:clamp(36px,4.5vw,48px);
-  margin:0 auto clamp(8px,1.5vw,14px);
-  color:var(--gold);filter:drop-shadow(0 0 6px var(--gold-glow));
-}
-.cat-icon svg{width:100%;height:100%;fill:currentColor;}
-.cat-name{
-  font-family:var(--font-title);
-  font-size:clamp(0.9rem,1.8vw,1.15rem);
-  color:var(--cream);letter-spacing:0.1em;
-}
+    /* RIGHT: dossier / clue card — game.html clue-card frame exactly */
+    .dossier-shell {
+      display: flex; flex-direction: column; gap: 10px;
+    }
 
-/* Sticky action bar */
-.sel-actions{
-  position:sticky;bottom:0;
-  width:100%;margin-top:auto;
-  padding:12px 0 calc(12px + env(safe-area-inset-bottom));
-  background:linear-gradient(to top,rgba(12,10,8,0.98) 70%,rgba(12,10,8,0.8) 92%,transparent);
-  display:flex;gap:10px;
-}
-.sel-actions .btn{
-  flex:1;padding:clamp(13px,2vw,16px) 20px;
-  font-size:clamp(0.8rem,1.5vw,0.95rem);
-}
-.btn-back-sel{
-  background:var(--lift);color:var(--cream-dim);
-  border:1px solid var(--rule-md);max-width:180px;
-}
-.btn-back-sel:hover{border-color:var(--rule-strong);color:var(--cream);}
-.btn-start-sel{
-  background:var(--red-dim);color:var(--cream);
-  border:1px solid var(--red);
-  box-shadow:0 4px 18px var(--red-glow);
-}
-.btn-start-sel:hover:not(:disabled){
-  background:var(--red);transform:translateY(-1px);
-  box-shadow:0 6px 26px rgba(196,30,58,0.4);
-}
-.btn-start-sel:disabled{opacity:0.38;cursor:not-allowed;}
+    .dossier-label {
+      font-family: var(--font-title); font-size: 0.65rem;
+      letter-spacing: 0.4em; color: var(--brass);
+      text-shadow: 0 0 12px var(--brass-glow);
+      padding-left: 4px;
+    }
 
-/* ============================================================
-   HOW TO PLAY & SETTINGS
-   ============================================================ */
-#howToPlayScreen,#settingsScreen{
-  background:var(--void);overflow-y:auto;
-}
-.info-shell{
-  max-width:640px;margin:0 auto;
-  padding:clamp(20px,4vw,48px) clamp(16px,3vw,32px);
-}
-.info-back-row{
-  display:flex;align-items:center;gap:14px;margin-bottom:28px;
-}
-.btn-back-sm{
-  width:38px;height:38px;border-radius:50%;
-  background:var(--lift);color:var(--cream-dim);
-  border:1px solid var(--rule-md);
-  cursor:pointer;font-size:1rem;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.15s;flex-shrink:0;
-}
-.btn-back-sm:hover{background:var(--lift2);color:var(--cream);}
-.info-title{
-  font-family:var(--font-display);font-weight:700;
-  font-size:clamp(1.3rem,3vw,1.8rem);color:var(--cream);
-}
-.info-section{margin-bottom:24px;}
-.info-section h3{
-  font-family:var(--font-title);font-size:1rem;
-  letter-spacing:0.15em;color:var(--gold);margin-bottom:8px;
-}
-.info-section p{color:var(--cream-faint);line-height:1.7;font-size:0.9rem;}
-.setting-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:14px;background:var(--surface);
-  border:1px solid var(--rule-md);margin-bottom:10px;gap:16px;
-}
-.setting-info{flex:1;}
-.setting-label{font-weight:500;color:var(--cream);margin-bottom:3px;font-size:0.9rem;}
-.setting-desc{font-size:0.78rem;color:var(--cream-faint);}
-.toggle{
-  width:46px;height:26px;background:var(--lift2);
-  border-radius:13px;position:relative;cursor:pointer;
-  transition:background 0.2s;border:1px solid var(--rule-md);flex-shrink:0;
-}
-.toggle.active{background:var(--gold);}
-.toggle::after{
-  content:'';position:absolute;top:3px;left:3px;
-  width:18px;height:18px;background:var(--cream);
-  border-radius:50%;transition:transform 0.2s;
-}
-.toggle.active::after{transform:translateX(20px);}
-.settings-about{color:var(--cream-faint);font-size:0.88rem;}
-.settings-about a{color:var(--gold);text-decoration:none;}
+    .clue-card {
+      background: rgba(8,5,12,0.98); border: none;
+      /* game.html clue-card box-shadow stack verbatim */
+      box-shadow:
+        0 0 0 3px rgba(60,50,70,1),
+        0 0 0 4px rgba(20,15,25,1),
+        0 0 0 7px rgba(50,40,60,1),
+        0 0 0 8px rgba(15,10,20,1),
+        0 0 40px rgba(232,23,93,0.08),
+        var(--shadow-deep);
+      overflow: hidden; position: relative;
+    }
 
-/* ============================================================
-   GAME SCREEN
-   ============================================================ */
-#gameScreen{background:var(--void);overflow:hidden;}
+    /* "NOW SHOWING" header — game.html clue-card::before */
+    .clue-card-header {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem; font-weight: bold;
+      color: #f2eef5; background: #1a1520;
+      padding: 10px 16px; letter-spacing: 0.18em;
+      border-bottom: 3px solid rgba(60,50,70,1);
+      white-space: nowrap;
+      box-shadow: inset 0 -4px 8px rgba(0,0,0,0.4);
+      display: flex; justify-content: space-between; align-items: center;
+    }
 
-.game-body{
-  flex:1;display:flex;overflow:hidden;min-height:0;
-}
+    /* double-rule under header — clue-card::after */
+    .clue-card-rule {
+      height: 3px;
+      background: rgba(40,30,50,1);
+      box-shadow: 0 1px 0 rgba(80,60,90,0.4), 0 -1px 0 rgba(10,8,14,1);
+    }
 
-/* ── SCREENING ROOM (LEFT) ── */
-.screening-room{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:clamp(16px,2.5vw,36px) clamp(24px,3.5vw,52px);
-  position:relative;overflow:hidden;
-  border-right:1px solid var(--rule-strong);
-  background:var(--deep);
-  gap:clamp(12px,1.8vh,20px);
-}
-/* Vignette like a film frame */
-.screening-room::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at center,transparent 50%,rgba(8,6,4,0.65) 100%);
-}
-/* Film perf sides */
-.sr-perfs{
-  position:absolute;top:0;bottom:0;width:18px;
-  display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;
-  background:var(--void);
-}
-.sr-perfs.left{left:0;border-right:1px solid var(--rule);}
-.sr-perfs.right{right:0;border-left:1px solid var(--rule);}
-.sr-perf{
-  width:9px;height:13px;border-radius:2px;
-  background:var(--deep);border:1px solid var(--rule-md);
-}
+    .clue-card-inner {
+      padding: clamp(18px, 3vw, 28px) clamp(18px, 2.5vw, 24px) clamp(16px, 2vw, 22px);
+    }
 
-/* Reel progress */
-.reel-track{
-  display:flex;align-items:center;gap:2px;
-  width:100%;max-width:580px;
-  background:var(--void);padding:6px 8px;
-  border:1px solid var(--rule-md);
-  position:relative;z-index:1;
-}
-.reel-frame{
-  flex:1;height:26px;
-  border:1px solid var(--rule);
-  display:flex;align-items:center;justify-content:center;
-  background:var(--surface);position:relative;
-  transition:all 0.35s;
-}
-.reel-frame::before,.reel-frame::after{
-  content:'';position:absolute;
-  left:50%;transform:translateX(-50%);
-  width:5px;height:4px;background:var(--void);
-  border:1px solid var(--rule);border-radius:1px;
-}
-.reel-frame::before{top:2px;}
-.reel-frame::after{bottom:2px;}
-.reel-frame.done{background:rgba(212,168,67,0.1);border-color:var(--gold-dim);}
-.reel-frame.done::before,.reel-frame.done::after{background:rgba(212,168,67,0.25);}
-.reel-frame.current{background:rgba(212,168,67,0.06);border-color:var(--gold);box-shadow:0 0 12px var(--gold-glow);}
-.reel-num{font-size:8px;letter-spacing:0.1em;color:var(--cream-faint);position:relative;z-index:1;}
-.reel-frame.done .reel-num{color:var(--gold-dim);}
-.reel-frame.current .reel-num{color:var(--gold);}
+    .clue-serial {
+      font-family: var(--font-title); font-size: 0.6rem;
+      letter-spacing: 0.3em; color: var(--gold-primary);
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .clue-serial::after { content:''; flex:1; height:1px; background:rgba(232,23,93,0.2); }
 
-/* Now showing label */
-.now-showing-label{
-  display:flex;align-items:center;gap:10px;
-  width:100%;max-width:580px;
-  position:relative;z-index:1;
-}
-.ns-bulb{
-  width:8px;height:8px;border-radius:50%;
-  background:var(--bulb);
-  box-shadow:0 0 8px 2px var(--bulb-glow);
-  animation:bulbPulse 1.6s ease-in-out infinite;
-}
-.ns-text{
-  font-family:var(--font-title);font-size:9px;
-  letter-spacing:0.5em;color:var(--cream-faint);
-}
-.ns-line{flex:1;height:1px;background:var(--rule-strong);}
+    .clue-text {
+      font-family: var(--font-type);
+      font-size: clamp(0.92rem, 1.4vw, 1.05rem);
+      line-height: 1.75; color: var(--cream);
+      min-height: 72px; margin-bottom: 18px;
+    }
 
-/* CLUE CARD — clapperboard */
-.clue-card{
-  width:100%;max-width:580px;
-  background:var(--surface);
-  border:1px solid var(--rule-strong);
-  position:relative;z-index:1;
-  box-shadow:0 20px 60px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.02);
-}
-.clapper-bar{
-  background:var(--void);
-  padding:7px 14px;
-  display:flex;align-items:center;gap:0;
-  border-bottom:1px solid var(--rule-strong);
-}
-.clapper-stripes{
-  display:flex;height:16px;overflow:hidden;
-  border-radius:1px;margin-right:14px;flex-shrink:0;
-}
-.clapper-stripe{width:9px;height:100%;}
-.clapper-stripe:nth-child(odd){background:var(--cream-dim);}
-.clapper-stripe:nth-child(even){background:var(--void);}
-.clapper-meta{
-  display:flex;gap:14px;
-  font-size:7.5px;letter-spacing:0.2em;
-  color:var(--cream-faint);text-transform:uppercase;
-}
-.clapper-meta em{color:var(--cream-dim);font-style:normal;}
-.clapper-genre{
-  margin-left:auto;
-  font-family:var(--font-title);font-size:9px;
-  letter-spacing:0.25em;color:var(--gold-dim);
-}
-.clue-inner{padding:clamp(16px,2.5vw,24px) clamp(16px,2.5vw,22px) clamp(14px,2vw,20px);}
-.clue-case-line{
-  font-size:7px;letter-spacing:0.25em;
-  color:var(--cream-faint);margin-bottom:12px;
-  display:flex;align-items:center;gap:10px;
-  text-transform:uppercase;
-}
-.clue-case-line::after{content:'';flex:1;height:1px;background:var(--rule);}
-.clue-text{
-  font-family:var(--font-clue);
-  font-size:clamp(0.9rem,1.5vw,1.05rem);
-  line-height:1.8;color:var(--cream);margin-bottom:14px;
-}
-.clue-foot{
-  display:flex;justify-content:space-between;align-items:center;
-  padding-top:10px;border-top:1px solid var(--rule);
-  font-size:7px;letter-spacing:0.15em;
-  color:var(--cream-faint);text-transform:uppercase;
-}
-.genre-badge{
-  background:var(--red-dim);color:rgba(240,232,216,0.85);
-  font-family:var(--font-title);font-size:9px;
-  letter-spacing:0.2em;padding:3px 8px;
-  border:1px solid var(--red-dim);
-}
+    /* progress pips — game.html */
+    .pip-row {
+      display: flex; gap: 7px; margin-bottom: 14px;
+    }
+    .pip {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: rgba(30,20,35,1); border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.4s ease;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+    .pip.done {
+      background: var(--neon-yellow); border-color: var(--neon-yellow);
+      box-shadow: 0 0 8px rgba(245,197,24,0.9), 0 0 20px rgba(245,197,24,0.4);
+    }
+    .pip.active {
+      background: rgba(245,197,24,0.25); border-color: rgba(245,197,24,0.6);
+      animation: pipPulse 1.4s ease-in-out infinite;
+    }
 
-/* Results strip below clue card */
-.results-strip{
-  width:100%;max-width:580px;
-  display:grid;grid-template-columns:1fr 1px 1fr;
-  position:relative;z-index:1;
-}
-.result-col{padding:0 14px;}
-.result-col:first-child{padding-left:2px;}
-.result-col-head{
-  font-size:7px;letter-spacing:0.3em;
-  color:var(--cream-faint);text-transform:uppercase;
-  margin-bottom:8px;padding-bottom:6px;
-  border-bottom:1px solid var(--rule);
-}
-.result-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:4px 0;border-bottom:1px solid var(--rule);
-  font-size:8.5px;letter-spacing:0.04em;
-}
-.result-row:last-child{border-bottom:none;}
-.result-title-t{color:var(--cream-dim);}
-.result-pts-t{color:var(--gold);font-weight:500;}
-.result-pts-t.zero{color:var(--cream-faint);}
-.result-divider{background:var(--rule-strong);}
-.intel-text{
-  font-family:var(--font-clue);
-  font-size:10px;color:var(--cream-dim);line-height:1.75;
-}
+    .reveal-btn {
+      width: 100%; border: none; color: #fff;
+      background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+      padding: 14px; font-family: var(--font-title);
+      font-size: 1.05rem; letter-spacing: 0.25em;
+      cursor: pointer; box-shadow: 0 4px 20px var(--gold-glow);
+      transition: all 0.2s;
+    }
+    .reveal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--gold-glow);
+    }
+    .reveal-btn.shown {
+      background: rgba(232,23,93,0.12);
+      color: var(--gold-light);
+      border: 1px solid rgba(232,23,93,0.35);
+      box-shadow: 0 0 20px rgba(232,23,93,0.1);
+    }
+    .next-btn {
+      width: 100%; margin-top: 8px;
+      background: var(--bg-elevated); border: 1px solid var(--text-muted);
+      color: var(--cream-muted); padding: 10px;
+      font-family: var(--font-title); font-size: 0.8rem;
+      letter-spacing: 0.2em; cursor: pointer; transition: all 0.2s;
+      opacity: 0; pointer-events: none;
+    }
+    .next-btn.vis { opacity: 1; pointer-events: auto; }
+    .next-btn:hover { border-color: var(--cream-muted); color: var(--cream); }
 
-/* ── OPERATIONS PANEL (RIGHT) ── */
-.operations{
-  width:clamp(280px,38vw,520px);
-  background:var(--panel);
-  display:flex;flex-direction:column;
-  padding:clamp(10px,1.5vw,16px) clamp(12px,2vw,18px);
-  gap:clamp(8px,1.2vh,12px);
-  overflow-y:auto;overflow-x:hidden;
-  border-left:none;
-}
-.ops-label{
-  font-size:7px;letter-spacing:0.3em;
-  color:var(--cream-faint);text-transform:uppercase;
-  padding-bottom:7px;border-bottom:1px solid var(--rule);
-  display:flex;align-items:center;gap:8px;flex-shrink:0;
-}
-.ops-label::before{content:'◈';color:var(--gold-dim);font-size:8px;}
+    .dossier-note {
+      text-align: center; font-size: 0.6rem;
+      color: var(--text-muted); letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
 
-/* Pot */
-.pot-display{
-  background:var(--void);border:1px solid var(--rule-md);
-  padding:10px 14px;
-  display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
-.pot-left{display:flex;flex-direction:column;gap:2px;}
-.pot-lbl{font-size:7px;letter-spacing:0.22em;color:var(--cream-faint);text-transform:uppercase;}
-.pot-val{
-  font-family:var(--font-display);font-weight:900;
-  font-size:clamp(1.4rem,2.5vw,2rem);
-  color:var(--gold);line-height:1;
-}
-.pot-val.dropping{animation:shake 0.25s ease;}
-.pot-mult{
-  font-family:var(--font-title);font-size:16px;
-  letter-spacing:0.1em;color:var(--teal);
-  border:1px solid var(--teal-dim);padding:5px 10px;
-  background:rgba(42,136,120,0.08);min-width:48px;text-align:center;
-}
-.pot-mult:empty{display:none;}
+    /* ============================================================
+       BRASS DIVIDER
+       ============================================================ */
+    .brass-divider {
+      position: relative;
+      width: 100%; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(212,168,83,0.35), transparent);
+      margin: 0;
+    }
+    .brass-divider .icon {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      background: var(--bg-deep);
+      padding: 0 12px;
+      color: rgba(212,168,83,0.4);
+      font-size: 1rem;
+    }
 
-/* Title reveal strip */
-.title-reveal-strip{
-  background:var(--void);border:1px solid var(--rule-md);
-  padding:clamp(10px,1.5vw,14px) 10px;
-  min-height:54px;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-}
-.title-letters-row{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:2px;
-  font-family:var(--font-title);
-  font-size:clamp(1.1rem,2.2vw,1.7rem);
-  letter-spacing:0.07em;
-}
-.tl-show{color:var(--gold);}
-.tl-show.revealed{animation:letterReveal 0.35s ease both;}
-.tl-hide{
-  color:var(--lift2);
-  border-bottom:1.5px solid var(--rule-strong);
-  min-width:0.55em;text-align:center;display:inline-block;
-}
-.tl-space{min-width:0.45em;display:inline-block;}
+    /* ============================================================
+       SCROLLING MARQUEE STRIP
+       ============================================================ */
+    .marquee-strip {
+      background: rgba(5,3,8,0.98);
+      border-top: 1px solid rgba(232,23,93,0.25);
+      border-bottom: 1px solid rgba(232,23,93,0.25);
+      padding: 14px 0; overflow: hidden;
+      position: relative; z-index: 2;
+    }
+    .marquee-inner {
+      display: flex; width: max-content;
+      animation: marqueeScroll 28s linear infinite;
+    }
+    .marquee-item {
+      font-family: var(--font-title); font-size: 0.72rem;
+      letter-spacing: 0.45em; color: var(--cream-muted);
+      padding: 0 36px;
+      display: flex; align-items: center; gap: 14px;
+      white-space: nowrap;
+    }
+    .mbulb {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--neon-yellow);
+      box-shadow: 0 0 10px rgba(245,197,24,0.9), 0 0 20px rgba(245,197,24,0.3);
+      animation: mbulbPulse 1.2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .mbulb.b { animation-delay: 0.4s; }
 
-/* Typewriter keyboard */
-.kb-wrap{
-  background:var(--void);
-  border:1px solid var(--rule-md);
-  padding:clamp(8px,1.2vw,12px) clamp(6px,1vw,10px) clamp(6px,1vw,10px);
-  display:flex;flex-direction:column;gap:4px;
-  position:relative;flex-shrink:0;
-}
-.kb-wrap::before{
-  content:'';position:absolute;
-  top:0;left:0;right:0;height:2px;
-  background:linear-gradient(to bottom,rgba(255,255,255,0.04),transparent);
-}
-.kb-row{display:flex;justify-content:center;gap:clamp(3px,0.5vw,5px);}
-.key{
-  width:clamp(24px,3.6vw,32px);
-  height:clamp(28px,4.5vh,36px);
-  background:var(--lift);
-  border:1px solid rgba(255,255,255,0.09);
-  border-bottom:2px solid rgba(0,0,0,0.55);
-  color:var(--cream-dim);
-  font-family:var(--font-body);font-size:clamp(9px,1.3vw,11px);font-weight:500;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:2px;
-  transition:all 0.08s ease;
-  user-select:none;
-  -webkit-tap-highlight-color:transparent;
-}
-.key:hover:not(:disabled){background:var(--lift2);color:var(--cream);border-color:rgba(255,255,255,0.15);}
-.key:active:not(:disabled){transform:translateY(1px);border-bottom-width:1px;}
-.key.hit{background:rgba(212,168,67,0.16);border-color:var(--gold-dim);border-bottom-color:rgba(212,168,67,0.28);color:var(--gold);}
-.key.miss{background:rgba(255,255,255,0.015);border-color:rgba(255,255,255,0.03);color:rgba(255,255,255,0.12);cursor:default;}
-.key:disabled{cursor:not-allowed;opacity:0.35;}
-.kb-hint{
-  text-align:center;font-size:7px;letter-spacing:0.14em;
-  color:rgba(255,255,255,0.2);padding-top:4px;
-  text-transform:uppercase;
-  display:none;
-}
-@media(min-width:900px){.kb-hint{display:block;}}
+    /* ============================================================
+       STATS STRIP
+       ============================================================ */
+    .stats-strip {
+      background: rgba(12,8,18,0.95);
+      padding: clamp(1.5rem, 3vw, 2.5rem) 0;
+    }
+    .stats-row {
+      display: flex; justify-content: space-around;
+    }
+    .stat {
+      display: flex; flex-direction: column;
+      align-items: center; padding: 0 1rem;
+      border-right: 1px solid rgba(212,168,83,0.12);
+      flex: 1;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--font-title);
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      color: var(--gold-light); margin: 0; line-height: 1;
+      text-shadow: 0 0 15px var(--gold-glow);
+    }
+    .stat-label {
+      font-size: 0.5rem; color: var(--cream-muted);
+      text-transform: uppercase; letter-spacing: 0.2em;
+      font-weight: 700; margin-top: 4px; opacity: 0.6;
+    }
+    @media (max-width: 640px) {
+      .stat:nth-child(n+3) { display: none; }
+    }
 
-/* Action buttons */
-.action-row{display:flex;gap:8px;flex-shrink:0;}
-.btn-give{
-  flex:1;padding:clamp(10px,1.5vw,13px) 12px;
-  background:transparent;
-  border:1px solid var(--rule-md);
-  color:var(--cream-faint);
-  font-family:var(--font-title);font-size:clamp(10px,1.4vw,12px);
-  letter-spacing:0.2em;cursor:pointer;transition:all 0.15s;
-}
-.btn-give:hover:not(:disabled){border-color:var(--rule-strong);color:var(--cream-dim);}
-.btn-give:disabled{opacity:0.35;cursor:not-allowed;}
-.btn-know{
-  flex:2;padding:clamp(10px,1.5vw,13px) 16px;
-  background:var(--red-dim);
-  border:1px solid var(--red);color:var(--cream);
-  font-family:var(--font-title);font-size:clamp(11px,1.6vw,14px);
-  letter-spacing:0.25em;cursor:pointer;
-  box-shadow:0 4px 18px var(--red-glow),inset 0 1px 0 rgba(255,255,255,0.05);
-  transition:all 0.15s;
-}
-.btn-know:hover:not(:disabled){background:var(--red);box-shadow:0 4px 24px rgba(196,30,58,0.4);}
-.btn-know:disabled{opacity:0.35;cursor:not-allowed;}
+    /* ============================================================
+       NOW SHOWING — TICKET CARDS
+       Box Office perforated ticket + game.html card treatment
+       ============================================================ */
+    .showings { padding: clamp(60px, 8vw, 100px) 0; }
 
-/* Classic mode controls */
-.classic-controls{
-  display:none;width:100%;flex-direction:column;gap:10px;flex-shrink:0;
-}
-.classic-input{
-  width:100%;padding:clamp(12px,1.8vw,16px);
-  font-family:var(--font-body);font-size:0.95rem;
-  background:var(--void);
-  border:1px solid var(--rule-md);
-  color:var(--gold);text-align:center;
-  transition:all 0.2s;
-}
-.classic-input:focus{outline:none;border-color:var(--gold-dim);box-shadow:0 0 16px var(--gold-glow);}
-.classic-input::placeholder{color:var(--cream-faint);}
-.classic-input:disabled{opacity:0.5;cursor:not-allowed;}
-.classic-feedback-panel{
-  background:var(--void);border:1px solid var(--rule);
-  padding:12px 14px;min-height:96px;
-  display:flex;flex-direction:column;gap:8px;
-}
-.classic-feedback{
-  font-size:0.88rem;color:var(--cream-faint);
-  line-height:1.5;min-height:40px;
-  display:flex;align-items:center;
-}
-.classic-feedback.correct{color:var(--gold);}
-.classic-feedback.incorrect{color:rgba(196,30,58,0.85);}
-.classic-reveal{
-  font-family:var(--font-clue);
-  font-size:0.9rem;color:var(--cream-faint);
-  padding-top:8px;border-top:1px dashed var(--rule);
-  opacity:0.6;
-}
-.classic-reveal.has-answer{
-  color:var(--cream-dim);opacity:1;
-  border-color:var(--gold-dim);
-}
-.classic-action-row{display:flex;gap:8px;}
-.classic-action-row .btn{
-  flex:1;padding:clamp(10px,1.5vw,13px);
-  font-size:clamp(10px,1.4vw,12px);letter-spacing:0.18em;
-}
-.btn-classic-submit{background:var(--red-dim);border:1px solid var(--red);color:var(--cream);}
-.btn-classic-submit:hover:not(:disabled){background:var(--red);}
-.btn-classic-reveal{background:transparent;border:1px solid var(--rule-md);color:var(--cream-faint);}
-.btn-classic-reveal:hover:not(:disabled){border-color:var(--rule-strong);color:var(--cream-dim);}
-.btn-classic-next{
-  width:100%;padding:clamp(11px,1.6vw,14px);
-  background:var(--gold-dim);border:1px solid var(--gold);
-  color:var(--void);font-size:clamp(10px,1.4vw,12px);letter-spacing:0.2em;
-  opacity:0;pointer-events:none;transition:opacity 0.2s,background 0.15s;
-}
-.btn-classic-next.visible{opacity:1;pointer-events:auto;}
-.btn-classic-next:hover{background:var(--gold);}
+    .section-hed {
+      margin-bottom: clamp(36px, 5vw, 56px);
+      display: flex; align-items: center; gap: 0;
+    }
+    .section-hed-text {
+      padding-left: 20px;
+      border-left: 4px solid var(--gold-primary);
+    }
+    .section-hed .eyebrow {
+      font-family: var(--font-title); font-size: 0.65rem;
+      letter-spacing: 0.4em; color: var(--gold-primary); opacity: 0.75;
+      margin-bottom: 6px;
+    }
+    .section-hed h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      color: var(--cream); margin: 0; text-transform: uppercase;
+    }
 
-/* Mobile game layout */
-@media(max-width:900px){
-  .game-body{flex-direction:column;overflow-y:auto;}
-  .screening-room{
-    border-right:none;border-bottom:1px solid var(--rule-strong);
-    padding:14px 16px;min-height:auto;flex:0 0 auto;justify-content:flex-start;
-  }
-  .sr-perfs{display:none;}
-  .operations{width:100%;flex:1;}
-  .results-strip{display:none;}
-}
+    .tickets-grid {
+      display: grid; gap: 24px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 768px) {
+      .tickets-grid { grid-template-columns: repeat(3, 1fr); }
+    }
 
-/* ============================================================
-   DAILY CHALLENGE SCREEN
-   ============================================================ */
-#dailyScreen{background:var(--void);}
-.daily-header{
-  text-align:center;padding:clamp(14px,2.5vw,28px) 20px clamp(10px,2vw,20px);
-  background:var(--deep);border-bottom:1px solid var(--rule-strong);
-  flex-shrink:0;
-}
-.daily-header h2{
-  font-family:var(--font-display);font-size:clamp(1.1rem,2.5vw,1.6rem);
-  color:var(--gold);margin-bottom:4px;font-weight:700;
-}
-.daily-date{font-size:0.8rem;color:var(--cream-faint);}
-.daily-content{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:clamp(14px,2.5vw,32px) clamp(14px,3vw,52px);
-  gap:clamp(10px,1.8vh,16px);
-  overflow-y:auto;max-width:680px;margin:0 auto;width:100%;
-}
-.daily-clue-card{
-  width:100%;background:var(--surface);
-  border:1px solid var(--rule-strong);
-  box-shadow:0 16px 48px rgba(0,0,0,0.5);
-}
-.daily-input-wrap{width:100%;}
-.daily-input{
-  width:100%;padding:14px;
-  font-family:var(--font-body);font-size:1rem;
-  background:var(--void);border:1px solid var(--rule-md);
-  color:var(--gold);text-align:center;
-  transition:all 0.2s;
-}
-.daily-input:focus{outline:none;border-color:var(--gold-dim);box-shadow:0 0 16px var(--gold-glow);}
-.daily-input::placeholder{color:var(--cream-faint);}
-.daily-input:disabled{opacity:0.5;cursor:not-allowed;}
-.daily-actions{display:flex;gap:10px;width:100%;}
-.daily-actions .btn{flex:1;padding:14px 20px;font-size:0.88rem;}
-.btn-skip-daily{background:var(--lift);border:1px solid var(--rule-md);color:var(--cream-dim);}
-.btn-skip-daily:hover{border-color:var(--rule-strong);color:var(--cream);}
-.btn-submit-daily{background:var(--red-dim);border:1px solid var(--red);color:var(--cream);box-shadow:0 4px 16px var(--red-glow);}
-.btn-submit-daily:hover{background:var(--red);}
+    /* Ticket card — Box Office perforated aesthetic + game.html depth */
+    .ticket {
+      background: var(--bg-card);
+      border: 2px solid rgba(50,40,62,1);
+      display: flex; overflow: hidden;
+      position: relative;
+      transition: all 0.25s ease;
+    }
+    .ticket:hover {
+      border-color: var(--gold-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 0 30px var(--gold-glow), inset 0 0 20px rgba(232,23,93,0.04);
+    }
+    .ticket.featured {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 24px var(--gold-glow);
+    }
 
-/* ============================================================
-   DAILY RESULTS
-   ============================================================ */
-#dailyResultsScreen{
-  background:radial-gradient(ellipse at 50% 30%,rgba(212,168,67,0.07) 0%,transparent 55%),var(--void);
-  align-items:center;justify-content:center;padding:20px;overflow-y:auto;
-}
-.daily-results-card{text-align:center;max-width:460px;width:100%;}
-.daily-results-title{
-  font-family:var(--font-display);font-weight:700;
-  font-size:clamp(1.3rem,3vw,1.8rem);color:var(--gold);margin-bottom:8px;
-}
-.daily-results-date{font-size:0.82rem;color:var(--cream-faint);margin-bottom:18px;}
-.daily-stars{display:flex;justify-content:center;gap:10px;margin-bottom:12px;}
-.daily-star{font-size:clamp(1.5rem,3vw,2rem);transition:all 0.3s;}
-.daily-star.earned{color:var(--gold);text-shadow:0 0 12px var(--gold-glow);}
-.daily-star.empty{color:var(--lift2);}
-.daily-score-text{
-  font-family:var(--font-title);font-size:1.3rem;
-  color:var(--cream);letter-spacing:0.1em;margin-bottom:22px;
-}
-.daily-breakdown{
-  background:var(--surface);border:1px solid var(--rule-md);
-  padding:14px;margin-bottom:22px;
-  max-height:200px;overflow-y:auto;
-}
-.daily-br-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:9px 4px;border-bottom:1px solid var(--rule);font-size:0.84rem;
-}
-.daily-br-row:last-child{border-bottom:none;}
-.daily-results-actions{display:flex;flex-direction:column;gap:10px;}
-.daily-results-actions .btn{width:100%;padding:14px;}
-.btn-share-daily{background:var(--lift);border:1px solid var(--rule-md);color:var(--cream-dim);}
-.btn-share-daily:hover{border-color:var(--rule-strong);color:var(--cream);}
-.btn-menu-daily{background:transparent;border:1px solid var(--rule);color:var(--cream-faint);}
-.daily-next{font-size:0.8rem;color:var(--cream-faint);margin-top:18px;}
+    /* Left perforation strip — Box Office ticket-edge */
+    .ticket-stub {
+      width: clamp(52px, 8vw, 72px);
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.4);
+      border-right: 2px dashed rgba(60,50,70,0.8);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative;
+      /* perforations top/bottom */
+    }
+    /* perforation holes */
+    .ticket-stub::before,
+    .ticket-stub::after {
+      content: '';
+      position: absolute; left: 50%;
+      transform: translateX(-50%);
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--bg-deep);
+      border: 1px solid rgba(50,40,62,0.5);
+    }
+    .ticket-stub::before { top: -7px; }
+    .ticket-stub::after  { bottom: -7px; }
 
-/* ============================================================
-   GAME OVER
-   ============================================================ */
-#gameOverScreen{
-  background:radial-gradient(ellipse at 50% 30%,rgba(196,30,58,0.08) 0%,transparent 50%),var(--void);
-  align-items:center;justify-content:center;padding:20px;overflow-y:auto;
-}
-.game-over-card{text-align:center;max-width:500px;width:100%;}
-.final-score-label{
-  font-size:7px;letter-spacing:0.35em;
-  color:var(--cream-faint);text-transform:uppercase;margin-bottom:4px;
-}
-.final-score{
-  font-family:var(--font-display);font-weight:900;
-  font-size:clamp(3.5rem,9vw,6rem);
-  color:var(--gold);
-  text-shadow:0 0 40px var(--gold-glow),0 0 80px rgba(212,168,67,0.12);
-  line-height:1;margin-bottom:8px;
-}
-.final-subtitle{font-size:0.92rem;color:var(--cream-faint);margin-bottom:30px;}
-.final-breakdown{
-  background:var(--surface);border:1px solid var(--rule-md);
-  padding:18px;margin-bottom:24px;
-  max-height:210px;overflow-y:auto;
-}
-.br-row{
-  display:flex;justify-content:space-between;
-  padding:9px 0;border-bottom:1px solid var(--rule);font-size:0.88rem;
-}
-.br-row:last-child{border-bottom:none;}
-.br-title{color:var(--cream);}
-.br-pts{font-family:var(--font-title);font-size:1rem;}
-.br-pts.earned{color:var(--gold);}
-.br-pts.missed{color:var(--cream-faint);}
-.game-over-actions{display:flex;flex-direction:column;gap:10px;}
-.game-over-actions .btn{width:100%;padding:15px;}
-.btn-play-again{background:var(--red-dim);border:1px solid var(--red);color:var(--cream);font-size:1rem;box-shadow:0 4px 18px var(--red-glow);}
-.btn-play-again:hover{background:var(--red);}
-.btn-share-go{background:var(--lift);border:1px solid var(--rule-md);color:var(--cream-dim);}
-.btn-share-go:hover{border-color:var(--rule-strong);color:var(--cream);}
-.btn-menu-go{background:transparent;border:1px solid var(--rule);color:var(--cream-faint);}
+    .stub-serial {
+      font-family: var(--font-type); font-size: 0.52rem;
+      color: var(--cream-muted); opacity: 0.5;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      letter-spacing: 0.2em;
+      user-select: none;
+    }
 
-/* ============================================================
-   MODALS & OVERLAYS
-   ============================================================ */
-.modal-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,0.88);
-  align-items:center;justify-content:center;
-  z-index:500;padding:20px;
-  backdrop-filter:blur(4px);
-}
-.modal-overlay.active{display:flex;}
-.modal-box{
-  background:var(--surface);
-  border:1px solid var(--rule-strong);
-  padding:clamp(22px,4vw,34px);
-  width:100%;max-width:460px;text-align:center;
-  box-shadow:0 30px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.03);
-}
-.modal-box h3{
-  font-family:var(--font-display);font-weight:700;
-  font-size:1.4rem;color:var(--gold);margin-bottom:16px;
-}
-.modal-box p{color:var(--cream-faint);margin-bottom:18px;font-size:0.9rem;line-height:1.5;}
-.modal-input{
-  width:100%;padding:14px;
-  font-family:var(--font-body);font-size:1rem;
-  background:var(--void);border:1px solid var(--rule-md);
-  color:var(--gold);text-align:center;margin-bottom:18px;
-  transition:all 0.2s;
-}
-.modal-input:focus{outline:none;border-color:var(--gold-dim);box-shadow:0 0 16px var(--gold-glow);}
-.modal-input::placeholder{color:var(--cream-faint);}
-.modal-actions{display:flex;gap:10px;}
-.modal-actions .btn{flex:1;padding:13px;}
-.btn-modal-cancel{background:var(--lift);border:1px solid var(--rule-md);color:var(--cream-dim);}
-.btn-modal-cancel:hover{border-color:var(--rule-strong);color:var(--cream);}
-.btn-modal-submit{background:var(--red-dim);border:1px solid var(--red);color:var(--cream);}
-.btn-modal-submit:hover{background:var(--red);}
+    .ticket-content {
+      flex: 1; padding: clamp(18px, 2.5vw, 26px) clamp(16px, 2.5vw, 22px);
+      display: flex; flex-direction: column;
+      /* Box Office velvet-gradient bg */
+      background: linear-gradient(135deg, rgba(26,14,22,0.85) 0%, rgba(13,8,16,0.95) 100%);
+    }
 
-/* Result overlay */
-.result-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,0.9);
-  align-items:center;justify-content:center;
-  z-index:500;padding:20px;
-}
-.result-overlay.active{display:flex;}
-.result-card{text-align:center;max-width:400px;}
-.result-icon{font-size:clamp(2.5rem,5vw,3.5rem);margin-bottom:18px;animation:resultPop 0.45s ease both;}
-.result-title-text{
-  font-family:var(--font-display);font-weight:700;
-  font-size:clamp(1rem,2.5vw,1.4rem);margin-bottom:10px;line-height:1.3;
-}
-.result-title-text.correct{color:var(--gold);}
-.result-title-text.incorrect{color:var(--red);}
-.result-movie-name{
-  font-family:var(--font-title);font-size:clamp(1.2rem,2.5vw,1.7rem);
-  color:var(--cream);letter-spacing:0.1em;margin-bottom:8px;
-}
-.result-pts-text{font-size:0.9rem;color:var(--gold);margin-bottom:28px;}
-.result-pts-text.zero{color:var(--cream-faint);}
-.btn-continue{
-  padding:clamp(12px,2vw,15px) clamp(32px,5vw,52px);
-  background:var(--red-dim);border:1px solid var(--red);color:var(--cream);
-  font-size:0.95rem;letter-spacing:0.2em;
-  box-shadow:0 4px 20px var(--red-glow);
-  transition:all 0.15s;
-}
-.btn-continue:hover{background:var(--red);}
+    .ticket-top {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; margin-bottom: 12px;
+    }
+    .ticket-badge {
+      font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--gold-light);
+      border: 1px solid rgba(232,23,93,0.35);
+      padding: 3px 9px;
+    }
+    .ticket-icon { font-size: 1.6rem; filter: drop-shadow(0 0 8px var(--gold-glow)); }
 
-/* PWA install prompt */
-.install-prompt{
-  position:fixed;bottom:0;left:50%;
-  transform:translateX(-50%) translateY(100%);
-  max-width:440px;width:100%;
-  background:var(--surface);border-top:1px solid var(--rule-strong);
-  padding:20px;z-index:900;transition:transform 0.3s ease;
-  box-shadow:0 -10px 40px rgba(0,0,0,0.5);
-}
-.install-prompt.visible{transform:translateX(-50%) translateY(0);}
-.install-prompt.dragging{transition:none;}
-.install-handle{width:36px;height:3px;background:var(--lift2);border-radius:2px;margin:0 auto 14px;}
-.install-close{
-  position:absolute;top:12px;right:12px;
-  width:26px;height:26px;background:var(--lift);
-  border:none;border-radius:50%;color:var(--cream-faint);
-  font-size:1rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-}
-.install-content{text-align:center;max-width:300px;margin:0 auto;}
-.install-icon{font-size:2.2rem;margin-bottom:8px;}
-.install-title{font-family:var(--font-display);font-weight:700;font-size:1.2rem;color:var(--cream);margin-bottom:6px;}
-.install-text{font-size:0.85rem;color:var(--cream-faint);margin-bottom:18px;line-height:1.5;}
-.install-actions{display:flex;gap:10px;justify-content:center;}
-.install-actions .btn{padding:10px 20px;font-size:0.82rem;}
-.btn-install-dismiss{background:var(--lift);border:1px solid var(--rule-md);color:var(--cream-dim);}
-.btn-install-go{background:var(--red-dim);border:1px solid var(--red);color:var(--cream);}
+    .ticket-name {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(1.2rem, 2vw, 1.55rem);
+      color: var(--cream); margin: 0 0 10px; line-height: 1.2;
+    }
+    .ticket-desc {
+      color: var(--cream-muted); font-size: 0.88rem;
+      line-height: 1.6; flex: 1; margin-bottom: 16px;
+    }
 
-/* Loading fallback */
-.loading-fallback{
-  position:fixed;inset:0;background:var(--void);
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:18px;z-index:1000;
-}
-.loading-fallback.hidden{display:none;}
-.loading-spinner{
-  width:44px;height:44px;
-  border:2px solid var(--lift2);border-top-color:var(--gold);
-  border-radius:50%;animation:spin 0.9s linear infinite;
-}
-.loading-text-sm{font-size:0.82rem;color:var(--cream-faint);}
-</style>
+    .ticket-footer {
+      display: flex; justify-content: space-between;
+      align-items: center; padding-top: 12px;
+      border-top: 1px solid rgba(60,50,70,0.5);
+    }
+    .admit-block { display: flex; flex-direction: column; }
+    .admit-label { font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; }
+    .admit-count {
+      font-family: var(--font-title); font-size: 1.05rem;
+      color: var(--gold-light); letter-spacing: 0.1em;
+    }
+    .play-link {
+      font-family: var(--font-title); font-size: 0.72rem;
+      letter-spacing: 0.2em; color: var(--gold-primary);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 5px;
+      transition: all 0.2s;
+    }
+    .play-link:hover { color: var(--gold-light); transform: translateX(2px); }
+
+    /* ============================================================
+       FEATURE PANELS
+       ============================================================ */
+    .features { padding: clamp(60px, 8vw, 100px) 0; }
+    .features-grid {
+      display: grid; gap: 20px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 768px) {
+      .features-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .feature-panel {
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed rgba(232,23,93,0.3);
+      padding: clamp(28px, 4vw, 42px) clamp(24px, 3vw, 36px);
+    }
+    .feature-panel h5 {
+      font-family: var(--font-title); font-size: 1.5rem;
+      color: var(--neon-yellow); letter-spacing: 0.15em;
+      margin: 0 0 12px;
+    }
+    .feature-panel p { color: var(--cream-muted); font-size: 0.9rem; line-height: 1.65; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    footer {
+      padding: clamp(60px, 8vw, 90px) 0 40px;
+      border-top: 1px solid rgba(232,23,93,0.15);
+      background: #030305;
+      text-align: center;
+    }
+    .footer-brand {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2.2rem, 10vw, 3.5rem);
+      color: var(--cream); text-transform: uppercase; line-height: 0.82;
+    }
+    .footer-brand span {
+      display: block; font-family: var(--font-title);
+      font-size: 0.4em; color: var(--gold-light);
+      letter-spacing: 0.55em; text-indent: 0.55em;
+      text-shadow: 0 0 16px var(--gold-glow);
+      margin-top: 8px;
+    }
+    .footer-links {
+      display: flex; justify-content: center;
+      gap: 2rem; margin: 22px 0;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 0.65rem; color: var(--text-muted);
+      text-decoration: none; text-transform: uppercase;
+      letter-spacing: 0.15em; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold-light); }
+    .footer-copy {
+      font-family: var(--font-type); font-size: 0.58rem;
+      color: var(--text-muted); opacity: 0.4;
+      line-height: 1.9; margin-top: 16px;
+    }
+
+    /* ============================================================
+       KEYFRAMES
+       ============================================================ */
+    @keyframes neonFlicker {
+      0%,92%,96%,100% { text-shadow:0 0 20px rgba(255,61,127,0.9),0 0 60px rgba(232,23,93,0.5); opacity:1; }
+      93%,95% { opacity:0.7; text-shadow:0 0 5px rgba(255,61,127,0.3); }
+    }
+    @keyframes dotPulse {
+      0%,100% { opacity:1; } 50% { opacity:0.5; }
+    }
+    @keyframes pipPulse {
+      0%,100% { box-shadow:0 0 6px rgba(245,197,24,0.4),0 0 14px rgba(245,197,24,0.2); }
+      50% { box-shadow:0 0 10px rgba(245,197,24,0.8),0 0 24px rgba(245,197,24,0.5); }
+    }
+    @keyframes mbulbPulse {
+      0%,100% { opacity:0.3; transform:scale(0.8); }
+      50% { opacity:1; transform:scale(1.2); box-shadow:0 0 16px rgba(245,197,24,1),0 0 30px rgba(245,197,24,0.4); }
+    }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+  </style>
 </head>
 <body>
+  <div class="film-grain"></div>
 
-<!-- CINEMA LOADING -->
-<div class="cinema-loading" id="cinemaLoading">
-  <div class="cinema-bulb-row">
-    <div class="cinema-bulb"></div><div class="cinema-bulb"></div>
-    <div class="cinema-bulb"></div><div class="cinema-bulb"></div>
-    <div class="cinema-bulb"></div>
-  </div>
-  <div class="cinema-title">Plot<br>Twisted</div>
-  <div class="cinema-sub">Now Loading</div>
-  <div class="cinema-dots">
-    <div class="cinema-dot"></div>
-    <div class="cinema-dot"></div>
-    <div class="cinema-dot"></div>
-  </div>
-</div>
-
-<div class="loading-fallback hidden" id="loadingFallback">
-  <div class="loading-spinner"></div>
-  <div class="loading-text-sm">Loading clues…</div>
-</div>
-
-<!-- ============================================================
-     START SCREEN
-     ============================================================ -->
-<div id="startScreen" class="screen active">
-  <div class="start-bg"></div>
-  <div class="start-perfs" id="startPerfsL">
-    <div class="perf-hole"></div><div class="perf-hole"></div><div class="perf-hole"></div>
-    <div class="perf-hole"></div><div class="perf-hole"></div><div class="perf-hole"></div>
-    <div class="perf-hole"></div><div class="perf-hole"></div><div class="perf-hole"></div>
-  </div>
-  <div class="start-perfs right" id="startPerfsR">
-    <div class="perf-hole"></div><div class="perf-hole"></div><div class="perf-hole"></div>
-    <div class="perf-hole"></div><div class="perf-hole"></div><div class="perf-hole"></div>
-    <div class="perf-hole"></div><div class="perf-hole"></div><div class="perf-hole"></div>
-  </div>
-
-  <div class="start-layout">
-    <div class="start-left">
-      <div class="film-strip-left" id="filmStripLeft"></div>
-      <div style="padding-left:30px;width:100%;">
-        <div class="start-eyebrow">A Nobody Studios Original</div>
-        <span class="start-title-plot">Plot<br>Twisted</span>
-        <span class="start-title-twisted">Cinematic Trivia</span>
-        <p class="start-tagline">Read the twisted plot summary. Name the movie. Score the glory. Every clue is technically accurate.</p>
-      </div>
-    </div>
-    <div class="start-right">
-      <div class="start-bulb-row">
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-        <div class="bulb"></div><div class="bulb"></div>
-      </div>
-      <div class="start-divider">
-        <div class="start-divider-line"></div>
-        <span class="start-divider-icon">▶</span>
-        <div class="start-divider-line"></div>
-      </div>
-      <button class="btn btn-primary-start" id="quickPlayBtn" disabled>
-        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
-        Quick Play
-      </button>
-      <button class="btn btn-primary-start btn-daily-start" id="dailyBtn" disabled>
-        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
-        Daily Ritual
-      </button>
-      <div class="menu-half-row">
-        <button class="btn btn-ghost-start" id="howToPlayBtn">How to Play</button>
-        <button class="btn btn-ghost-start" id="settingsBtn">Settings</button>
-      </div>
-      <div class="start-quote-wrap">
-        <div class="start-quote" id="startQuote"></div>
-        <div class="start-quote-src" id="startQuoteSrc"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     MODE SCREEN
-     ============================================================ -->
-<div id="modeScreen" class="screen">
-  <div class="selection-shell">
-    <div class="sel-header">
-      <span class="sel-eyebrow">Step 1 of 2</span>
-      <h2>Choose Your Mode</h2>
-      <p>How do you want to play this round?</p>
-    </div>
-    <div class="mode-grid" id="modeGrid">
-      <div class="mode-card selected" data-mode="classic" id="classicCard">
-        <div class="mode-badge">Classic</div>
-        <div class="mode-title">Classic Hardcase</div>
-        <div class="mode-desc">Type the title from the twisted clue. No reveals, no hints — pure memory.</div>
-      </div>
-      <div class="mode-card" data-mode="marquee" id="marqueeCard">
-        <div class="mode-badge">Recommended</div>
-        <div class="mode-title">Marquee Mode</div>
-        <div class="mode-desc">Reveal letters one at a time. Solve early with 80% hidden for a 1.5× multiplier.</div>
-      </div>
-    </div>
-    <div class="sel-actions">
-      <button class="btn btn-back-sel" id="modeBackBtn">← Back</button>
-      <button class="btn btn-start-sel" id="modeContinueBtn">Continue →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     CATEGORY SCREEN
-     ============================================================ -->
-<div id="categoryScreen" class="screen">
-  <div class="selection-shell">
-    <div class="sel-header">
-      <span class="sel-eyebrow">Step 2 of 2</span>
-      <h2>Choose Your Genre</h2>
-      <p>Pick a category — 5 films, no mercy.</p>
-    </div>
-    <div class="category-grid" id="categoryGrid"></div>
-    <div class="sel-actions">
-      <button class="btn btn-back-sel" id="categoryBackBtn">← Back</button>
-      <button class="btn btn-start-sel" id="startGameBtn" disabled>Start Game →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     HOW TO PLAY
-     ============================================================ -->
-<div id="howToPlayScreen" class="screen">
-  <div class="info-shell">
-    <div class="info-back-row">
-      <button class="btn-back-sm" id="howToBackBtn">←</button>
-      <h2 class="info-title">How to Play</h2>
-    </div>
-    <div class="info-section">
-      <h3>🎬 The Goal</h3>
-      <p>Read the twisted (but technically accurate) plot summary and guess the movie title. Use the keyboard to reveal letters one at a time, or go straight for the full solve.</p>
-    </div>
-    <div class="info-section">
-      <h3>💰 Scoring</h3>
-      <p>Each movie starts at 500 points. Wrong consonant guesses cost 30 points — vowels are always free. Solve early with 80%+ hidden for a 1.5× multiplier, or 50%+ for 1.25×.</p>
-    </div>
-    <div class="info-section">
-      <h3>❌ Strikes</h3>
-      <p>You have 3 strikes per game. Wrong full-title guesses cost a strike. Run out and the screening ends early.</p>
-    </div>
-    <div class="info-section">
-      <h3>⌨️ Physical Keyboard</h3>
-      <p>On desktop, type letters directly. Press Enter to open the solve dialog, Escape to dismiss it.</p>
-    </div>
-    <div class="info-section">
-      <h3>📅 Daily Ritual</h3>
-      <p>Same 5 movies for every player every day. One guess per film. No letter hints. Share your scorecard.</p>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     SETTINGS
-     ============================================================ -->
-<div id="settingsScreen" class="screen" style="overflow-y:auto;">
-  <div class="info-shell">
-    <div class="info-back-row">
-      <button class="btn-back-sm" id="settingsBackBtn">←</button>
-      <h2 class="info-title">Settings</h2>
-    </div>
-    <div style="margin-bottom:24px;">
-      <div style="font-size:7px;letter-spacing:0.3em;color:var(--cream-faint);text-transform:uppercase;margin-bottom:14px;">Game Options</div>
-      <div class="setting-row">
-        <div class="setting-info">
-          <div class="setting-label">Sound Effects</div>
-          <div class="setting-desc">Play audio for correct / incorrect guesses</div>
-        </div>
-        <div class="toggle" id="soundToggle"></div>
-      </div>
-    </div>
-    <div>
-      <div style="font-size:7px;letter-spacing:0.3em;color:var(--cream-faint);text-transform:uppercase;margin-bottom:14px;">About</div>
-      <p class="settings-about">Created by <a href="https://x.com/Ben_Soup" target="_blank">Ben Campbell</a> · A Nobody Studios Original</p>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     GAME SCREEN
-     ============================================================ -->
-<div id="gameScreen" class="screen">
-  <!-- Shared marquee header -->
-  <div class="marquee-header">
-    <div class="bulb-rail">
-      <div class="bulb-strip">
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-      </div>
-      <span class="rail-center-text">Now Screening</span>
-      <div class="bulb-strip">
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-      </div>
-    </div>
-    <div class="header-main">
-      <a class="header-logo" href="#">
-        <span class="logo-plot">Plot Twisted</span>
-        <span class="logo-twisted">Cinematic Trivia</span>
+  <!-- ── HEADER ── -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <span class="plot">PLOT</span>
+        <span class="twisted">TWISTED</span>
       </a>
-      <div class="header-stats">
-        <div class="hstat">
-          <span class="hstat-label">Score</span>
-          <span class="hstat-value gold" id="totalScore">0</span>
-        </div>
-        <div class="hstat" id="strikesStatBlock">
-          <span class="hstat-label">Strikes</span>
-          <div class="strikes-row" id="strikesDisplay">
-            <div class="spip"></div><div class="spip"></div><div class="spip"></div>
+      <nav class="nav-links">
+        <a href="#showings">Screenings</a>
+        <a href="#showings">Daily</a>
+        <a href="/game.html">Play</a>
+      </nav>
+      <a href="/game.html" class="nav-cta">
+        <div class="live-dot"></div>
+        Now Screening
+      </a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+      <div class="hero-cinebg"></div>
+      <div class="hero-spotlight"></div>
+
+      <div class="hero-body">
+        <div class="container">
+          <div class="hero-grid">
+
+            <!-- Title in brass marquee frame -->
+            <div>
+              <div class="marquee-frame">
+                <span class="corner-bl"></span>
+                <span class="corner-br"></span>
+                <div class="frame-inner">
+                  <div class="title-eyebrow">★ A _Nobody Studios Production ★</div>
+                  <span class="title-plot">PLOT</span>
+                  <span class="title-twisted">TWISTED</span>
+                  <p class="hero-tagline">The movie guessing ritual for those who remember the twist, but forget the title before the credits roll.</p>
+                  <div class="hero-btn-row">
+                    <a href="/game.html" class="btn btn-primary">
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
+                      Enter Screening
+                    </a>
+                    <a href="#showings" class="btn btn-ghost">See Modes</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dossier card -->
+            <div class="dossier-shell">
+              <div class="dossier-label">TONIGHT'S DOSSIER</div>
+              <div class="clue-card">
+                <div class="clue-card-header">
+                  <span>N O W &nbsp; S H O W I N G</span>
+                  <span id="clueNum" style="opacity:0.5;">1 / 5</span>
+                </div>
+                <div class="clue-card-rule"></div>
+                <div class="clue-card-inner">
+                  <div class="clue-serial" id="clueSerial">CASE #802</div>
+                  <div class="clue-text" id="clueText">"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy."</div>
+                  <div class="pip-row" id="pipRow"></div>
+                  <button class="reveal-btn" id="revealBtn" onclick="handleReveal()">REVEAL TITLE</button>
+                  <button class="next-btn" id="nextBtn" onclick="nextClue()">NEXT CLUE →</button>
+                </div>
+              </div>
+              <p class="dossier-note">Sample clues — full game has 1,200+</p>
+            </div>
+
           </div>
         </div>
       </div>
-      <div class="header-actions">
-        <button class="hbtn" id="howToGameBtn">?</button>
-        <button class="hbtn danger" id="quitBtn">✕ Quit</button>
-      </div>
+    </section>
+
+    <!-- ── MARQUEE STRIP ── -->
+    <div class="marquee-strip" aria-hidden="true">
+      <div class="marquee-inner" id="marqueeInner"></div>
     </div>
-    <div class="header-ticker">
-      <span class="ticker-label">▶ Live</span>
-      <div class="ticker-items" id="gameTicker"></div>
-    </div>
-  </div>
 
-  <div class="game-body">
-    <!-- SCREENING ROOM -->
-    <div class="screening-room">
-      <div class="sr-perfs left" id="srPerfsL"></div>
-      <div class="sr-perfs right" id="srPerfsR"></div>
-
-      <!-- Reel progress -->
-      <div class="reel-track" id="reelTrack"></div>
-
-      <!-- Now showing label -->
-      <div class="now-showing-label">
-        <div class="ns-bulb"></div>
-        <span class="ns-text">Now Showing</span>
-        <div class="ns-line"></div>
+    <!-- ── STATS ── -->
+    <section class="stats-strip">
+      <div class="container stats-row">
+        <div class="stat"><div class="stat-num">1.2K+</div><div class="stat-label">Twisted Plots</div></div>
+        <div class="stat"><div class="stat-num">94%</div><div class="stat-label">Failure Rate</div></div>
+        <div class="stat"><div class="stat-num">DAILY</div><div class="stat-label">Global Mystery</div></div>
+        <div class="stat"><div class="stat-num">ZERO</div><div class="stat-label">Spoiler Mercy</div></div>
       </div>
+    </section>
 
-      <!-- Clue card -->
-      <div class="clue-card fade-up" id="clueCard">
-        <div class="clapper-bar">
-          <div class="clapper-stripes">
-            <div class="clapper-stripe"></div><div class="clapper-stripe"></div>
-            <div class="clapper-stripe"></div><div class="clapper-stripe"></div>
-            <div class="clapper-stripe"></div><div class="clapper-stripe"></div>
-          </div>
-          <div class="clapper-meta">
-            PROD: PLOT&#8209;TWISTED &nbsp;·&nbsp; SCENE: <em id="clapperScene">001</em> &nbsp;·&nbsp; TAKE: <em>01</em>
-          </div>
-          <span class="clapper-genre" id="clapperGenre">—</span>
-        </div>
-        <div class="clue-inner">
-          <div class="clue-case-line" id="clueCaseLine">Plot Summary · Case #001</div>
-          <div class="clue-text" id="clueText"></div>
-          <div class="clue-foot">
-            <span id="clueFilmNum">Film 1 of 5</span>
-            <span class="genre-badge" id="genreBadge">—</span>
+    <!-- ── TICKET DIVIDER ── -->
+    <div class="brass-divider"><span class="icon">🎬</span></div>
+
+    <!-- ── NOW SHOWING: MODES ── -->
+    <section id="showings" class="showings">
+      <div class="container">
+        <div class="section-hed">
+          <div class="section-hed-text">
+            <div class="eyebrow">SELECT YOUR SCREENING</div>
+            <h2>Now Showing</h2>
           </div>
         </div>
-      </div>
 
-      <!-- Results strip -->
-      <div class="results-strip">
-        <div class="result-col">
-          <div class="result-col-head">Previous results</div>
-          <div id="prevResultsList"></div>
+        <div class="tickets-grid">
+
+          <!-- Classic -->
+          <div class="ticket">
+            <div class="ticket-stub">
+              <span class="stub-serial">SRL: CLC-01 — ADMIT ONE</span>
+            </div>
+            <div class="ticket-content">
+              <div class="ticket-top">
+                <span class="ticket-badge">Classic</span>
+                <span class="ticket-icon">📝</span>
+              </div>
+              <div class="ticket-name">Classic Hardcase</div>
+              <div class="ticket-desc">Read the twisted summary. Type the title from memory alone. No lifelines. No letter reveals. Pure recall or nothing.</div>
+              <div class="ticket-footer">
+                <div class="admit-block">
+                  <span class="admit-label">Admit</span>
+                  <span class="admit-count">ONE</span>
+                </div>
+                <a href="/game.html" class="play-link">PLAY →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Marquee — featured -->
+          <div class="ticket featured">
+            <div class="ticket-stub" style="background:rgba(232,23,93,0.08); border-right-color:rgba(232,23,93,0.3);">
+              <span class="stub-serial">SRL: MRQ-01 — RECOMMENDED</span>
+            </div>
+            <div class="ticket-content">
+              <div class="ticket-top">
+                <span class="ticket-badge" style="color:var(--gold-light); border-color:rgba(255,61,127,0.4);">Recommended</span>
+                <span class="ticket-icon">🎰</span>
+              </div>
+              <div class="ticket-name">Marquee Mode</div>
+              <div class="ticket-desc">Wheel of Fortune meets the multiplex. Reveal letters one by one. Solve early with 80% hidden and score a 1.5× multiplier.</div>
+              <div class="ticket-footer">
+                <div class="admit-block">
+                  <span class="admit-label">Admit</span>
+                  <span class="admit-count">ONE</span>
+                </div>
+                <a href="/game.html" class="play-link">PLAY →</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily -->
+          <div class="ticket">
+            <div class="ticket-stub">
+              <span class="stub-serial">SRL: DLY-01 — DAILY RITUAL</span>
+            </div>
+            <div class="ticket-content">
+              <div class="ticket-top">
+                <span class="ticket-badge">Daily</span>
+                <span class="ticket-icon">📅</span>
+              </div>
+              <div class="ticket-name">The Daily Ritual</div>
+              <div class="ticket-desc">Five movies. One guess each. Same clues for every player on the planet, every 24 hours. No hints. Share your scorecard.</div>
+              <div class="ticket-footer">
+                <div class="admit-block">
+                  <span class="admit-label">Admit</span>
+                  <span class="admit-count">ALL</span>
+                </div>
+                <a href="/game.html" class="play-link">PLAY →</a>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div class="result-divider"></div>
-        <div class="result-col">
-          <div class="result-col-head">Field intel</div>
-          <div class="intel-text" id="intelText">Wrong consonants cost 30 pts. Vowels are free. Solve with 80%+ hidden for a 1.5× multiplier.</div>
+      </div>
+    </section>
+
+    <!-- ── FEATURES ── -->
+    <section class="features">
+      <div class="container">
+        <div class="section-hed">
+          <div class="section-hed-text">
+            <div class="eyebrow">THE PERSONALITY</div>
+            <h2>The Roast &amp; The Glory</h2>
+          </div>
+        </div>
+        <div class="features-grid">
+          <div class="feature-panel">
+            <h5>VICIOUS ROASTS</h5>
+            <p>Guess wrong and the game has notes. "Your answer has strong straight-to-DVD energy." Guess right and it might still question your rewatch count.</p>
+          </div>
+          <div class="feature-panel">
+            <h5>SOCIAL BRAGGING</h5>
+            <p>Daily scorecard exports as a shareable emoji grid. Post your result, flex your streak, and invite everyone you know to fail just as publicly.</p>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- OPERATIONS PANEL -->
-    <div class="operations">
-      <div class="ops-label">Points on the line</div>
-      <div class="pot-display">
-        <div class="pot-left">
-          <span class="pot-lbl">Current Pot</span>
-          <span class="pot-val" id="potValue">500</span>
-        </div>
-        <span class="pot-mult" id="potMult"></span>
-      </div>
+  </main>
 
-      <!-- MARQUEE MODE CONTROLS -->
-      <div id="marqueeControls">
-        <div class="ops-label">Title reveal</div>
-        <div class="title-reveal-strip" id="titleReveal">
-          <div class="title-letters-row" id="titleLetters"></div>
-        </div>
-        <div class="ops-label">Keyboard</div>
-        <div class="kb-wrap" id="keyboard"></div>
-        <div class="kb-hint">Type on keyboard · Enter to solve · Esc to cancel</div>
-        <div class="action-row">
-          <button class="btn btn-give" id="giveUpBtn">Give Up</button>
-          <button class="btn btn-know" id="solveBtn">I Know It →</button>
-        </div>
-      </div>
-
-      <!-- CLASSIC MODE CONTROLS -->
-      <div class="classic-controls" id="classicControls">
-        <input type="text" class="classic-input" id="classicInput" placeholder="Type the movie title…" autocomplete="off" autocapitalize="off">
-        <div class="classic-feedback-panel">
-          <div class="classic-feedback" id="classicFeedback">Take your best shot.</div>
-          <div class="classic-reveal" id="classicReveal">Need a hint? Use Skip / Reveal.</div>
-        </div>
-        <div class="classic-action-row">
-          <button class="btn btn-classic-submit" id="classicSubmitBtn">Submit</button>
-          <button class="btn btn-classic-reveal" id="classicRevealBtn">Skip / Reveal</button>
-        </div>
-        <button class="btn btn-classic-next" id="classicNextBtn">Next Question →</button>
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="container">
+      <div class="footer-brand">PLOT<span>TWISTED</span></div>
+      <nav class="footer-links">
+        <a href="/game.html">Play Now</a>
+        <a href="#showings">Modes</a>
+        <a href="https://x.com/Ben_Soup" target="_blank" rel="noopener">@Ben_Soup</a>
+      </nav>
+      <div class="footer-copy">
+        AN ORIGINAL _NOBODY STUDIOS PRODUCTION © 2026<br>
+        <span style="opacity:0.7;">Dedicated to the ones who remember the vibe, but never the title.</span>
       </div>
     </div>
-  </div>
-</div>
+  </footer>
 
-<!-- ============================================================
-     DAILY CHALLENGE
-     ============================================================ -->
-<div id="dailyScreen" class="screen">
-  <div class="marquee-header">
-    <div class="bulb-rail">
-      <div class="bulb-strip">
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-      </div>
-      <span class="rail-center-text">Daily Ritual</span>
-      <div class="bulb-strip">
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-        <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
-      </div>
-    </div>
-    <div class="header-main">
-      <a class="header-logo" href="#"><span class="logo-plot">Plot Twisted</span><span class="logo-twisted">Cinematic Trivia</span></a>
-      <div style="text-align:center;">
-        <div style="font-size:7px;letter-spacing:0.3em;color:var(--cream-faint);text-transform:uppercase;margin-bottom:4px;">Daily Ritual</div>
-        <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--gold);" id="dailyDateDisplay"></div>
-      </div>
-      <div class="header-actions">
-        <button class="hbtn danger" id="dailyQuitBtn">✕ Exit</button>
-      </div>
-    </div>
-  </div>
+  <script>
+    /* ── Demo clues ─────────────────────────────── */
+    const DEMO = [
+      { serial:"CASE #802", clue:'"A billionaire spends his entire inheritance on high-tech cosplay to avoid going to therapy."',           title:"BATMAN BEGINS" },
+      { serial:"CASE #417", clue:'"An old man ties balloons to his house to escape a retirement home and accidentally kidnaps a child."',   title:"UP" },
+      { serial:"CASE #231", clue:'"A group of guys spend an entire weekend looking for their friend who slept on a roof."',                  title:"THE HANGOVER" },
+      { serial:"CASE #609", clue:'"A farm boy with severe father issues learns to trust an invisible energy drink and blows up a government building."', title:"STAR WARS: A NEW HOPE" },
+      { serial:"CASE #158", clue:'"A woman in a red dress keeps reappearing everywhere, and everyone around her refuses to explain why."',   title:"THE MATRIX" },
+    ];
+    let idx = 0, shown = false;
 
-  <div class="daily-content">
-    <div class="reel-track" id="dailyReelTrack" style="max-width:100%;"></div>
-    <div class="daily-clue-card" id="dailyClueCard">
-      <div class="clapper-bar">
-        <div class="clapper-stripes">
-          <div class="clapper-stripe"></div><div class="clapper-stripe"></div>
-          <div class="clapper-stripe"></div><div class="clapper-stripe"></div>
-          <div class="clapper-stripe"></div><div class="clapper-stripe"></div>
-        </div>
-        <div class="clapper-meta">DAILY RITUAL &nbsp;·&nbsp; FILM <em id="dailyFilmNum">1</em> OF 5</div>
-      </div>
-      <div class="clue-inner">
-        <div class="clue-case-line" id="dailyCaseLine">Plot Summary · Case #001</div>
-        <div class="clue-text" id="dailyClueText"></div>
-      </div>
-    </div>
-    <div class="daily-input-wrap">
-      <input type="text" class="daily-input" id="dailyInput" placeholder="Type your guess…" autocomplete="off" autocapitalize="off">
-    </div>
-    <div class="daily-actions">
-      <button class="btn btn-skip-daily" id="dailySkipBtn">Skip</button>
-      <button class="btn btn-submit-daily" id="dailySubmitBtn">Submit</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     DAILY RESULTS
-     ============================================================ -->
-<div id="dailyResultsScreen" class="screen">
-  <div class="daily-results-card fade-up">
-    <div class="daily-results-title">Daily Ritual Complete</div>
-    <div class="daily-results-date" id="dailyResultsDate"></div>
-    <div class="daily-stars" id="dailyStars"></div>
-    <div class="daily-score-text" id="dailyScoreText">3/5 Correct</div>
-    <div class="daily-breakdown" id="dailyBreakdown"></div>
-    <div class="daily-results-actions">
-      <button class="btn btn-share-daily" id="dailyShareBtn">Share Results</button>
-      <button class="btn btn-menu-daily" id="dailyMenuBtn">Main Menu</button>
-    </div>
-    <div class="daily-next" id="dailyNextText"></div>
-  </div>
-</div>
-
-<!-- ============================================================
-     GAME OVER
-     ============================================================ -->
-<div id="gameOverScreen" class="screen">
-  <div class="game-over-card fade-up">
-    <div class="final-score-label">Final Score</div>
-    <div class="final-score" id="finalScore">0</div>
-    <div class="final-subtitle" id="finalSubtitle">5 of 5 films solved</div>
-    <div class="final-breakdown" id="finalBreakdown"></div>
-    <div class="game-over-actions">
-      <button class="btn btn-play-again" id="playAgainBtn">Play Again</button>
-      <button class="btn btn-share-go" id="shareBtn">Share Score</button>
-      <button class="btn btn-menu-go" id="menuBtn">Main Menu</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
-     MODALS
-     ============================================================ -->
-<div class="modal-overlay" id="solveModal">
-  <div class="modal-box">
-    <h3>What's the movie?</h3>
-    <input type="text" class="modal-input" id="solveInput" placeholder="Type your answer…" autocomplete="off" autocapitalize="off">
-    <div class="modal-actions">
-      <button class="btn btn-modal-cancel" id="cancelSolveBtn">Cancel</button>
-      <button class="btn btn-modal-submit" id="submitSolveBtn">Submit</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="quitModal">
-  <div class="modal-box">
-    <h3>Quit the Screening?</h3>
-    <p>Your progress will be lost and the film will burn.</p>
-    <div class="modal-actions">
-      <button class="btn btn-modal-cancel" id="cancelQuitBtn">Stay</button>
-      <button class="btn btn-modal-submit" id="confirmQuitBtn">Quit</button>
-    </div>
-  </div>
-</div>
-
-<div class="result-overlay" id="resultOverlay">
-  <div class="result-card">
-    <div class="result-icon" id="resultIcon">🎬</div>
-    <div class="result-title-text" id="resultTitleText">Correct!</div>
-    <div class="result-movie-name" id="resultMovieName"></div>
-    <div class="result-pts-text" id="resultPtsText">+500 points</div>
-    <button class="btn btn-continue" id="continueBtn">Continue →</button>
-  </div>
-</div>
-
-<!-- PWA Install -->
-<div class="install-prompt" id="installPrompt">
-  <div class="install-handle"></div>
-  <button class="install-close" id="installClose">×</button>
-  <div class="install-content">
-    <div class="install-icon">🎬</div>
-    <div class="install-title">Add to Home Screen</div>
-    <div class="install-text" id="installText">Install Plot Twisted for quick access and offline play!</div>
-    <div class="install-actions">
-      <button class="btn btn-install-dismiss" id="installDismissBtn">Not Now</button>
-      <button class="btn btn-install-go" id="installActionBtn">Install</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ============================================================
-   CATEGORY ICONS
-   ============================================================ */
-const CATEGORY_ICONS = {
-  Family:`<svg viewBox="0 0 48 48"><path d="M35 16c0-2.76-2.24-5-5-5s-5 2.24-5 5c0 1.86 1.03 3.47 2.54 4.33L24 28l-3.54-7.67C21.97 19.47 23 17.86 23 16c0-2.76-2.24-5-5-5s-5 2.24-5 5c0 1.86 1.03 3.47 2.54 4.33L8 38h32L32.46 20.33C33.97 19.47 35 17.86 35 16zM18 14c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm6 20l3-8 3 8H24zm6-18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>`,
-  SciFi:`<svg viewBox="0 0 48 48"><path d="M24 2L4 14v20l20 12 20-12V14L24 2zm0 4.5l14 8.4v15.2l-14 8.4-14-8.4V14.9l14-8.4zM24 16c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>`,
-  Fantasy:`<svg viewBox="0 0 48 48"><path d="M24 4l-6 18h-14l11.5 8.5-4.5 13.5 13-9.5 13 9.5-4.5-13.5L44 22H30L24 4z"/></svg>`,
-  Superhero:`<svg viewBox="0 0 48 48"><path d="M24 4C12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20S35.05 4 24 4zm0 6c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 28c-5.52 0-10.29-3.23-12.54-7.9.06-4.15 8.36-6.43 12.54-6.43s12.48 2.28 12.54 6.43C33.29 34.77 29.52 38 24 38z"/></svg>`,
-  EmotionalDamage:`<svg viewBox="0 0 48 48"><path d="M24 44l-2.5-2.27C10.3 31.52 4 25.79 4 18.5 4 12.42 8.42 8 14.5 8c3.43 0 6.73 1.6 8.86 4.11L24 12.8l.64-.69C26.77 9.6 30.07 8 33.5 8 39.58 8 44 12.42 44 18.5c0 7.29-6.3 13.02-17.5 23.23L24 44z"/></svg>`,
-  StreamingHits:`<svg viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><path d="M20 18v8l7-4-7-4z"/><line x1="16" y1="38" x2="32" y2="38" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
-  Horror:`<svg viewBox="0 0 48 48"><path d="M24 4C13 4 4 13 4 24s9 20 20 20 20-9 20-20S35 4 24 4zm0 4c2.2 0 4 1.8 4 4s-1.8 4-4 4-4-1.8-4-4 1.8-4 4-4zM14 34c0-4 4.5-7 10-7s10 3 10 7H14zm15-13h-2v-3h-6v3h-2v-5c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v5z"/></svg>`,
-  Action:`<svg viewBox="0 0 48 48"><path d="M38 12l-4-4-16 16-6-6-4 4 10 10 20-20zM8 32v4h32v-4H8z"/></svg>`
-};
-
-const DISPLAY_NAMES = {
-  Family:"Family",SciFi:"Sci-Fi",Fantasy:"Fantasy",Superhero:"Superhero",
-  EmotionalDamage:"Emotional Damage",StreamingHits:"Streaming Hits",
-  Horror:"Horror",Action:"Action"
-};
-
-const DAILY_QUOTES = [
-  {quote:"Every great film should seem new every time you see it.",source:"Roger Ebert"},
-  {quote:"Cinema is a matter of what's in the frame and what's out.",source:"Martin Scorsese"},
-  {quote:"A film is never really good unless the camera is an eye in the head of a poet.",source:"Orson Welles"},
-  {quote:"Movies are like an expensive form of therapy for me.",source:"Tim Burton"},
-  {quote:"The cinema is truth twenty-four times per second.",source:"Jean-Luc Godard"},
-  {quote:"Film lovers are sick people.",source:"François Truffaut"},
-  {quote:"I don't dream at night, I dream all day; I dream for a living.",source:"Steven Spielberg"},
-  {quote:"Cinema is the most beautiful fraud in the world.",source:"Jean-Luc Godard"},
-  {quote:"Every single movie is a miracle.",source:"Guillermo del Toro"},
-  {quote:"The length of a film should be directly related to the endurance of the human bladder.",source:"Alfred Hitchcock"},
-  {quote:"If it can be written, or thought, it can be filmed.",source:"Stanley Kubrick"}
-];
-
-const FEEDBACK_POOL = {
-  correct:["Roll credits — that answer just won opening weekend.","Spotlight on you. Correct, and with style.","The clue tipped its hat. You earned it.","That landed like a third-act reveal.","Box office confirmed: correct.","Your watchlist is paying dividends."],
-  wrong:["Hard cut. That answer missed the franchise.","The clue remains undefeated on that one.","Nice swing, wrong screenplay.","Your guess had reboot energy. Not the good kind.","That answer has strong direct-to-streaming energy.","The director's notes say: no."],
-  nearMiss:["You were one typo from glory.","Emotionally correct. Technically not.","The clue felt that near miss.","Trailer-close. Almost there."],
-  giveUp:["Strategic surrender logged.","The clue wins this round. It happens.","You exited before the third act.","Your brain called in a stunt double."],
-  reveal:["The answer was [TITLE]. Now you know.","[TITLE] takes this round.","Curtain lifted: [TITLE].","The projection booth reveals: [TITLE]."],
-  fallback:["Dramatic tension intensifies.","The reels are spinning.","Your movie fate is pending.","Take your best shot."]
-};
-
-function pickFeedback(cat, vars={}) {
-  const pool = FEEDBACK_POOL[cat] || FEEDBACK_POOL.fallback;
-  const msg = pool[Math.floor(Math.random()*pool.length)];
-  return msg.replace('[TITLE]', vars.title||'');
-}
-
-/* ============================================================
-   CINEMA LOADING
-   ============================================================ */
-(function(){
-  const el = document.getElementById('cinemaLoading');
-  const MIN = 1800;
-  const t0 = Date.now();
-  function hide(){
-    const rem = Math.max(0, MIN-(Date.now()-t0));
-    setTimeout(()=>{
-      el.classList.add('fade-out');
-      setTimeout(()=>el.classList.add('hidden'),650);
-    },rem);
-  }
-  if(document.readyState==='complete') hide();
-  else window.addEventListener('load',hide);
-  setTimeout(()=>{el.classList.add('fade-out');setTimeout(()=>el.classList.add('hidden'),650);},4500);
-})();
-
-/* ============================================================
-   PWA INSTALL
-   ============================================================ */
-class InstallManager {
-  constructor(){
-    this.prompt=null;
-    this.el=document.getElementById('installPrompt');
-    this.startY=0;this.curY=0;this.dragging=false;
-    this.init();
-  }
-  init(){
-    if(this.isStandalone()||this.dismissed()) return;
-    window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();this.prompt=e;this.show('android');});
-    if(this.isIOS()&&!this.isStandalone()) setTimeout(()=>this.show('ios'),3000);
-    document.getElementById('installDismissBtn').onclick=()=>this.dismiss();
-    document.getElementById('installClose').onclick=()=>this.dismiss();
-    document.getElementById('installActionBtn').onclick=()=>this.install();
-    this.el.addEventListener('touchstart',e=>{this.startY=e.touches[0].clientY;this.dragging=true;this.el.classList.add('dragging');},{passive:true});
-    this.el.addEventListener('touchmove',e=>{if(!this.dragging)return;this.curY=e.touches[0].clientY;const d=this.curY-this.startY;if(d>0)this.el.style.transform=`translateX(-50%) translateY(${d}px)`;},{passive:true});
-    this.el.addEventListener('touchend',()=>{this.dragging=false;this.el.classList.remove('dragging');if(this.curY-this.startY>80)this.dismiss();else this.el.style.transform='';});
-  }
-  isIOS(){return/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;}
-  isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
-  dismissed(){const d=localStorage.getItem('ptInstallDismissed');return d&&Date.now()-parseInt(d)<86400000;}
-  show(p){
-    if(p==='ios'){
-      document.getElementById('installText').innerHTML='Tap <strong>Share</strong> then <strong>"Add to Home Screen"</strong>.';
-      document.getElementById('installActionBtn').textContent='Got It';
-      document.getElementById('installActionBtn').onclick=()=>this.dismiss();
-    }
-    setTimeout(()=>this.el.classList.add('visible'),2500);
-  }
-  async install(){if(this.prompt){this.prompt.prompt();await this.prompt.userChoice;this.prompt=null;}this.dismiss();}
-  dismiss(){this.el.classList.remove('visible');localStorage.setItem('ptInstallDismissed',Date.now().toString());}
-}
-
-/* ============================================================
-   BUILD FILM STRIP
-   ============================================================ */
-function buildPerfs(el, count=8){
-  if(!el) return;
-  for(let i=0;i<count;i++){const d=document.createElement('div');d.className='sr-perf';el.appendChild(d);}
-}
-function buildStartPerfs(){
-  ['startPerfsL','startPerfsR'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    for(let i=0;i<9;i++){const d=document.createElement('div');d.className='perf-hole';el.appendChild(d);}
-  });
-}
-
-/* ============================================================
-   MAIN GAME CLASS
-   ============================================================ */
-class PlotTwisted {
-  constructor(){
-    this.state={
-      screen:'start',mode:'classic',category:null,
-      questions:[],idx:0,totalScore:0,strikes:3,pot:500,
-      revealedIdx:[],guessedLetters:[],results:[],seen:{},
-      classicDone:false,
-      dailyQuestions:[],dailyIdx:0,dailyResults:[],dailyCompleted:false
-    };
-    this.config={maxPot:500,letterCost:30,minPot:50,qPerRound:5,
-      classicBase:100,classicPenalty:15,classicMin:40};
-    this.clueBank=null;
-    this.settings={sound:false};
-    this._keyHandler=null;
-    this._lastFeedback={};
-  }
-
-  async init(){
-    this.cacheDOM();
-    this.bindEvents();
-    this.loadSettings();
-    this.loadSeen();
-    buildStartPerfs();
-    buildPerfs(document.getElementById('srPerfsL'));
-    buildPerfs(document.getElementById('srPerfsR'));
-    await this.loadClues();
-    new InstallManager();
-    this.loadQuote();
-    this.checkDailyStatus();
-    this.showScreen('start');
-  }
-
-  async loadClues(){
-    try{
-      const r=await fetch('./clues.json');
-      if(!r.ok) throw new Error('fetch failed');
-      this.clueBank=await r.json();
-      this.dom.quickPlayBtn.disabled=false;
-      this.dom.dailyBtn.disabled=false;
-    }catch(e){
-      console.error(e);
-      document.querySelector('#loadingFallback .loading-text-sm').textContent='Failed to load. Please refresh.';
-      document.getElementById('loadingFallback').classList.remove('hidden');
-    }
-  }
-
-  cacheDOM(){
-    const g=id=>document.getElementById(id);
-    this.screens={
-      start:g('startScreen'),mode:g('modeScreen'),category:g('categoryScreen'),
-      howToPlay:g('howToPlayScreen'),settings:g('settingsScreen'),
-      game:g('gameScreen'),daily:g('dailyScreen'),
-      dailyResults:g('dailyResultsScreen'),gameOver:g('gameOverScreen')
-    };
-    this.dom={
-      quickPlayBtn:g('quickPlayBtn'),dailyBtn:g('dailyBtn'),
-      categoryGrid:g('categoryGrid'),startGameBtn:g('startGameBtn'),
-      classicCard:g('classicCard'),marqueeCard:g('marqueeCard'),
-      modeContinueBtn:g('modeContinueBtn'),modeBackBtn:g('modeBackBtn'),
-      clueText:g('clueText'),clueCard:g('clueCard'),
-      clapperScene:g('clapperScene'),clapperGenre:g('clapperGenre'),
-      clueCaseLine:g('clueCaseLine'),clueFilmNum:g('clueFilmNum'),
-      genreBadge:g('genreBadge'),
-      titleLetters:g('titleLetters'),
-      marqueeControls:g('marqueeControls'),
-      classicControls:g('classicControls'),
-      classicInput:g('classicInput'),
-      classicSubmitBtn:g('classicSubmitBtn'),
-      classicRevealBtn:g('classicRevealBtn'),
-      classicFeedback:g('classicFeedback'),
-      classicReveal:g('classicReveal'),
-      classicNextBtn:g('classicNextBtn'),
-      potValue:g('potValue'),potMult:g('potMult'),
-      totalScore:g('totalScore'),
-      strikesDisplay:g('strikesDisplay'),
-      strikesStatBlock:g('strikesStatBlock'),
-      reelTrack:g('reelTrack'),
-      keyboard:g('keyboard'),
-      giveUpBtn:g('giveUpBtn'),solveBtn:g('solveBtn'),
-      solveModal:g('solveModal'),solveInput:g('solveInput'),
-      quitModal:g('quitModal'),
-      resultOverlay:g('resultOverlay'),
-      resultIcon:g('resultIcon'),resultTitleText:g('resultTitleText'),
-      resultMovieName:g('resultMovieName'),resultPtsText:g('resultPtsText'),
-      continueBtn:g('continueBtn'),
-      soundToggle:g('soundToggle'),
-      finalScore:g('finalScore'),finalSubtitle:g('finalSubtitle'),
-      finalBreakdown:g('finalBreakdown'),
-      startQuote:g('startQuote'),startQuoteSrc:g('startQuoteSrc'),
-      dailyDateDisplay:g('dailyDateDisplay'),
-      dailyReelTrack:g('dailyReelTrack'),
-      dailyClueText:g('dailyClueText'),dailyCaseLine:g('dailyCaseLine'),
-      dailyFilmNum:g('dailyFilmNum'),
-      dailyInput:g('dailyInput'),
-      dailyStars:g('dailyStars'),dailyScoreText:g('dailyScoreText'),
-      dailyBreakdown:g('dailyBreakdown'),
-      dailyResultsDate:g('dailyResultsDate'),dailyNextText:g('dailyNextText'),
-      prevResultsList:g('prevResultsList'),
-      gameTicker:g('gameTicker'),
-      intelText:g('intelText'),
-    };
-  }
-
-  bindEvents(){
-    const g=id=>document.getElementById(id);
-    this.dom.quickPlayBtn.onclick=()=>this.showModeScreen();
-    this.dom.dailyBtn.onclick=()=>this.startDaily();
-    g('howToPlayBtn').onclick=()=>this.showScreen('howToPlay');
-    g('howToBackBtn').onclick=()=>this.showScreen('start');
-    g('howToGameBtn').onclick=()=>this.showScreen('howToPlay');
-    g('settingsBtn').onclick=()=>this.showScreen('settings');
-    g('settingsBackBtn').onclick=()=>this.showScreen('start');
-    this.dom.soundToggle.onclick=()=>this.toggleSound();
-    this.dom.modeBackBtn.onclick=()=>this.showScreen('start');
-    this.dom.modeContinueBtn.onclick=()=>this.showCategoryScreen();
-    this.dom.classicCard.onclick=()=>this.selectMode('classic');
-    this.dom.marqueeCard.onclick=()=>this.selectMode('marquee');
-    g('categoryBackBtn').onclick=()=>this.showScreen('mode');
-    this.dom.startGameBtn.onclick=()=>this.startGame();
-    this.dom.giveUpBtn.onclick=()=>this.giveUp();
-    this.dom.solveBtn.onclick=()=>this.openSolveModal();
-    g('quitBtn').onclick=()=>this.dom.quitModal.classList.add('active');
-    g('cancelQuitBtn').onclick=()=>this.dom.quitModal.classList.remove('active');
-    g('confirmQuitBtn').onclick=()=>{this.dom.quitModal.classList.remove('active');this.showScreen('start');};
-    g('cancelSolveBtn').onclick=()=>this.closeSolveModal();
-    g('submitSolveBtn').onclick=()=>this.submitSolve();
-    this.dom.solveInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();this.submitSolve();}if(e.key==='Escape')this.closeSolveModal();});
-    this.dom.continueBtn.onclick=()=>{};
-    g('playAgainBtn').onclick=()=>this.playAgain();
-    g('shareBtn').onclick=()=>this.shareScore();
-    g('menuBtn').onclick=()=>this.showScreen('start');
-    g('dailyQuitBtn').onclick=()=>this.showScreen('start');
-    this.dom.dailyInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();this.submitDailyGuess();}});
-    g('dailySubmitBtn').onclick=()=>this.submitDailyGuess();
-    g('dailySkipBtn').onclick=()=>this.skipDailyQuestion();
-    g('dailyShareBtn').onclick=()=>this.shareDailyScore();
-    g('dailyMenuBtn').onclick=()=>this.showScreen('start');
-    this.dom.classicSubmitBtn.onclick=()=>this.submitClassic();
-    this.dom.classicRevealBtn.onclick=()=>this.revealClassic();
-    this.dom.classicNextBtn.onclick=()=>this.advanceClassic();
-    this.dom.classicInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();this.submitClassic();}});
-  }
-
-  /* ── PHYSICAL KEYBOARD ── */
-  attachKeyboard(){
-    if(this._keyHandler) return;
-    this._keyHandler=(e)=>{
-      const tag=document.activeElement?.tagName;
-      if(tag==='INPUT'||tag==='TEXTAREA') return;
-      if(this.state.screen!=='game'||this.state.mode!=='marquee') return;
-      if(this.dom.solveModal.classList.contains('active')) return;
-      if(this.dom.resultOverlay.classList.contains('active')) return;
-      const k=e.key.toUpperCase();
-      if(e.key==='Enter'){e.preventDefault();this.openSolveModal();return;}
-      if(e.key==='Escape'){e.preventDefault();this.dom.quitModal.classList.remove('active');return;}
-      if(/^[A-Z]$/.test(k)){
-        e.preventDefault();
-        if(!this.state.guessedLetters.includes(k)){
-          const keyEl=this.dom.keyboard.querySelector(`[data-letter="${k}"]`);
-          if(keyEl&&!keyEl.disabled) this.guessLetter(k);
-        }
-      }
-    };
-    document.addEventListener('keydown',this._keyHandler);
-  }
-  detachKeyboard(){
-    if(this._keyHandler){document.removeEventListener('keydown',this._keyHandler);this._keyHandler=null;}
-  }
-
-  /* ── SETTINGS ── */
-  loadSettings(){
-    const s=localStorage.getItem('ptSettings');
-    this.settings=s?JSON.parse(s):{sound:false};
-    this.dom.soundToggle.classList.toggle('active',!!this.settings.sound);
-  }
-  saveSettings(){localStorage.setItem('ptSettings',JSON.stringify(this.settings));}
-  toggleSound(){this.settings.sound=!this.settings.sound;this.dom.soundToggle.classList.toggle('active',this.settings.sound);this.saveSettings();}
-
-  /* ── SCREENS ── */
-  showScreen(name){
-    Object.values(this.screens).forEach(s=>s.classList.remove('active'));
-    this.screens[name]?.classList.add('active');
-    this.state.screen=name;
-    if(name==='game') this.attachKeyboard();
-    else this.detachKeyboard();
-  }
-
-  /* ── QUOTE ── */
-  loadQuote(){
-    const today=new Date().toDateString();
-    let i=parseInt(localStorage.getItem('ptQI'),10);
-    if(localStorage.getItem('ptQD')!==today||isNaN(i)){
-      i=Math.floor(Math.random()*DAILY_QUOTES.length);
-      localStorage.setItem('ptQD',today);
-      localStorage.setItem('ptQI',String(i));
-    }
-    const q=DAILY_QUOTES[i]||DAILY_QUOTES[0];
-    this.dom.startQuote.textContent=`"${q.quote}"`;
-    this.dom.startQuoteSrc.textContent=`— ${q.source}`;
-  }
-
-  /* ── MODE / CATEGORY SELECTION ── */
-  showModeScreen(){this.selectMode(this.state.mode||'classic');this.showScreen('mode');}
-  selectMode(m){
-    this.state.mode=m;
-    this.dom.classicCard.classList.toggle('selected',m==='classic');
-    this.dom.marqueeCard.classList.toggle('selected',m==='marquee');
-  }
-  showCategoryScreen(){
-    this.renderCategories();
-    this.state.category=null;
-    this.dom.startGameBtn.disabled=true;
-    this.showScreen('category');
-  }
-  renderCategories(){
-    if(!this.clueBank) return;
-    this.dom.categoryGrid.innerHTML='';
-    Object.keys(this.clueBank).forEach(name=>{
-      const card=document.createElement('div');
-      card.className='category-card';
-      card.dataset.cat=name;
-      card.innerHTML=`<div class="cat-icon">${CATEGORY_ICONS[name]||CATEGORY_ICONS.Family}</div><div class="cat-name">${DISPLAY_NAMES[name]||name}</div>`;
-      card.onclick=()=>this.selectCategory(name);
-      this.dom.categoryGrid.appendChild(card);
-    });
-  }
-  selectCategory(name){
-    document.querySelectorAll('.category-card').forEach(c=>c.classList.remove('selected'));
-    document.querySelector(`.category-card[data-cat="${name}"]`)?.classList.add('selected');
-    this.state.category=name;
-    this.dom.startGameBtn.disabled=false;
-  }
-
-  /* ── GAME START ── */
-  startGame(){
-    const cat=this.state.category;
-    const all=this.clueBank[cat];
-    const seen=this.state.seen[cat]||[];
-    const unseen=all.filter(c=>!seen.includes(c.title));
-    const seenClues=all.filter(c=>seen.includes(c.title));
-    let pool=this.shuffle(unseen);
-    if(pool.length<this.config.qPerRound) pool=[...pool,...this.shuffle(seenClues)];
-    this.state.questions=pool.slice(0,this.config.qPerRound);
-    if(!this.state.seen[cat]) this.state.seen[cat]=[];
-    this.state.questions.forEach(q=>{if(!this.state.seen[cat].includes(q.title))this.state.seen[cat].push(q.title);});
-    this.saveSeen();
-    this.state.idx=0;this.state.totalScore=0;this.state.strikes=3;
-    this.state.results=[];this.state.classicDone=false;
-    this.buildReelTrack(this.dom.reelTrack);
-    this.updateScore();this.updateStrikes();
-    this.showScreen('game');
-    this.configureMode();
-    this.updateTicker();
-    this.loadQuestion();
-  }
-  configureMode(){
-    const isC=this.state.mode==='classic';
-    this.dom.marqueeControls.style.display=isC?'none':'block';
-    this.dom.classicControls.style.display=isC?'flex':'none';
-    this.dom.strikesStatBlock.style.display=isC?'none':'flex';
-    this.dom.potMult.style.display=isC?'none':'inline-block';
-  }
-  updateTicker(){
-    const modeLabel=this.state.mode==='marquee'?'Marquee Mode':'Classic Mode';
-    const catLabel=DISPLAY_NAMES[this.state.category]||this.state.category||'';
-    this.dom.gameTicker.innerHTML=`
-      <span class="ticker-item active">${modeLabel}</span>
-      <span class="ticker-item">${catLabel}</span>
-      <span class="ticker-item">Film ${this.state.idx+1} of ${this.config.qPerRound}</span>
-    `;
-  }
-
-  loadQuestion(){
-    const q=this.state.questions[this.state.idx];
-    const isC=this.state.mode==='classic';
-    this.state.pot=isC?this.config.classicBase:this.config.maxPot;
-    this.state.revealedIdx=[];
-    this.state.guessedLetters=[];
-    this.state.classicDone=false;
-
-    const dt=this.displayTitle(q.title).toUpperCase();
-    dt.split('').forEach((ch,i)=>{if(/[0-9]/.test(ch)) this.state.revealedIdx.push(i);});
-
-    const cat=this.state.category;
-    const caseNum=String(this.state.idx+1).padStart(3,'0');
-    this.dom.clapperScene.textContent=caseNum;
-    this.dom.clapperGenre.textContent=(DISPLAY_NAMES[cat]||cat||'').toUpperCase();
-    this.dom.clueCaseLine.textContent=`Plot Summary · Case #${cat?cat.substring(0,2).toUpperCase():'XX'}-${caseNum}`;
-    this.dom.clueText.textContent=q.clue;
-    this.dom.clueFilmNum.textContent=`Film ${this.state.idx+1} of ${this.config.qPerRound}`;
-    this.dom.genreBadge.textContent=(DISPLAY_NAMES[cat]||cat||'').toUpperCase();
-
-    this.updatePot();
-    this.updateReelTrack(this.dom.reelTrack);
-    this.updateTicker();
-    this.updatePrevResults();
-
-    if(isC) this.loadClassicQ();
-    else{this.renderTitle();this.renderKeyboard();}
-  }
-
-  updatePrevResults(){
-    const list=this.dom.prevResultsList;
-    list.innerHTML='';
-    const prev=this.state.results.slice(-3);
-    if(prev.length===0){
-      const r=document.createElement('div');r.className='result-row';
-      r.innerHTML=`<span class="result-title-t" style="color:var(--cream-faint)">No results yet</span>`;
-      list.appendChild(r);
-    } else {
-      prev.forEach(r=>{
-        const d=document.createElement('div');d.className='result-row';
-        d.innerHTML=`<span class="result-title-t">${r.title}</span><span class="result-pts-t ${r.correct?'':'zero'}">${r.correct?'+'+r.points:'—'}</span>`;
-        list.appendChild(d);
+    function buildPips() {
+      const row = document.getElementById('pipRow');
+      row.innerHTML = '';
+      DEMO.forEach((_,i) => {
+        const p = document.createElement('div');
+        p.className = 'pip' + (i < idx ? ' done' : i === idx ? ' active' : '');
+        row.appendChild(p);
       });
+      document.getElementById('clueNum').textContent = `${idx+1} / ${DEMO.length}`;
     }
-    // Pending
-    const d=document.createElement('div');d.className='result-row';
-    d.innerHTML=`<span class="result-title-t" style="color:var(--cream-faint)">In progress…</span><span class="result-pts-t zero">—</span>`;
-    list.appendChild(d);
-  }
 
-  /* ── CLASSIC MODE ── */
-  loadClassicQ(){
-    this.state.pot=this.config.classicBase;
-    this.updatePot();
-    this.dom.classicInput.value='';
-    this.dom.classicInput.disabled=false;
-    this.dom.classicSubmitBtn.disabled=false;
-    this.dom.classicRevealBtn.disabled=false;
-    this.dom.classicFeedback.textContent=pickFeedback('fallback');
-    this.dom.classicFeedback.className='classic-feedback';
-    this.dom.classicReveal.textContent='Need a hint? Use Skip / Reveal.';
-    this.dom.classicReveal.className='classic-reveal';
-    this.dom.classicNextBtn.className='btn btn-classic-next';
-    setTimeout(()=>this.dom.classicInput.focus(),80);
-  }
-  submitClassic(){
-    if(this.state.classicDone) return;
-    const guess=this.dom.classicInput.value.trim();
-    if(!guess) return;
-    const q=this.state.questions[this.state.idx];
-    if(this.isMatch(guess,q.title,q)){
-      this.state.classicDone=true;
-      this.state.results.push({title:q.title,points:this.state.pot,correct:true});
-      this.state.totalScore+=this.state.pot;
-      this.updateScore();
-      this.dom.classicFeedback.textContent=pickFeedback('correct');
-      this.dom.classicFeedback.className='classic-feedback correct';
-      this.dom.classicReveal.textContent=`Answer: ${q.title}`;
-      this.dom.classicReveal.className='classic-reveal has-answer';
-      this.dom.classicInput.disabled=true;
-      this.dom.classicSubmitBtn.disabled=true;
-      this.dom.classicRevealBtn.disabled=true;
-      this.dom.classicNextBtn.className='btn btn-classic-next visible';
-    } else {
-      this.state.pot=Math.max(this.config.classicMin,this.state.pot-this.config.classicPenalty);
-      this.updatePot(true);
-      this.dom.classicFeedback.textContent=pickFeedback('wrong');
-      this.dom.classicFeedback.className='classic-feedback incorrect';
-      this.dom.classicInput.focus();this.dom.classicInput.select();
+    function handleReveal() {
+      if (shown) return;
+      shown = true;
+      const btn = document.getElementById('revealBtn');
+      btn.textContent = DEMO[idx].title;
+      btn.classList.add('shown');
+      document.getElementById('nextBtn').classList.add('vis');
     }
-  }
-  revealClassic(){
-    if(this.state.classicDone) return;
-    const q=this.state.questions[this.state.idx];
-    this.state.classicDone=true;
-    this.state.results.push({title:q.title,points:0,correct:false,gaveUp:true});
-    this.dom.classicFeedback.textContent=pickFeedback('giveUp');
-    this.dom.classicFeedback.className='classic-feedback incorrect';
-    this.dom.classicReveal.textContent=pickFeedback('reveal',{title:q.title});
-    this.dom.classicReveal.className='classic-reveal has-answer';
-    this.dom.classicInput.disabled=true;
-    this.dom.classicSubmitBtn.disabled=true;
-    this.dom.classicRevealBtn.disabled=true;
-    this.dom.classicNextBtn.className='btn btn-classic-next visible';
-  }
-  advanceClassic(){if(this.state.classicDone) this.nextQuestion();}
 
-  /* ── MARQUEE MODE ── */
-  renderTitle(){
-    const q=this.state.questions[this.state.idx];
-    const dt=this.displayTitle(q.title).toUpperCase();
-    this.dom.titleLetters.innerHTML='';
-    dt.split('').forEach((ch,i)=>{
-      const s=document.createElement('span');
-      if(ch===' '){s.className='tl-space';s.textContent=' ';}
-      else if(/[A-Z0-9]/.test(ch)){
-        if(this.state.revealedIdx.includes(i)){s.className='tl-show revealed';s.textContent=ch;}
-        else{s.className='tl-hide';s.textContent='_';}
-      } else{s.className='tl-show';s.textContent=ch;}
-      this.dom.titleLetters.appendChild(s);
-    });
-  }
-  renderKeyboard(){
-    const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
-    this.dom.keyboard.innerHTML='';
-    rows.forEach(row=>{
-      const rowEl=document.createElement('div');rowEl.className='kb-row';
-      row.split('').forEach(l=>{
-        const k=document.createElement('button');
-        k.className='key';k.textContent=l;k.dataset.letter=l;
-        if(this.state.guessedLetters.includes(l)){
-          k.disabled=true;
-          k.classList.add(this.letterInTitle(l)?'hit':'miss');
-        }
-        k.onclick=()=>this.guessLetter(l);
-        rowEl.appendChild(k);
+    function nextClue() {
+      idx = (idx + 1) % DEMO.length;
+      shown = false;
+      const btn = document.getElementById('revealBtn');
+      btn.textContent = 'REVEAL TITLE';
+      btn.classList.remove('shown');
+      document.getElementById('nextBtn').classList.remove('vis');
+      document.getElementById('clueSerial').textContent = DEMO[idx].serial;
+      document.getElementById('clueText').textContent   = DEMO[idx].clue;
+      buildPips();
+    }
+
+    buildPips();
+
+    /* ── Scrolling marquee ──────────────────────── */
+    (function() {
+      const ITEMS = [
+        "NOW PLAYING","DAILY CHALLENGE LIVE","1,200+ CLUES",
+        "MARQUEE MODE","NOBODY APPROVED THIS","CLASSIC MODE",
+        "RATE YOUR CINEMATIC IQ","NO SPOILER MERCY",
+        "GUESS THE MOVIE","STREAMING HITS","DAILY RITUAL",
+      ];
+      const inner = document.getElementById('marqueeInner');
+      [...ITEMS, ...ITEMS].forEach(t => {
+        const el = document.createElement('div');
+        el.className = 'marquee-item';
+        el.innerHTML = `<span class="mbulb"></span>${t}<span class="mbulb b"></span>`;
+        inner.appendChild(el);
       });
-      this.dom.keyboard.appendChild(rowEl);
-    });
-  }
-  letterInTitle(l){
-    const q=this.state.questions[this.state.idx];
-    return this.displayTitle(q.title).toUpperCase().includes(l);
-  }
-  guessLetter(l){
-    if(this.state.guessedLetters.includes(l)) return;
-    this.state.guessedLetters.push(l);
-    const q=this.state.questions[this.state.idx];
-    const dt=this.displayTitle(q.title).toUpperCase();
-    let found=false;
-    dt.split('').forEach((ch,i)=>{if(ch===l){this.state.revealedIdx.push(i);found=true;}});
-    const vowels=['A','E','I','O','U'];
-    if(!found&&!vowels.includes(l)){
-      this.state.pot=Math.max(this.config.minPot,this.state.pot-this.config.letterCost);
-      this.updatePot(true);
-    }
-    this.renderTitle();
-    this.renderKeyboard();
-    this.updateMult();
-    const allIdx=[];
-    dt.split('').forEach((ch,i)=>{if(/[A-Z0-9]/.test(ch)) allIdx.push(i);});
-    if(allIdx.every(i=>this.state.revealedIdx.includes(i))) this.autoSolve();
-  }
-  autoSolve(){
-    const q=this.state.questions[this.state.idx];
-    const pts=Math.round(this.state.pot*this.getMult());
-    this.state.results.push({title:q.title,points:pts,correct:true});
-    this.state.totalScore+=pts;
-    this.updateScore();
-    this.showResult(true,q.title,pts);
-    try{if(typeof confetti==='function') confetti({particleCount:70,spread:55,origin:{y:0.6},colors:['#D4A843','#F5C842','#ffffff'],disableForReducedMotion:true});}catch(e){}
-  }
-  giveUp(){
-    if(this.state.mode!=='marquee') return;
-    const q=this.state.questions[this.state.idx];
-    this.state.results.push({title:q.title,points:0,correct:false,gaveUp:true});
-    const dt=this.displayTitle(q.title).toUpperCase();
-    dt.split('').forEach((ch,i)=>{if(/[A-Z0-9]/.test(ch)) this.state.revealedIdx.push(i);});
-    this.renderTitle();
-    this.showResult(false,q.title,0,false,true);
-  }
-  openSolveModal(){
-    if(this.state.mode!=='marquee') return;
-    this.dom.solveModal.classList.add('active');
-    this.dom.solveInput.value='';
-    setTimeout(()=>this.dom.solveInput.focus(),100);
-  }
-  closeSolveModal(){this.dom.solveModal.classList.remove('active');}
-  submitSolve(){
-    const guess=this.dom.solveInput.value.trim();
-    if(!guess) return;
-    const q=this.state.questions[this.state.idx];
-    this.closeSolveModal();
-    if(this.isMatch(guess,q.title,q)) this.handleCorrect();
-    else this.handleIncorrect();
-  }
-  handleCorrect(){
-    const q=this.state.questions[this.state.idx];
-    const pts=Math.round(this.state.pot*this.getMult());
-    this.state.results.push({title:q.title,points:pts,correct:true});
-    this.state.totalScore+=pts;
-    this.updateScore();
-    const dt=this.displayTitle(q.title).toUpperCase();
-    dt.split('').forEach((ch,i)=>{if(/[A-Z0-9]/.test(ch)) this.state.revealedIdx.push(i);});
-    this.renderTitle();
-    this.showResult(true,q.title,pts);
-    try{if(typeof confetti==='function') confetti({particleCount:70,spread:55,origin:{y:0.6},colors:['#D4A843','#F5C842','#ffffff'],disableForReducedMotion:true});}catch(e){}
-  }
-  handleIncorrect(){
-    const q=this.state.questions[this.state.idx];
-    this.state.strikes--;
-    this.updateStrikes();
-    this.dom.clueCard.classList.add('shake');
-    setTimeout(()=>this.dom.clueCard.classList.remove('shake'),400);
-    if(this.state.strikes<=0){
-      this.state.results.push({title:q.title,points:0,correct:false});
-      this.showResult(false,q.title,0,true);
-    } else {
-      this.showResult(false,q.title,0,false);
-    }
-  }
-
-  showResult(correct,title,pts,gameOver=false,gaveUp=false){
-    const commentary=pickFeedback(correct?'correct':(gaveUp?'giveUp':'wrong'),{title});
-    this.dom.resultIcon.textContent=correct?'🎬':(gaveUp?'🏳️':'❌');
-    this.dom.resultTitleText.textContent=commentary;
-    this.dom.resultTitleText.className=`result-title-text ${correct?'correct':'incorrect'}`;
-    if(correct||gaveUp||gameOver){this.dom.resultMovieName.textContent=title.toUpperCase();this.dom.resultMovieName.style.display='block';}
-    else{this.dom.resultMovieName.style.display='none';}
-    if(correct){this.dom.resultPtsText.textContent=`+${pts} points`;this.dom.resultPtsText.className='result-pts-text';}
-    else if(gameOver){this.dom.resultPtsText.textContent='Out of strikes';this.dom.resultPtsText.className='result-pts-text zero';}
-    else if(gaveUp){this.dom.resultPtsText.textContent='0 points';this.dom.resultPtsText.className='result-pts-text zero';}
-    else{this.dom.resultPtsText.textContent=`${this.state.strikes} strike${this.state.strikes!==1?'s':''} left`;this.dom.resultPtsText.className='result-pts-text zero';}
-
-    if(!correct&&!gameOver&&!gaveUp){
-      this.dom.continueBtn.textContent='Try Again';
-      this.dom.continueBtn.onclick=()=>this.dom.resultOverlay.classList.remove('active');
-    } else {
-      this.dom.continueBtn.textContent='Continue →';
-      this.dom.continueBtn.onclick=()=>{
-        this.dom.resultOverlay.classList.remove('active');
-        if(gameOver) this.endGame();
-        else this.nextQuestion();
-      };
-    }
-    this.dom.resultOverlay.classList.add('active');
-  }
-
-  nextQuestion(){
-    this.state.idx++;
-    if(this.state.idx>=this.state.questions.length) this.endGame();
-    else this.loadQuestion();
-  }
-
-  endGame(){
-    const solved=this.state.results.filter(r=>r.correct).length;
-    this.dom.finalScore.textContent=this.state.totalScore;
-    this.dom.finalSubtitle.textContent=`${solved} of ${this.state.results.length} films solved`;
-    this.dom.finalBreakdown.innerHTML='';
-    this.state.results.forEach(r=>{
-      const row=document.createElement('div');row.className='br-row';
-      row.innerHTML=`<span class="br-title">${r.title}</span><span class="br-pts ${r.correct?'earned':'missed'}">${r.correct?'+'+r.points:'—'}</span>`;
-      this.dom.finalBreakdown.appendChild(row);
-    });
-    this.showScreen('gameOver');
-  }
-
-  playAgain(){if(this.state.category) this.startGame();else this.showCategoryScreen();}
-  shareScore(){
-    const solved=this.state.results.filter(r=>r.correct).length;
-    const emoji=this.state.results.map(r=>r.correct?'🟨':(r.gaveUp?'⬜':'🟥')).join('');
-    const text=`🎬 Plot Twisted — ${DISPLAY_NAMES[this.state.category]||this.state.category}\n🏆 ${this.state.totalScore} pts\n${emoji}\n${solved}/${this.state.results.length} correct`;
-    if(navigator.share) navigator.share({text}).catch(()=>this.copy(text));
-    else this.copy(text);
-  }
-  copy(t){navigator.clipboard.writeText(t).then(()=>alert('Copied to clipboard!')).catch(()=>{});}
-
-  /* ── DAILY ── */
-  todayKey(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-  checkDailyStatus(){
-    const s=localStorage.getItem(`ptDaily_${this.todayKey()}`);
-    if(s){this.state.dailyCompleted=true;this.state.dailyResults=JSON.parse(s);}
-    else{this.state.dailyCompleted=false;this.state.dailyResults=[];}
-  }
-  startDaily(){
-    this.checkDailyStatus();
-    if(this.state.dailyCompleted){this.showDailyResults();return;}
-    const seed=parseInt(this.todayKey().replace(/-/g,''),10);
-    const rng=this.seededRng(seed);
-    const cats=Object.keys(this.clueBank);
-    const sc=this.shuffleRng(cats,rng);
-    this.state.dailyQuestions=[];
-    for(let i=0;i<5;i++){
-      const cat=sc[i%sc.length];
-      const clues=this.clueBank[cat];
-      this.state.dailyQuestions.push({...clues[Math.floor(rng()*clues.length)],category:cat});
-    }
-    this.state.dailyIdx=0;this.state.dailyResults=[];
-    const today=new Date();
-    this.dom.dailyDateDisplay.textContent=today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-    this.buildReelTrack(this.dom.dailyReelTrack);
-    this.updateDailyReel();
-    this.loadDailyQ();
-    this.showScreen('daily');
-  }
-  seededRng(s){return()=>{s=(s*9301+49297)%233280;return s/233280;};}
-  shuffleRng(a,rng){const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;}
-  loadDailyQ(){
-    const q=this.state.dailyQuestions[this.state.dailyIdx];
-    const n=this.state.dailyIdx+1;
-    this.dom.dailyFilmNum.textContent=n;
-    const caseNum=String(n).padStart(3,'0');
-    this.dom.dailyCaseLine.textContent=`Plot Summary · Daily Case #${caseNum}`;
-    this.dom.dailyClueText.textContent=q.clue;
-    this.dom.dailyInput.value='';
-    this.dom.dailyInput.disabled=false;
-    setTimeout(()=>this.dom.dailyInput.focus(),80);
-  }
-  submitDailyGuess(){
-    const guess=this.dom.dailyInput.value.trim();if(!guess)return;
-    const q=this.state.dailyQuestions[this.state.dailyIdx];
-    const correct=this.isMatch(guess,q.title,q);
-    this.state.dailyResults.push({title:q.title,correct,skipped:false});
-    this.dom.dailyInput.disabled=true;
-    this.advanceDaily();
-  }
-  skipDailyQuestion(){
-    const q=this.state.dailyQuestions[this.state.dailyIdx];
-    this.state.dailyResults.push({title:q.title,correct:false,skipped:true});
-    this.advanceDaily();
-  }
-  advanceDaily(){
-    this.state.dailyIdx++;
-    this.updateDailyReel();
-    if(this.state.dailyIdx>=5) this.finishDaily();
-    else this.loadDailyQ();
-  }
-  updateDailyReel(){this.updateReelTrack(this.dom.dailyReelTrack,this.state.dailyIdx);}
-  finishDaily(){
-    localStorage.setItem(`ptDaily_${this.todayKey()}`,JSON.stringify(this.state.dailyResults));
-    this.state.dailyCompleted=true;
-    this.showDailyResults();
-  }
-  showDailyResults(){
-    const results=this.state.dailyResults;
-    const correct=results.filter(r=>r.correct).length;
-    const today=new Date();
-    this.dom.dailyResultsDate.textContent=today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-    this.dom.dailyStars.innerHTML='';
-    for(let i=0;i<5;i++){
-      const s=document.createElement('span');
-      s.className=`daily-star ${i<correct?'earned':'empty'}`;s.textContent='★';
-      this.dom.dailyStars.appendChild(s);
-    }
-    this.dom.dailyScoreText.textContent=`${correct}/5 Correct`;
-    this.dom.dailyBreakdown.innerHTML='';
-    results.forEach(r=>{
-      const row=document.createElement('div');row.className='daily-br-row';
-      row.innerHTML=`<span>${r.title}</span><span>${r.correct?'✅':(r.skipped?'⏭️':'❌')}</span>`;
-      this.dom.dailyBreakdown.appendChild(row);
-    });
-    const now=new Date();const tom=new Date(now);tom.setDate(tom.getDate()+1);tom.setHours(0,0,0,0);
-    const diff=tom-now;const h=Math.floor(diff/3600000);const m=Math.floor((diff%3600000)/60000);
-    this.dom.dailyNextText.textContent=`Next puzzle in ${h}h ${m}m`;
-    this.showScreen('dailyResults');
-  }
-  shareDailyScore(){
-    const results=this.state.dailyResults;
-    const correct=results.filter(r=>r.correct).length;
-    const today=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    const emoji=results.map(r=>r.correct?'⭐':'☆').join('');
-    const text=`🎬 Plot Twisted Daily — ${today}\n${emoji} ${correct}/5`;
-    if(navigator.share) navigator.share({text}).catch(()=>this.copy(text));
-    else this.copy(text);
-  }
-
-  /* ── REEL TRACK ── */
-  buildReelTrack(el){
-    if(!el)return;el.innerHTML='';
-    for(let i=0;i<this.config.qPerRound;i++){
-      const f=document.createElement('div');f.className='reel-frame';
-      f.innerHTML=`<span class="reel-num">${i+1}</span>`;
-      el.appendChild(f);
-    }
-  }
-  updateReelTrack(el,idx){
-    if(!el)return;
-    const cur=idx!==undefined?idx:this.state.idx;
-    el.querySelectorAll('.reel-frame').forEach((f,i)=>{
-      f.classList.remove('done','current');
-      if(i<cur) f.classList.add('done');
-      else if(i===cur) f.classList.add('current');
-    });
-  }
-
-  /* ── MULTIPLIER / POT ── */
-  getMult(){
-    const q=this.state.questions[this.state.idx];
-    const dt=this.displayTitle(q.title).toUpperCase();
-    let total=0;dt.split('').forEach(ch=>{if(/[A-Z0-9]/.test(ch))total++;});
-    const pct=(total-this.state.revealedIdx.length)/total;
-    return pct>=0.8?1.5:pct>=0.5?1.25:1;
-  }
-  updateMult(){
-    const m=this.getMult();
-    this.dom.potMult.textContent=m>1?`${m}×`:'';
-  }
-  updatePot(anim=false){
-    if(anim){this.dom.potValue.classList.add('dropping');setTimeout(()=>this.dom.potValue.classList.remove('dropping'),280);}
-    this.dom.potValue.textContent=this.state.pot;
-    if(this.state.mode==='marquee') this.updateMult();
-  }
-  updateScore(){this.dom.totalScore.textContent=this.state.totalScore;}
-  updateStrikes(){
-    const pips=this.dom.strikesDisplay.querySelectorAll('.spip');
-    pips.forEach((p,i)=>p.classList.toggle('out',i>=this.state.strikes));
-  }
-
-  /* ── MATCH ENGINE ── */
-  norm(s){
-    return String(s||'').toLowerCase().trim()
-      .replace(/\([^)]*\)/g,'').replace(/[''`]/g,"'")
-      .replace(/&/g,' and ').replace(/[:\-–—_\/\\]/g,' ')
-      .replace(/[^\w\s']/g,' ').replace(/'/g,'')
-      .replace(/\s+/g,' ').replace(/^(the|a|an)\s+/,'').trim();
-  }
-  displayTitle(t){return t.replace(/\([^)]*\)/g,'').trim();}
-  lev(a,b){
-    const m=[];
-    for(let i=0;i<=b.length;i++) m[i]=[i];
-    for(let j=0;j<=a.length;j++) m[0][j]=j;
-    for(let i=1;i<=b.length;i++) for(let j=1;j<=a.length;j++)
-      m[i][j]=b[i-1]===a[j-1]?m[i-1][j-1]:1+Math.min(m[i-1][j-1],m[i][j-1],m[i-1][j]);
-    return m[b.length][a.length];
-  }
-  sim(a,b){if(!a||!b)return 0;const mx=Math.max(a.length,b.length);return mx?1-this.lev(a,b)/mx:1;}
-  aliases(title,clue={}){
-    const raw=new Set([title,...(Array.isArray(clue.aliases)?clue.aliases:[])]);
-    const parts=title.replace(/\([^)]*\)/g,'').trim().split(/\s*[:\-–—]\s*/).filter(Boolean);
-    if(parts.length){raw.add(parts[0]);if(parts.length>1) raw.add(parts.slice(1).join(' '));}
-    const out=new Set();
-    raw.forEach(e=>{const n=this.norm(e);if(n){out.add(n);out.add(n.replace(/\bmovie\b/g,'').replace(/\s+/g,' ').trim());}});
-    return [...out].filter(Boolean);
-  }
-  isMatch(guess,title,clue={}){
-    const g=this.norm(guess);const nc=this.norm(title);
-    if(!g||!nc) return false;
-    if(nc.length<4||g.length<3) return g===nc;
-    if(g===nc) return true;
-    const al=this.aliases(title,clue);
-    if(al.includes(g)) return true;
-    const escaped=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    const whole=(text,phrase)=>new RegExp(`(^|\\s)${escaped(phrase)}(\\s|$)`).test(text);
-    if(g.length>=4&&al.some(a=>whole(a,g)||(a.length>=4&&whole(g,a)))) return true;
-    const toks=new Set(g.split(' ').filter(Boolean));
-    for(const a of al){
-      if(this.sim(g,a)>=0.83) return true;
-      const aToks=a.split(' ').filter(Boolean);
-      const ov=aToks.filter(t=>toks.has(t)).length;
-      if(ov>=Math.min(2,aToks.length)&&ov/aToks.length>=0.66&&g.length>=4) return true;
-    }
-    return false;
-  }
-
-  /* ── PERSISTENCE ── */
-  loadSeen(){const s=localStorage.getItem('ptSeen');this.state.seen=s?JSON.parse(s):{};}
-  saveSeen(){localStorage.setItem('ptSeen',JSON.stringify(this.state.seen));}
-  shuffle(a){const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;}
-}
-
-/* Boot */
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').then(reg=>{
-      reg.addEventListener('updatefound',()=>{
-        const w=reg.installing;
-        w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'});});
-      });
-    }).catch(()=>{});
-  });
-  navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload());
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  const game=new PlotTwisted();
-  game.init();
-});
-</script>
+    })();
+  </script>
 </body>
 </html>
