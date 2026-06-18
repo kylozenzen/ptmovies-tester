@@ -885,6 +885,10 @@ body{
 }
 @media(min-width:900px){.kb-hint{display:block;}}
 
+/* Marquee controls wrapper */
+#marqueeControls{display:flex;flex-direction:column;gap:clamp(8px,1.2vh,12px);width:100%;}
+#marqueeControls.hidden{display:none;}
+
 /* Action buttons */
 .action-row{display:flex;gap:8px;flex-shrink:0;}
 .btn-give{
@@ -2056,10 +2060,14 @@ class PlotTwisted {
   }
   configureMode(){
     const isC=this.state.mode==='classic';
-    this.dom.marqueeControls.style.display=isC?'none':'block';
+    // Marquee controls: use class toggle to preserve inner flex layout
+    this.dom.marqueeControls.classList.toggle('hidden',isC);
+    // Classic controls: inline flex
     this.dom.classicControls.style.display=isC?'flex':'none';
-    this.dom.strikesStatBlock.style.display=isC?'none':'flex';
-    this.dom.potMult.style.display=isC?'none':'inline-block';
+    // Strikes only shown in marquee mode
+    this.dom.strikesStatBlock.style.display=isC?'none':'';
+    // Multiplier only shown in marquee mode
+    if(this.dom.potMult) this.dom.potMult.style.display=isC?'none':'';
   }
   updateTicker(){
     const modeLabel=this.state.mode==='marquee'?'Marquee Mode':'Classic Mode';
@@ -2544,10 +2552,19 @@ class PlotTwisted {
 /* Boot */
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').then(reg=>{
-      reg.addEventListener('updatefound',()=>{
-        const w=reg.installing;
-        w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)w.postMessage({type:'SKIP_WAITING'});});
+    // Unregister any old service workers first, then register fresh
+    navigator.serviceWorker.getRegistrations().then(regs=>{
+      const stale=regs.filter(r=>r.active&&!r.active.scriptURL.includes('sw.js'));
+      Promise.all(stale.map(r=>r.unregister())).then(()=>{
+        navigator.serviceWorker.register('sw.js?v=4').then(reg=>{
+          reg.addEventListener('updatefound',()=>{
+            const w=reg.installing;
+            if(w) w.addEventListener('statechange',()=>{
+              if(w.state==='installed'&&navigator.serviceWorker.controller)
+                w.postMessage({type:'SKIP_WAITING'});
+            });
+          });
+        }).catch(()=>{});
       });
     }).catch(()=>{});
   });
